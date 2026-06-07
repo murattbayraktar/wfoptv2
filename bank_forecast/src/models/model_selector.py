@@ -93,6 +93,7 @@ class ModelSelector:
         candidates: list[str] = None,
         cfg: dict = None,
         min_training_days: int = 60,
+        progress_callback=None,
     ) -> dict:
         if cfg is None:
             cfg = {}
@@ -107,6 +108,13 @@ class ModelSelector:
 
         all_scores = {}
         console.print(f"\n[cyan]Model seçimi: {transaction_type} / {freq}[/cyan]")
+        if progress_callback:
+            progress_callback({
+                "kind": "selection_start",
+                "type": transaction_type,
+                "freq": freq,
+                "candidates": candidates,
+            })
 
         for model_name in candidates:
             try:
@@ -119,12 +127,30 @@ class ModelSelector:
             except Exception as e:
                 console.print(f"  [red]{model_name}: hata — {e}[/red]")
                 all_scores[model_name] = float("inf")
+            if progress_callback:
+                progress_callback({
+                    "kind": "model_evaluated",
+                    "type": transaction_type,
+                    "freq": freq,
+                    "model": model_name,
+                    "score": all_scores[model_name],
+                    "metric": metric,
+                })
 
         best_model = min(all_scores, key=all_scores.get)
         best_score = all_scores[best_model]
 
         reason = _build_reason(best_model, best_score, all_scores, metric)
         console.print(f"  [green]Seçilen: {best_model} ({metric.upper()}={best_score:.4f})[/green]")
+        if progress_callback:
+            progress_callback({
+                "kind": "model_selected",
+                "type": transaction_type,
+                "freq": freq,
+                "model": best_model,
+                "score": best_score,
+                "reason": reason,
+            })
 
         return {
             "best_model": best_model,

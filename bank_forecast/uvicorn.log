@@ -1,0 +1,1571 @@
+INFO:     Started server process [24944]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 10048] error while attempting to bind on address ('127.0.0INFO:     127.0.0.1:13718 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13722 - "POST /api/retrain HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:13727 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13730 - "POST /api/upload HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13731 - "POST /api/retrain HTTP/1.1" 200 OK
+Veri yükleniyor...
+
+Veri Doğrulama Raporu
+  Toplam satır   : 1,155
+  Tarih aralığı  : 2025-06-02 → 2025-10-24
+  Gün sayısı     : 145
+  İşlem tipleri  : EFT
+  ✓ Veri kalitesi iyi.
+
+──────────────────────────────────────────────────
+Eğitim: EFT_daily
+
+Model seçimi: EFT / daily
+INFO:     127.0.0.1:13732 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13744 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13746 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13781 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13783 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13788 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13790 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13791 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13792 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  xgboost              RMSE = 344.9349
+INFO:     127.0.0.1:13795 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13796 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13799 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13800 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13801 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  lightgbm             RMSE = 495.0463
+INFO:     127.0.0.1:13803 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13804 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13806 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13807 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13808 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13810 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13811 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13812 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13814 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13818 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13822 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13823 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13824 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13825 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13826 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13829 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13835 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13836 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13839 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  random_forest        RMSE = 306.8166
+  holt_winters         RMSE = 373.2679
+  ridge                RMSE = 321.1920
+  Seçilen: random_forest (RMSE=306.8166)
+INFO:     127.0.0.1:13841 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13843 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13845 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13846 - "GET /api/retrain/status HTTP/1.1" 200 OK
+
+──────────────────────────────────────────────────
+Eğitim: EFT_hourly
+
+Model seçimi: EFT / hourly
+INFO:     127.0.0.1:13848 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13849 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13851 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13852 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13853 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13854 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13855 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13857 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13861 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13862 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13864 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13865 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13887 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13893 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13895 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13897 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13898 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13899 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13900 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13902 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13904 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13906 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13907 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13908 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13910 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13911 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13914 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13917 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13918 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13924 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13936 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13937 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13940 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13942 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13943 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13944 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13945 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13946 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13948 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13949 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13950 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13951 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13952 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13953 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13954 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13955 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13956 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13957 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13960 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13961 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13963 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13967 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13969 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13970 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13972 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13981 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13982 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13983 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13985 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13986 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13987 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13989 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13990 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13991 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13993 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13995 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13998 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13999 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14000 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14001 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14002 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14003 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14008 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14009 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14010 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14011 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14012 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14014 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14015 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14016 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14018 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14019 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14020 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14022 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14024 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14025 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14027 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14033 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14034 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14036 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14044 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14045 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14046 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14052 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14054 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14055 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14057 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14060 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14061 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14065 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14068 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14070 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14071 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14072 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14075 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14076 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14077 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14079 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14080 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14081 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14082 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  xgboost              RMSE = 77.0395
+INFO:     127.0.0.1:14083 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14085 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14087 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14092 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14099 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14114 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14118 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14119 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14121 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14122 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14124 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14125 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14126 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14133 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14138 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14139 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14140 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14141 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14142 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14143 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14146 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14149 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14156 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14163 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14168 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14171 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14172 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14173 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14175 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14176 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14177 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14178 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14179 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14180 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14181 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  lightgbm             RMSE = 79.2983
+INFO:     127.0.0.1:14183 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14190 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14192 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14195 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14196 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14197 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14198 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14206 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14208 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14217 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14219 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14221 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14224 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14225 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14228 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14231 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14235 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14238 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14241 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14244 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14247 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14248 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14251 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14254 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14257 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14260 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14263 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14266 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14269 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14270 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14273 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14276 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14279 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14282 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14285 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14288 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14289 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14292 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14295 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14298 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14301 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14304 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14307 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14310 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14311 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14314 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14319 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14323 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14326 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14329 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14332 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14335 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14336 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14339 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14345 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14348 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14352 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14356 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14357 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14360 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14363 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14366 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14369 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14372 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14375 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14378 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14379 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14382 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14385 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14388 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14391 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14394 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14397 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14400 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14401 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14404 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14407 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14410 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14413 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14416 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14419 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14420 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14423 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14426 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14429 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14432 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14435 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14438 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14442 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14443 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14446 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14449 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14452 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14455 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14458 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14459 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14463 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14470 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14475 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14478 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14481 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14482 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14484 - "GET /api/retrain/status HTTP/1.1" 200 OK
+  random_forest        RMSE = 74.9941
+  holt_winters         RMSE = 198.5238
+  ridge                RMSE = 116.9908
+  Seçilen: random_forest (RMSE=74.9941)
+INFO:     127.0.0.1:14488 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14491 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14494 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14497 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14500 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14503 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14506 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14510 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14513 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14514 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14518 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14521 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14526 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14529 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14532 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14535 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14536 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14539 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14543 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14546 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14549 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14552 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14555 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14558 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14559 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14562 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14565 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14569 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14572 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14575 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14578 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14581 - "GET /api/retrain/status HTTP/1.1" 200 OK
+
+Registry kaydedildi: models/saved\model_registry.json
+INFO:     127.0.0.1:14582 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14585 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14586 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14587 - "GET /api/retrain/status HTTP/1.1" 200 OK
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+INFO:     127.0.0.1:14611 - "POST /api/forecast HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14620 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14623 - "GET /api/retrain/status HTTP/1.1" 200 OK
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+INFO:     127.0.0.1:14629 - "POST /api/forecast HTTP/1.1" 200 OK
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+D:\Projects\wfoptv2\bank_forecast\venv\Lib\site-packages\sklearn\utils\validation.py:2820: UserWarning: X has feature names, but DecisionTreeRegressor was fitted without feature names
+  warnings.warn(
+INFO:     127.0.0.1:14637 - "POST /api/forecast HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14907 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14909 - "GET /api/dataset/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14920 - "GET /api/retrain/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:14922 - "GET /api/retrain/status HTTP/1.1" 200 OK

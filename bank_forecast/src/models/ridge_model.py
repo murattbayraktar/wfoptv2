@@ -30,6 +30,10 @@ class RidgeForecaster(BaseForecaster):
         self.model.fit(Xs, y)
         self.metrics["alpha"] = float(self.model.alpha_)
 
+        # Bootstrap PI fallback için eğitim rezidüellerini sakla
+        fitted = np.maximum(self.model.predict(Xs), 0)
+        self._residuals = (y.values - fitted)
+
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         Xs = self._scaler.transform(X[self.feature_names])
         preds = self.model.predict(Xs)

@@ -49,6 +49,7 @@ def train_pipeline(
     output_dir: str = "models/saved",
     report: bool = True,
     config_path: str = "config/settings.yaml",
+    progress_callback=None,
 ) -> dict:
     cfg = load_config(config_path)
     models_cfg = cfg.get("models", {})
@@ -87,14 +88,39 @@ def train_pipeline(
         "models": {},
     }
 
+    if progress_callback:
+        progress_callback({
+            "kind": "data_ready",
+            "row_count": int(len(df)),
+            "transaction_types": available_types,
+            "data_range": registry["data_range"],
+        })
+        total_units = len(types) * len(freqs)
+        progress_callback({
+            "kind": "plan",
+            "total_units": total_units,
+            "types": types,
+            "freqs": freqs,
+        })
+
     selector = ModelSelector()
     all_scores_for_plot = {}
 
+    unit_index = 0
     for transaction_type in types:
         for f in freqs:
             key = f"{transaction_type}_{f}"
+            unit_index += 1
             console.print(f"\n[bold]{'─'*50}[/bold]")
             console.print(f"[bold yellow]Eğitim: {key}[/bold yellow]")
+            if progress_callback:
+                progress_callback({
+                    "kind": "unit_start",
+                    "type": transaction_type,
+                    "freq": f,
+                    "index": unit_index,
+                    "total": len(types) * len(freqs),
+                })
 
             try:
                 if f == "daily":
@@ -126,6 +152,7 @@ def train_pipeline(
                     candidates=candidate_models,
                     cfg=models_cfg,
                     min_training_days=min_days,
+                    progress_callback=progress_callback,
                 )
 
                 # Final model tüm veri üzerinde eğit
@@ -162,13 +189,33 @@ def train_pipeline(
                     fi_path = f"outputs/plots/fi_{key}.html"
                     plot_feature_importance(fi_df, f"Feature Önemi: {key}", fi_path)
 
+                if progress_callback:
+                    progress_callback({
+                        "kind": "unit_done",
+                        "type": transaction_type,
+                        "freq": f,
+                        "model": sel_result["best_model"],
+                        "cv_rmse": sel_result["best_score"],
+                        "feature_importance_top5": top5,
+                    })
+
             except Exception as e:
                 console.print(f"[red]Hata ({key}): {e}[/red]")
                 import traceback
                 traceback.print_exc()
+                if progress_callback:
+                    progress_callback({
+                        "kind": "unit_failed",
+                        "type": transaction_type,
+                        "freq": f,
+                        "error": str(e),
+                    })
 
-    _save_registry(registry, os.path.join(output_dir, "model_registry.json"))
-    console.print(f"\n[green]Registry kaydedildi: {os.path.join(output_dir, 'model_registry.json')}[/green]")
+    registry_path = os.path.join(output_dir, "model_registry.json")
+    _save_registry(registry, registry_path)
+    console.print(f"\n[green]Registry kaydedildi: {registry_path}[/green]")
+    if progress_callback:
+        progress_callback({"kind": "completed", "registry_path": registry_path})
 
     if report:
         try:
