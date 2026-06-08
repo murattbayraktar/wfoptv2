@@ -1,8 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import * as api from '../api/client'
+import { useEffect, useRef } from 'react'
 import type { RetrainStatus, TrainingStep } from '../types'
-
-const POLL_INTERVAL_MS = 1200
 
 const KIND_ICON: Record<string, string> = {
   data_ready: '📥',
@@ -34,33 +31,8 @@ function unitSummaries(steps: TrainingStep[]) {
   return steps.filter((s) => s.kind === 'unit_done')
 }
 
-export default function TrainingProgress({ initialStatus }: { initialStatus?: RetrainStatus | null }) {
-  const [status, setStatus] = useState<RetrainStatus | null>(initialStatus ?? null)
+export default function TrainingProgress({ status }: { status: RetrainStatus | null }) {
   const logRef = useRef<HTMLOListElement>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    let timer: ReturnType<typeof setTimeout> | undefined
-
-    async function tick() {
-      try {
-        const next = await api.getRetrainStatus()
-        if (cancelled) return
-        setStatus(next)
-        if (next.status === 'running' || next.status === 'idle') {
-          timer = setTimeout(tick, POLL_INTERVAL_MS)
-        }
-      } catch {
-        if (!cancelled) timer = setTimeout(tick, POLL_INTERVAL_MS)
-      }
-    }
-
-    void tick()
-    return () => {
-      cancelled = true
-      if (timer) clearTimeout(timer)
-    }
-  }, [])
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' })

@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as api from '../api/client'
-import type { DatasetSummary, ForecastResponse } from '../types'
+import type { DatasetSummary, ForecastResponse, RetrainStatus } from '../types'
+
+const RETRAIN_POLL_INTERVAL_MS = 1500
 
 export type UiStep = 'idle' | 'progress' | 'results'
 
@@ -10,6 +12,13 @@ interface DataContextValue {
   loadingDataset: boolean
   loadDemo: () => Promise<void>
   upload: (file: File) => Promise<void>
+
+  trainModel: string
+  setTrainModel: (v: string) => void
+  startTraining: () => Promise<void>
+  startingTraining: boolean
+  trainingStartError: string | null
+  retrainStatus: RetrainStatus | null
 
   rangeStart: string
   rangeEnd: string
@@ -54,6 +63,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [dataset, setDataset] = useState<DatasetSummary | null>(null)
   const [datasetError, setDatasetError] = useState<string | null>(null)
   const [loadingDataset, setLoadingDataset] = useState(false)
+  const [trainModel, setTrainModel] = useState('auto')
+  const [startingTraining, setStartingTraining] = useState(false)
+  const [trainingStartError, setTrainingStartError] = useState<string | null>(null)
+  const [retrainStatus, setRetrainStatus] = useState<RetrainStatus | null>(null)
 
   const initialRange = defaultRange()
   const [rangeStart, setRangeStart] = useState(initialRange.start)
@@ -80,6 +93,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // sayfa açılışında özet alınamazsa sessizce "veri yok" durumunda kalınır
       })
   }, [])
+
+  const trackingRetrain = dataset?.loaded && dataset.source_kind === 'upload'
+
+  useEffect(() => {
+    if (!trackingRetrain) {
+      setRetrainStatus(null)
+      return
+    }
+    let cancelled = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    async function tick() {
+      try {
+        const next = await api.getRetrainStatus()
+        if (cancelled) return
+        setRetrainStatus(next)
+      } finally {
+        if (!cancelled) timer = setTimeout(tick, RETRAIN_POLL_INTERVAL_MS)
+      }
+    }
+
+    void tick()
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
+    }
+  }, [trackingRetrain])
 
   const loadDemo = useCallback(async () => {
     setLoadingDataset(true)
@@ -114,21 +154,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setRangeStart(suggested.start)
         setRangeEnd(suggested.end)
       }
-      if (summary.source_kind === 'upload') {
-        try {
-          await api.startRetrain({ freq: 'both' })
-        } catch (e) {
-          // Eğitim tetiklenemese bile yükleme başarılıdır; durum /retrain/status üzerinden
-          // TrainingProgress tarafından izlenir — burada sadece konsola loglanır.
-          console.error('Otomatik model eğitimi başlatılamadı:', e)
-        }
-      }
     } catch (e) {
       setDatasetError(e instanceof Error ? e.message : 'Dosya yüklenemedi.')
     } finally {
       setLoadingDataset(false)
     }
   }, [])
+
+  const startTraining = useCallback(async () => {
+    if (retrainStatus?.status === 'running') return
+    setStartingTraining(true)
+    setTrainingStartError(null)
+    try {
+      const models = trainModel === 'auto' ? undefined : [trainModel]
+      await api.startRetrain({ freq: 'both', models })
+      setRetrainStatus(await api.getRetrainStatus())
+    } catch (e) {
+      setTrainingStartError(e instanceof Error ? e.message : 'Eğitim başlatılamadı.')
+    } finally {
+      setStartingTraining(false)
+    }
+  }, [trainModel, retrainStatus])
 
   const createForecast = useCallback(async () => {
     setForecastError(null)
@@ -155,6 +201,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     loadingDataset,
     loadDemo,
     upload,
+    trainModel,
+    setTrainModel,
+    startTraining,
+    startingTraining,
+    trainingStartError,
+    retrainStatus,
     rangeStart,
     rangeEnd,
     setRangeStart,

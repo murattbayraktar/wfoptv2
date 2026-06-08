@@ -45,7 +45,7 @@ export async function runForecast(params: {
   return handleJson<ForecastResponse>(res)
 }
 
-export async function startRetrain(params: { freq?: string; types?: string[] }): Promise<{ status: string }> {
+export async function startRetrain(params: { freq?: string; types?: string[]; models?: string[] }): Promise<{ status: string }> {
   const res = await fetch('/api/retrain', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -1,8 +1,16 @@
 import { useMemo, useState } from 'react'
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import type { ForecastByType } from '../types'
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import type { ComparisonResult, ForecastByType } from '../types'
 
-export default function HourlyBreakdownChart({ type, info }: { type: string; info: ForecastByType }) {
+export default function HourlyBreakdownChart({
+  type,
+  info,
+  comparison,
+}: {
+  type: string
+  info: ForecastByType
+  comparison?: ComparisonResult
+}) {
   const hourly = info.hourly
   const dates = useMemo(() => (hourly ? Object.keys(hourly).sort() : []), [hourly])
   const [selectedDate, setSelectedDate] = useState(dates[0] ?? '')
@@ -12,10 +20,19 @@ export default function HourlyBreakdownChart({ type, info }: { type: string; inf
   }
 
   const activeDate = dates.includes(selectedDate) ? selectedDate : dates[0]
+
+  const actualByHour = new Map<number, number>()
+  for (const row of comparison?.by_type[type] ?? []) {
+    if (row.date === activeDate && row.hour !== undefined) {
+      actualByHour.set(row.hour, row.actual_count)
+    }
+  }
+  const hasActual = actualByHour.size > 0
+
   const data = (hourly[activeDate] ?? [])
     .slice()
     .sort((a, b) => a.hour - b.hour)
-    .map((h) => ({ hour: `${h.hour}:00`, count: h.count }))
+    .map((h) => ({ hour: `${h.hour}:00`, count: h.count, actual: actualByHour.get(h.hour) }))
 
   return (
     <div>
@@ -42,7 +59,11 @@ export default function HourlyBreakdownChart({ type, info }: { type: string; inf
             contentStyle={{ background: '#0c1322', border: '1px solid #2a3a5c', borderRadius: 8, fontSize: 12 }}
             labelStyle={{ color: '#e2e8f0' }}
           />
+          {hasActual && <Legend wrapperStyle={{ fontSize: 12 }} />}
           <Bar dataKey="count" name="Tahmin edilen kayıt" fill="#60a5fa" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          {hasActual && (
+            <Bar dataKey="actual" name="Gerçekleşen kayıt" fill="#34d399" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>

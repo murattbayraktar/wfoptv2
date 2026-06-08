@@ -8,7 +8,9 @@ import os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from src.pipeline import forecast_pipeline
+from src.pipeline import forecast_pipeline, load_config
+from src.data.loader import load_transactions
+from src.data.aggregator import aggregate_daily, aggregate_hourly
 from rich.console import Console
 
 console = Console()
@@ -16,6 +18,9 @@ console = Console()
 
 def parse_args():
     p = argparse.ArgumentParser(description="Banka işlem tahmini")
+    p.add_argument("--input", default=None,
+                   help="Eğitimde kullanılan CSV (verilirse lag/rolling özellikleri "
+                        "gerçek geçmiş verilerden beslenir; verilmezse tip medyanına düşer)")
     p.add_argument("--start", required=True, help="Tahmin başlangıç tarihi (YYYY-MM-DD)")
     p.add_argument("--end", required=True, help="Tahmin bitiş tarihi (YYYY-MM-DD)")
     p.add_argument("--types", default="", help="Virgülle ayrılmış işlem tipleri (boş = hepsi)")
@@ -37,6 +42,17 @@ def main():
     types = [t.strip() for t in args.types.split(",") if t.strip()] or None
     fmt = [f.strip() for f in args.format.split(",") if f.strip()]
 
+    historical_data = None
+    if args.input:
+        cfg = load_config(args.config)
+        working_hours = tuple(cfg.get("data", {}).get("working_hours", [7, 18]))
+        df = load_transactions(args.input)
+        historical_data = {"daily": aggregate_daily(df)}
+        try:
+            historical_data["hourly"] = aggregate_hourly(df, working_hours=working_hours)
+        except ValueError:
+            historical_data["hourly"] = None
+
     console.print(f"\n[bold cyan]Tahmin başlıyor[/bold cyan]")
     console.print(f"  Aralık  : {args.start} → {args.end}")
     console.print(f"  Tipler  : {types or 'tüm kayıtlı tipler'}")
@@ -52,6 +68,7 @@ def main():
         plot=args.plot,
         registry_path=args.registry,
         config_path=args.config,
+        historical_data=historical_data,
     )
 
     total = sum(

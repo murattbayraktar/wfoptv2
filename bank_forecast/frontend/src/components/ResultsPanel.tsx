@@ -89,7 +89,7 @@ export default function ResultsPanel() {
         </div>
 
         {showHourly && hasHourly ? (
-          <HourlyBreakdownChart type={selected} info={info} />
+          <HourlyBreakdownChart type={selected} info={info} comparison={forecastResult.comparison.hourly} />
         ) : (
           <DailyForecastChart type={selected} info={info} />
         )}

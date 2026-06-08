@@ -2,7 +2,7 @@ import { useRef, useState, type DragEvent } from 'react'
 import { useData } from '../context/DataContext'
 
 export default function UploadDropzone() {
-  const { upload, loadDemo, loadingDataset, datasetError } = useData()
+  const { upload, loadDemo, loadingDataset, datasetError, trainModel, setTrainModel } = useData()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -19,6 +19,28 @@ export default function UploadDropzone() {
 
   return (
     <div className="rounded-xl border border-navy-700 bg-navy-900 p-8">
+      <div className="mb-6">
+        <label className="mb-2 block text-xs font-medium text-slate-400">
+          Eğitim için algoritma seçimi
+        </label>
+        <select
+          value={trainModel}
+          onChange={(e) => setTrainModel(e.target.value)}
+          disabled={loadingDataset}
+          className="w-full rounded-md border border-navy-600 bg-navy-800 px-3 py-2 text-sm text-slate-200 transition-colors focus:border-gold-500 focus:outline-none disabled:opacity-50"
+        >
+          <option value="auto">Tümü (otomatik en iyi seçim)</option>
+          <option value="xgboost">XGBoost</option>
+          <option value="lightgbm">LightGBM</option>
+          <option value="random_forest">Random Forest</option>
+          <option value="holt_winters">Holt-Winters</option>
+          <option value="ridge">Ridge</option>
+        </select>
+        <p className="mt-1.5 text-xs text-slate-500">
+          "Tümü" seçilirse her aday algoritma denenip en iyisi otomatik seçilir (daha uzun sürer).
+          Belirli bir algoritma seçilirse eğitim yalnızca onunla yapılır (daha hızlıdır).
+        </p>
+      </div>
       <div
         onDragOver={(e) => {
           e.preventDefault()

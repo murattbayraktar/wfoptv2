@@ -1,28 +1,24 @@
 {
-  "trained_at": "2026-06-07T20:58:44.680987",
+  "trained_at": "2026-06-08T11:00:07.835684",
   "data_range": {
     "start": "2025-06-02",
     "end": "2025-10-24"
   },
   "models": {
     "EFT_daily": {
-      "best_model": "random_forest",
-      "cv_rmse": 306.8166,
-      "cv_mae": 306.8166,
+      "best_model": "lightgbm",
+      "cv_rmse": 496.08,
+      "cv_mae": 496.08,
       "all_scores": {
-        "xgboost": 344.9349,
-        "lightgbm": 495.0463,
-        "random_forest": 306.8166,
-        "holt_winters": 373.2679,
-        "ridge": 321.192
+        "lightgbm": 496.08
       },
-      "selection_reason": "random_forest en düşük CV RMSE'yi verdi (306.8166). İkinci sıra: ridge (321.1920).",
+      "selection_reason": "lightgbm en düşük CV RMSE'yi verdi (496.0800).",
       "feature_importance_top5": [
-        "day_of_week",
-        "is_weekend",
-        "sin_7_1",
+        "day_of_month",
+        "lag_1",
         "sin_7_3",
-        "lag_14"
+        "sin_7_1",
+        "cos_365_5"
       ],
       "model_path": "models/saved\\EFT_daily_best.pkl",
       "encoder_path": "models/saved\\EFT_daily_encoder.pkl",
@@ -84,23 +80,19 @@
       ]
     },
     "EFT_hourly": {
-      "best_model": "random_forest",
-      "cv_rmse": 74.9941,
-      "cv_mae": 74.9941,
+      "best_model": "lightgbm",
+      "cv_rmse": 78.3992,
+      "cv_mae": 78.3992,
       "all_scores": {
-        "xgboost": 77.0395,
-        "lightgbm": 79.2983,
-        "random_forest": 74.9941,
-        "holt_winters": 198.5238,
-        "ridge": 116.9908
+        "lightgbm": 78.3992
       },
-      "selection_reason": "random_forest en düşük CV RMSE'yi verdi (74.9941). İkinci sıra: xgboost (77.0395).",
+      "selection_reason": "lightgbm en düşük CV RMSE'yi verdi (78.3992).",
       "feature_importance_top5": [
         "lag_168",
         "lag_1",
         "sin_24_2",
-        "day_of_week",
-        "is_weekend"
+        "sin_24_1",
+        "rolling_mean_168"
       ],
       "model_path": "models/saved\\EFT_hourly_best.pkl",
       "encoder_path": "models/saved\\EFT_hourly_encoder.pkl",

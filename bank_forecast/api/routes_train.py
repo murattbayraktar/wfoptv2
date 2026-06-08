@@ -66,7 +66,7 @@ def _on_event(event: dict) -> None:
             RETRAIN_STATUS.progress = RETRAIN_STATUS.completed_units / RETRAIN_STATUS.total_units
 
 
-def _run_training(input_path: str, freq: str, types: list[str] | None) -> None:
+def _run_training(input_path: str, freq: str, types: list[str] | None, models: list[str] | None) -> None:
     RETRAIN_STATUS.reset()
     RETRAIN_STATUS.status = "running"
     RETRAIN_STATUS.message = "Modeller yeniden eğitiliyor..."
@@ -74,7 +74,7 @@ def _run_training(input_path: str, freq: str, types: list[str] | None) -> None:
     RETRAIN_STATUS.finished_at = None
     try:
         train_pipeline(
-            input_path=input_path, freq=freq, types=types, models=["auto"],
+            input_path=input_path, freq=freq, types=types, models=models or ["auto"],
             report=False, progress_callback=_on_event,
         )
         RETRAIN_STATUS.status = "done"
@@ -100,7 +100,7 @@ async def start_retrain(req: RetrainRequest):
 
     thread = threading.Thread(
         target=_run_training,
-        args=(STATE.uploaded_path, req.freq, req.types),
+        args=(STATE.uploaded_path, req.freq, req.types, req.models),
         daemon=True,
     )
     thread.start()

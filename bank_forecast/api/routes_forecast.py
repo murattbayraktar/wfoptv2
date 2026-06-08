@@ -32,6 +32,7 @@ async def create_forecast(req: ForecastRequest):
             fmt=[],
             plot=False,
             registry_path=REGISTRY_FILE,
+            historical_data={"daily": STATE.daily_agg, "hourly": STATE.hourly_agg},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Tahmin üretilemedi: {e}")
