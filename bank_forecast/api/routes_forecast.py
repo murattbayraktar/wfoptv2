@@ -3,13 +3,31 @@ import os
 
 from fastapi import APIRouter, HTTPException
 
-from src.pipeline import forecast_pipeline, REGISTRY_FILE
+from src.pipeline import forecast_pipeline, REGISTRY_FILE, _load_registry
 
 from . import comparison
 from .schemas import ForecastRequest
 from .state import STATE
 
 router = APIRouter(prefix="/api", tags=["forecast"])
+
+
+@router.get("/models/available")
+async def available_models():
+    """Tahmin için seçilebilir, kayıtlı modelleri (işlem tipi, frekans) bazında döner."""
+    if not os.path.exists(REGISTRY_FILE):
+        return {"available": {}}
+
+    registry = _load_registry(REGISTRY_FILE)
+    out: dict = {}
+    for key, entry in registry["models"].items():
+        tt, f = key.rsplit("_", 1)
+        avail = entry.get("available_models") or {entry["best_model"]: {}}
+        out.setdefault(tt, {})[f] = {
+            "best_model": entry["best_model"],
+            "models": sorted(avail.keys()),
+        }
+    return {"available": out}
 
 
 @router.post("/forecast")
@@ -33,6 +51,7 @@ async def create_forecast(req: ForecastRequest):
             plot=False,
             registry_path=REGISTRY_FILE,
             historical_data={"daily": STATE.daily_agg, "hourly": STATE.hourly_agg},
+            models=req.models,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Tahmin üretilemedi: {e}")

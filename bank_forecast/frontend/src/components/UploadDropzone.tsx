@@ -1,8 +1,9 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { useData } from '../context/DataContext'
+import { MODEL_LABELS, MODEL_OPTIONS } from '../constants'
 
 export default function UploadDropzone() {
-  const { upload, loadDemo, loadingDataset, datasetError, trainModel, setTrainModel } = useData()
+  const { upload, loadDemo, loadingDataset, datasetError, trainModels, toggleTrainModel } = useData()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -23,22 +24,30 @@ export default function UploadDropzone() {
         <label className="mb-2 block text-xs font-medium text-slate-400">
           Eğitim için algoritma seçimi
         </label>
-        <select
-          value={trainModel}
-          onChange={(e) => setTrainModel(e.target.value)}
-          disabled={loadingDataset}
-          className="w-full rounded-md border border-navy-600 bg-navy-800 px-3 py-2 text-sm text-slate-200 transition-colors focus:border-gold-500 focus:outline-none disabled:opacity-50"
-        >
-          <option value="auto">Tümü (otomatik en iyi seçim)</option>
-          <option value="xgboost">XGBoost</option>
-          <option value="lightgbm">LightGBM</option>
-          <option value="random_forest">Random Forest</option>
-          <option value="holt_winters">Holt-Winters</option>
-          <option value="ridge">Ridge</option>
-        </select>
+        <div className="flex flex-col gap-1.5 rounded-md border border-navy-600 bg-navy-800 px-3 py-2.5">
+          {MODEL_OPTIONS.map((opt) => {
+            return (
+              <label
+                key={opt}
+                className={`flex items-center gap-2 text-sm text-slate-200 ${loadingDataset ? 'opacity-50' : 'cursor-pointer'}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={trainModels.includes(opt)}
+                  onChange={() => toggleTrainModel(opt)}
+                  disabled={loadingDataset}
+                  className="h-4 w-4 rounded border-navy-600 bg-navy-900 accent-gold-500"
+                />
+                {MODEL_LABELS[opt] ?? opt}
+              </label>
+            )
+          })}
+        </div>
         <p className="mt-1.5 text-xs text-slate-500">
           "Tümü" seçilirse her aday algoritma denenip en iyisi otomatik seçilir (daha uzun sürer).
-          Belirli bir algoritma seçilirse eğitim yalnızca onunla yapılır (daha hızlıdır).
+          Tek bir spesifik algoritma seçilirse eğitim yalnızca onunla yapılır (daha hızlıdır).
+          Birden fazla spesifik algoritma seçerseniz HEPSİ tam veri ile eğitilip kaydedilir —
+          tahmin ekranında aralarında karşılaştırma yapabilirsiniz (daha uzun sürer ve daha fazla disk alanı kullanır).
         </p>
       </div>
       <div

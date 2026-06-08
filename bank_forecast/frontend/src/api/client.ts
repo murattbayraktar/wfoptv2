@@ -1,4 +1,4 @@
-import type { DatasetSummary, ForecastResponse, RetrainStatus } from '../types'
+import type { AvailableModelsResponse, DatasetSummary, ForecastResponse, RetrainStatus } from '../types'
 
 async function handleJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -36,6 +36,7 @@ export async function runForecast(params: {
   end: string
   freq?: string
   types?: string[]
+  models?: string[]
 }): Promise<ForecastResponse> {
   const res = await fetch('/api/forecast', {
     method: 'POST',
@@ -43,6 +44,11 @@ export async function runForecast(params: {
     body: JSON.stringify(params),
   })
   return handleJson<ForecastResponse>(res)
+}
+
+export async function getAvailableModels(): Promise<AvailableModelsResponse> {
+  const res = await fetch('/api/models/available')
+  return handleJson<AvailableModelsResponse>(res)
 }
 
 export async function startRetrain(params: { freq?: string; types?: string[]; models?: string[] }): Promise<{ status: string }> {

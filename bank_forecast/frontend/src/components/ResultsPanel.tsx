@@ -98,6 +98,7 @@ export default function ResultsPanel() {
       {(dailyComparisonHasType || hourlyComparisonHasType) && (
         <ActualVsPredictedChart
           type={selected}
+          info={info}
           comparison={showHourly && hourlyComparisonHasType ? forecastResult.comparison.hourly : forecastResult.comparison.daily}
         />
       )}

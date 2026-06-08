@@ -194,6 +194,10 @@ def train_pipeline(
     else:
         candidate_models = None  # ModelSelector tüm adayları dener
 
+    # Birden fazla model açıkça seçildiyse, hepsi tam veri ile eğitilip ayrı
+    # dosyalar olarak kaydedilir (tahmin sırasında karşılaştırılabilmeleri için).
+    multi_save = bool(candidate_models and len(candidate_models) > 1)
+
     freqs = ["daily", "hourly"] if freq == "both" else [freq]
 
     registry = {
@@ -272,32 +276,59 @@ def train_pipeline(
                     progress_callback=progress_callback,
                 )
 
-                # Final model tüm veri üzerinde eğit
-                final_model = selector.train_best(sel_result, transaction_type, f, X, y, models_cfg)
+                encoder_path = os.path.join(output_dir, f"{key}_encoder.pkl")
+                best_name = sel_result["best_model"]
+                best_model_path = os.path.join(output_dir, f"{key}_best.pkl")
+                available_models: dict = {}
 
-                # Kaydet
-                model_path = os.path.join(output_dir, f"{key}_best.pkl")
-                final_model.save(model_path)
+                if multi_save:
+                    # Açıkça seçilen HER modeli tam veri ile eğit ve ayrı dosyaya kaydet
+                    trained = selector.train_selected(
+                        transaction_type, f, X, y, candidate_models, models_cfg
+                    )
+                    for name, model in trained.items():
+                        m_path = best_model_path if name == best_name else os.path.join(output_dir, f"{key}_{name}.pkl")
+                        model.save(m_path)
+                        available_models[name] = {
+                            "model_path": m_path,
+                            "encoder_path": encoder_path,
+                            "cv_rmse": sel_result["all_scores"].get(name),
+                            "feature_names": feat_cols,
+                        }
+                    final_model = trained[best_name]
+                    model_path = best_model_path
+                else:
+                    # Mevcut davranış: sadece kazanan model tam veri ile eğitilip kaydedilir
+                    final_model = selector.train_best(sel_result, transaction_type, f, X, y, models_cfg)
+                    model_path = best_model_path
+                    final_model.save(model_path)
+                    available_models[best_name] = {
+                        "model_path": model_path,
+                        "encoder_path": encoder_path,
+                        "cv_rmse": sel_result["all_scores"].get(best_name),
+                        "feature_names": feat_cols,
+                    }
 
-                # Feature importance
+                # Feature importance (kazanan model üzerinden)
                 fi_df = final_model.get_feature_importance()
                 top5 = fi_df["feature"].head(5).tolist() if not fi_df.empty else []
 
                 registry["models"][key] = {
-                    "best_model": sel_result["best_model"],
+                    "best_model": best_name,
                     "cv_rmse": sel_result["best_score"],
-                    "cv_mae": sel_result["all_scores"].get(sel_result["best_model"], 0),
+                    "cv_mae": sel_result["all_scores"].get(best_name, 0),
                     "all_scores": sel_result["all_scores"],
                     "selection_reason": sel_result["selection_reason"],
                     "feature_importance_top5": top5,
                     "model_path": model_path,
-                    "encoder_path": os.path.join(output_dir, f"{key}_encoder.pkl"),
+                    "encoder_path": encoder_path,
                     "feature_names": feat_cols,
+                    "available_models": available_models,
                 }
 
-                # Encoder kaydet
+                # Encoder kaydet (tüm modeller tarafından paylaşılır)
                 import joblib
-                joblib.dump(encoder, registry["models"][key]["encoder_path"])
+                joblib.dump(encoder, encoder_path)
 
                 all_scores_for_plot[key] = sel_result["all_scores"]
 
@@ -367,12 +398,18 @@ def forecast_pipeline(
     registry_path: str = REGISTRY_FILE,
     config_path: str = "config/settings.yaml",
     historical_data: dict | None = None,
+    models: list[str] | None = None,
 ) -> dict:
     """
     `historical_data`: {"daily": daily_agg_df, "hourly": hourly_agg_df} biçiminde,
     yüklenen verinin agregasyonları (varsa). Verilirse, lag/rolling özellikleri
     sabit sıfır yerine gerçek geçmiş değerlerden ve döngü içinde üretilen
     tahminlerden (recursive) hesaplanır — bkz. `_recursive_predict`.
+
+    `models`: None ise registry'deki `best_model` kullanılır (mevcut davranış).
+    Bir veya daha fazla model adı verilirse, kayıtlı (`available_models`) olanlar
+    için ayrı ayrı tahmin üretilir. Birden fazla model çalışırsa karşılaştırma
+    için `by_type[type]["models"]` alanı doldurulur — bkz. modül başı yorum.
     """
     cfg = load_config(config_path)
     features_cfg = cfg.get("features", {})
@@ -411,6 +448,145 @@ def forecast_pipeline(
     from src.features.seasonal_features import add_daily_fourier, add_hourly_fourier
     from src.models.base_model import BaseForecaster
 
+    def _run_single_model_forecast(model_name: str, model_entry: dict, transaction_type: str, f: str):
+        """Tek bir kayıtlı model ile bu (tip, frekans) için tahmin üretir.
+
+        Döner: (piece, forecast_df). `piece`, result["by_type"][type] altına
+        yazılacak {"model_used", "daily"} veya {"model_used", "hourly"} parçasıdır;
+        `forecast_df` ise CSV/plot çıktıları için kullanılan ham tablodur.
+        Mantık, tek-model dönemindeki akışla birebir aynıdır — yalnızca model
+        bilgisi parametre olarak alınır.
+        """
+        model: BaseForecaster = BaseForecaster.load(model_entry["model_path"])
+        encoder = joblib.load(model_entry["encoder_path"])
+        feat_cols = model_entry["feature_names"]
+
+        lag_cols = [c for c in feat_cols if c.startswith("lag_") or c.startswith("rolling_")]
+
+        # Yüklenen verinin agregasyonundan bu (tip, frekans) için geçmiş seri
+        hist_agg = historical_data.get(f)
+        hist_subset = None
+        if hist_agg is not None and not hist_agg.empty:
+            candidate = hist_agg[hist_agg["transaction_type"] == transaction_type]
+            if not candidate.empty:
+                hist_subset = candidate
+        hist_keys, hist_count_map, fallback = _history_lookup(hist_subset, f)
+
+        # Tahmin aralığı, geçmiş verinin bittiği yerden sonra başlıyorsa
+        # (boşluk varsa) ızgarayı geçmişin hemen ardından başlatıyoruz —
+        # böylece lag/rolling zinciri kopmadan (recursive) ilerleyebilir.
+        grid_start_dt = start_dt
+        if hist_keys:
+            hist_last_date = hist_keys[-1][0] if f == "hourly" else hist_keys[-1]
+            if hist_last_date < start_dt - pd.Timedelta(days=1):
+                grid_start_dt = hist_last_date + pd.Timedelta(days=1)
+
+        grid_dates = pd.date_range(grid_start_dt, end_dt, freq="D")
+
+        if f == "daily":
+            grid_df = pd.DataFrame({
+                "date": grid_dates,
+                "transaction_type": transaction_type,
+                "count": 0,
+                "amount": 0,
+            })
+        else:
+            rows = [(d, h, transaction_type) for d in grid_dates for h in hours]
+            grid_df = pd.DataFrame(rows, columns=["date", "hour", "transaction_type"])
+            grid_df["count"] = 0
+            grid_df["amount"] = 0
+
+        grid_df["date"] = pd.to_datetime(grid_df["date"])
+        grid_df = add_calendar_features(grid_df)
+
+        # Lag/rolling sütunları recursive döngüde doldurulacak — şimdilik yer tutucu
+        for col in lag_cols:
+            grid_df[col] = np.nan
+
+        # Fourier
+        if f == "daily":
+            grid_df = add_daily_fourier(
+                grid_df,
+                weekly_terms=features_cfg.get("fourier_weekly_terms", 3),
+                yearly_terms=features_cfg.get("fourier_yearly_terms", 5),
+            )
+        else:
+            grid_df = add_hourly_fourier(grid_df)
+
+        # Target encoding
+        grid_df["transaction_type_enc"] = encoder.transform(
+            grid_df[["transaction_type"]]
+        )
+
+        # Eksik sütunları sıfırla
+        for col in feat_cols:
+            if col not in grid_df.columns:
+                grid_df[col] = 0
+
+        preds_raw = _recursive_predict(
+            model=model,
+            grid_df=grid_df,
+            feat_cols=feat_cols,
+            lag_cols=lag_cols,
+            freq=f,
+            hist_keys=hist_keys,
+            hist_count_map=hist_count_map,
+            fallback=fallback,
+        )
+        grid_df["predicted_count_raw"] = preds_raw
+
+        # Izgara, geçmişle köprü kurmak için tahmin aralığından erken
+        # başlamış olabilir (boşluk doldurma) — sonuca yalnızca istenen
+        # aralığı dahil ediyoruz.
+        forecast_df = grid_df.loc[grid_df["date"] >= start_dt].reset_index(drop=True)
+
+        X_pred = forecast_df[feat_cols].fillna(0)
+        try:
+            qpreds = model.predict_quantiles(X_pred, [0.1, 0.9])
+            lower = qpreds[0.1]
+            upper = qpreds[0.9]
+        except Exception:
+            lower = forecast_df["predicted_count_raw"].values * 0.8
+            upper = forecast_df["predicted_count_raw"].values * 1.2
+
+        forecast_df["predicted_count"] = np.round(forecast_df["predicted_count_raw"].values, 1)
+        forecast_df["lower_80"] = np.round(np.maximum(lower, 0), 1)
+        forecast_df["upper_80"] = np.round(np.maximum(upper, 0), 1)
+        forecast_df["confidence"] = "high"
+        forecast_df["model_used"] = model_name
+
+        calendar_cols = ["is_public_holiday", "is_religious_holiday", "is_month_start",
+                         "is_month_end", "is_eve_of_holiday"]
+        def _flags(row):
+            return [c for c in calendar_cols if row.get(c, 0) == 1]
+        forecast_df["calendar_flags"] = forecast_df.apply(
+            lambda r: ",".join(_flags(r)), axis=1
+        )
+
+        if f == "daily":
+            daily_list = []
+            for _, row in forecast_df.iterrows():
+                daily_list.append({
+                    "date": str(row["date"].date()),
+                    "predicted_count": float(row["predicted_count"]),
+                    "lower_80": float(row["lower_80"]),
+                    "upper_80": float(row["upper_80"]),
+                    "confidence": row["confidence"],
+                    "calendar_flags": row["calendar_flags"].split(",") if row["calendar_flags"] else [],
+                })
+            piece = {"model_used": model_name, "daily": daily_list}
+        else:
+            hourly_by_date = {}
+            for _, row in forecast_df.iterrows():
+                d = str(row["date"].date())
+                hourly_by_date.setdefault(d, []).append({
+                    "hour": int(row["hour"]),
+                    "count": float(row["predicted_count"]),
+                })
+            piece = {"model_used": model_name, "hourly": hourly_by_date}
+
+        return piece, forecast_df
+
     for transaction_type in types:
         result["by_type"][transaction_type] = {}
         for f in freqs:
@@ -419,143 +595,57 @@ def forecast_pipeline(
                 console.print(f"[yellow]Model bulunamadı: {key}, atlanıyor.[/yellow]")
                 continue
 
-            model_info = registry["models"][key]
+            reg_entry = registry["models"][key]
+            best_name = reg_entry["best_model"]
+            # Eski formatlı kayıtlarda available_models yok — best_model'den sentezle
+            avail = reg_entry.get("available_models") or {best_name: {
+                "model_path": reg_entry["model_path"],
+                "encoder_path": reg_entry["encoder_path"],
+                "cv_rmse": reg_entry.get("cv_rmse"),
+                "feature_names": reg_entry["feature_names"],
+            }}
 
-            try:
-                model: BaseForecaster = BaseForecaster.load(model_info["model_path"])
-                encoder = joblib.load(model_info["encoder_path"])
-                feat_cols = model_info["feature_names"]
-            except Exception as e:
-                console.print(f"[red]Model yüklenemedi ({key}): {e}[/red]")
+            if not models:
+                run_models = [best_name]
+            else:
+                run_models = [m for m in models if m in avail]
+                if not run_models:
+                    run_models = [best_name]
+
+            primary_name = best_name if best_name in run_models else run_models[0]
+
+            pieces: dict[str, dict] = {}
+            primary_forecast_df = None
+            for model_name in run_models:
+                try:
+                    piece, f_df = _run_single_model_forecast(model_name, avail[model_name], transaction_type, f)
+                except Exception as e:
+                    console.print(f"[red]Tahmin üretilemedi ({key} / {model_name}): {e}[/red]")
+                    continue
+                pieces[model_name] = piece
+                if model_name == primary_name:
+                    primary_forecast_df = f_df
+
+            if not pieces:
                 continue
 
-            lag_cols = [c for c in feat_cols if c.startswith("lag_") or c.startswith("rolling_")]
+            primary_piece = pieces.get(primary_name) or next(iter(pieces.values()))
+            # Geriye dönük uyum: birincil modelin sonucu doğrudan üst seviyeye yazılır
+            # (mevcut tüketiciler — comparison.py, frontend — bunu okumaya devam eder).
+            result["by_type"][transaction_type].update(primary_piece)
 
-            # Yüklenen verinin agregasyonundan bu (tip, frekans) için geçmiş seri
-            hist_agg = historical_data.get(f)
-            hist_subset = None
-            if hist_agg is not None and not hist_agg.empty:
-                candidate = hist_agg[hist_agg["transaction_type"] == transaction_type]
-                if not candidate.empty:
-                    hist_subset = candidate
-            hist_keys, hist_count_map, fallback = _history_lookup(hist_subset, f)
+            if len(pieces) > 1:
+                # Karşılaştırma verisi: her model için ayrı sonuç (overlay için).
+                # daily/hourly geçişleri arasında birikimli olarak birleştirilir.
+                models_field = result["by_type"][transaction_type].setdefault("models", {})
+                for name, piece in pieces.items():
+                    entry = models_field.setdefault(name, {"model_used": name})
+                    entry.update(piece)
 
-            # Tahmin aralığı, geçmiş verinin bittiği yerden sonra başlıyorsa
-            # (boşluk varsa) ızgarayı geçmişin hemen ardından başlatıyoruz —
-            # böylece lag/rolling zinciri kopmadan (recursive) ilerleyebilir.
-            grid_start_dt = start_dt
-            if hist_keys:
-                hist_last_date = hist_keys[-1][0] if f == "hourly" else hist_keys[-1]
-                if hist_last_date < start_dt - pd.Timedelta(days=1):
-                    grid_start_dt = hist_last_date + pd.Timedelta(days=1)
+            forecast_df = primary_forecast_df
 
-            grid_dates = pd.date_range(grid_start_dt, end_dt, freq="D")
-
-            if f == "daily":
-                grid_df = pd.DataFrame({
-                    "date": grid_dates,
-                    "transaction_type": transaction_type,
-                    "count": 0,
-                    "amount": 0,
-                })
-            else:
-                rows = [(d, h, transaction_type) for d in grid_dates for h in hours]
-                grid_df = pd.DataFrame(rows, columns=["date", "hour", "transaction_type"])
-                grid_df["count"] = 0
-                grid_df["amount"] = 0
-
-            grid_df["date"] = pd.to_datetime(grid_df["date"])
-            grid_df = add_calendar_features(grid_df)
-
-            # Lag/rolling sütunları recursive döngüde doldurulacak — şimdilik yer tutucu
-            for col in lag_cols:
-                grid_df[col] = np.nan
-
-            # Fourier
-            if f == "daily":
-                grid_df = add_daily_fourier(
-                    grid_df,
-                    weekly_terms=features_cfg.get("fourier_weekly_terms", 3),
-                    yearly_terms=features_cfg.get("fourier_yearly_terms", 5),
-                )
-            else:
-                grid_df = add_hourly_fourier(grid_df)
-
-            # Target encoding
-            grid_df["transaction_type_enc"] = encoder.transform(
-                grid_df[["transaction_type"]]
-            )
-
-            # Eksik sütunları sıfırla
-            for col in feat_cols:
-                if col not in grid_df.columns:
-                    grid_df[col] = 0
-
-            preds_raw = _recursive_predict(
-                model=model,
-                grid_df=grid_df,
-                feat_cols=feat_cols,
-                lag_cols=lag_cols,
-                freq=f,
-                hist_keys=hist_keys,
-                hist_count_map=hist_count_map,
-                fallback=fallback,
-            )
-            grid_df["predicted_count_raw"] = preds_raw
-
-            # Izgara, geçmişle köprü kurmak için tahmin aralığından erken
-            # başlamış olabilir (boşluk doldurma) — sonuca yalnızca istenen
-            # aralığı dahil ediyoruz.
-            forecast_df = grid_df.loc[grid_df["date"] >= start_dt].reset_index(drop=True)
-
-            X_pred = forecast_df[feat_cols].fillna(0)
-            try:
-                qpreds = model.predict_quantiles(X_pred, [0.1, 0.9])
-                lower = qpreds[0.1]
-                upper = qpreds[0.9]
-            except Exception:
-                lower = forecast_df["predicted_count_raw"].values * 0.8
-                upper = forecast_df["predicted_count_raw"].values * 1.2
-
-            forecast_df["predicted_count"] = np.round(forecast_df["predicted_count_raw"].values, 1)
-            forecast_df["lower_80"] = np.round(np.maximum(lower, 0), 1)
-            forecast_df["upper_80"] = np.round(np.maximum(upper, 0), 1)
-            forecast_df["confidence"] = "high"
-            forecast_df["model_used"] = model_info["best_model"]
-
-            calendar_cols = ["is_public_holiday", "is_religious_holiday", "is_month_start",
-                             "is_month_end", "is_eve_of_holiday"]
-            def _flags(row):
-                return [c for c in calendar_cols if row.get(c, 0) == 1]
-            forecast_df["calendar_flags"] = forecast_df.apply(
-                lambda r: ",".join(_flags(r)), axis=1
-            )
-
-            if f == "daily":
-                result["by_type"][transaction_type]["model_used"] = model_info["best_model"]
-                daily_list = []
-                for _, row in forecast_df.iterrows():
-                    daily_list.append({
-                        "date": str(row["date"].date()),
-                        "predicted_count": float(row["predicted_count"]),
-                        "lower_80": float(row["lower_80"]),
-                        "upper_80": float(row["upper_80"]),
-                        "confidence": row["confidence"],
-                        "calendar_flags": row["calendar_flags"].split(",") if row["calendar_flags"] else [],
-                    })
-                result["by_type"][transaction_type]["daily"] = daily_list
-            else:
-                hourly_by_date = {}
-                for _, row in forecast_df.iterrows():
-                    d = str(row["date"].date())
-                    hourly_by_date.setdefault(d, []).append({
-                        "hour": int(row["hour"]),
-                        "count": float(row["predicted_count"]),
-                    })
-                result["by_type"][transaction_type]["hourly"] = hourly_by_date
-
-            # CSV çıktı
-            if "csv" in fmt:
+            # CSV çıktı (birincil model için — mevcut davranışla aynı dosya adı)
+            if "csv" in fmt and forecast_df is not None:
                 os.makedirs(output_dir, exist_ok=True)
                 csv_path = os.path.join(output_dir, f"forecast_{start}_{transaction_type}_{f}.csv")
                 out_cols = ["date", "transaction_type", "predicted_count", "lower_80", "upper_80",
@@ -564,8 +654,8 @@ def forecast_pipeline(
                     out_cols.insert(1, "hour")
                 forecast_df[out_cols].to_csv(csv_path, index=False)
 
-            # Grafik
-            if plot and f == "daily":
+            # Grafik (birincil model için)
+            if plot and f == "daily" and forecast_df is not None:
                 plot_path = f"outputs/plots/forecast_{transaction_type}_{f}_{start}.html"
                 plot_forecast(forecast_df, transaction_type, plot_path)
 

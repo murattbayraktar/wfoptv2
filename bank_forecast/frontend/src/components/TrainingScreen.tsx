@@ -1,18 +1,10 @@
 import { useData } from '../context/DataContext'
 import UploadDropzone from './UploadDropzone'
 import TrainingProgress from './TrainingProgress'
-
-const MODEL_LABELS: Record<string, string> = {
-  auto: 'Tümü (otomatik en iyi seçim)',
-  xgboost: 'XGBoost',
-  lightgbm: 'LightGBM',
-  random_forest: 'Random Forest',
-  holt_winters: 'Holt-Winters',
-  ridge: 'Ridge',
-}
+import { MODEL_LABELS } from '../constants'
 
 function DatasetSummaryCard() {
-  const { dataset, trainModel, startTraining, startingTraining, trainingStartError, retrainStatus } = useData()
+  const { dataset, trainModels, startTraining, startingTraining, trainingStartError, retrainStatus } = useData()
   if (!dataset?.loaded) return null
 
   const isRunning = retrainStatus?.status === 'running'
@@ -46,7 +38,7 @@ function DatasetSummaryCard() {
               ? 'Eğitim devam ediyor…'
               : startingTraining
                 ? 'Eğitim başlatılıyor…'
-                : `Eğitimi Başlat — ${MODEL_LABELS[trainModel] ?? trainModel}`}
+                : `Eğitimi Başlat — ${trainModels.map((m) => MODEL_LABELS[m] ?? m).join(' + ')}`}
           </button>
           {isRunning && (
             <p className="text-xs text-slate-500">

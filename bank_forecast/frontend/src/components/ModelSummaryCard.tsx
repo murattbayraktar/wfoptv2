@@ -1,4 +1,5 @@
 import type { ForecastByType } from '../types'
+import { MODEL_LABELS } from '../constants'
 
 const FLAG_LABELS: Record<string, string> = {
   is_public_holiday: 'Resmi tatil',
@@ -36,6 +37,17 @@ export default function ModelSummaryCard({
       <div className="mt-1 text-xs text-slate-400">
         Kullanılan algoritma: <span className="text-gold-400">{info.model_used}</span>
       </div>
+      {info.models && Object.keys(info.models).length > 1 && (
+        <div className="mt-1 text-xs text-slate-400">
+          Karşılaştırılan algoritmalar:{' '}
+          <span className="text-slate-300">
+            {Object.keys(info.models)
+              .sort()
+              .map((m) => MODEL_LABELS[m] ?? m)
+              .join(', ')}
+          </span>
+        </div>
+      )}
       {flagSet.size > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[...flagSet].map((flag) => (

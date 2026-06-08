@@ -33,6 +33,17 @@ export interface ForecastByType {
   model_used: string
   daily?: DailyForecastEntry[]
   hourly?: Record<string, HourlyForecastEntry[]>
+  /** Birden fazla model seçildiğinde dolu olur — model adı -> o modelin tahmin sonucu (overlay/karşılaştırma için) */
+  models?: Record<string, {
+    model_used: string
+    daily?: DailyForecastEntry[]
+    hourly?: Record<string, HourlyForecastEntry[]>
+  }>
+}
+
+export interface AvailableModelsResponse {
+  /** available[işlem_tipi][frekans] = { best_model, models: [...] } */
+  available: Record<string, Record<string, { best_model: string; models: string[] }>>
 }
 
 export interface ComparisonRow {

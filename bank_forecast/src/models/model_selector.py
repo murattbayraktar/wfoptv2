@@ -175,6 +175,30 @@ class ModelSelector:
         model.fit(X_train, y_train)
         return model
 
+    def train_selected(
+        self,
+        transaction_type: str,
+        freq: str,
+        X_train: pd.DataFrame,
+        y_train: pd.Series,
+        candidate_names: list[str],
+        cfg: dict = None,
+    ) -> dict:
+        """candidate_names listesindeki HER modeli tüm veri üzerinde eğitir.
+
+        CV skorlaması (`select_best`) zaten her aday için ayrı ayrı yapıldığından
+        burada tekrarlanmaz — sadece tam veri ile final-fit gerçekleştirilir.
+        Döner: {model_name: fitted_model}
+        """
+        if cfg is None:
+            cfg = {}
+        trained = {}
+        for name in candidate_names:
+            model = _make_model(name, transaction_type, freq, cfg)
+            model.fit(X_train, y_train)
+            trained[name] = model
+        return trained
+
 
 class WeightedEnsemble(BaseForecaster):
     def __init__(self, transaction_type: str, freq: str):

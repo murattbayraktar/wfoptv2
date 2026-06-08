@@ -12,6 +12,7 @@ class ForecastRequest(BaseModel):
     end: str  # "YYYY-MM-DD"
     types: list[str] | None = None
     freq: str = "daily"  # "daily" | "hourly" | "both"
+    models: list[str] | None = None  # None: registry'nin best_model'ı kullanılır; birden fazla verilirse karşılaştırma üretilir
 
 
 class RetrainRequest(BaseModel):
