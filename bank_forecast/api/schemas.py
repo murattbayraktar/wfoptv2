@@ -19,3 +19,4 @@ class RetrainRequest(BaseModel):
     freq: str = "daily"  # "daily" | "hourly" | "both"
     types: list[str] | None = None
     models: list[str] | None = None  # None/["auto"] = tüm adaylar denenir; tek model verilirse yalnızca o eğitilir
+    holdout_days: int = 0  # 0 = devre dışı; >0 = son N günü eğitime dahil etme (doğrulama seti)

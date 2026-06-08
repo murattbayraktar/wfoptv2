@@ -167,6 +167,7 @@ def train_pipeline(
     report: bool = True,
     config_path: str = "config/settings.yaml",
     progress_callback=None,
+    holdout_days: int = 0,
 ) -> dict:
     cfg = load_config(config_path)
     models_cfg = cfg.get("models", {})
@@ -200,12 +201,31 @@ def train_pipeline(
 
     freqs = ["daily", "hourly"] if freq == "both" else [freq]
 
+    # Holdout seti: son N günü eğitime dahil etme
+    holdout_period = None
+    if holdout_days > 0:
+        max_date = df["date"].max()
+        holdout_start = max_date - pd.Timedelta(days=holdout_days - 1)
+        holdout_period = {
+            "start": str(holdout_start.date()),
+            "end": str(max_date.date()),
+        }
+        if progress_callback:
+            progress_callback({
+                "kind": "holdout_set",
+                "holdout_start": str(holdout_start.date()),
+                "holdout_end": str(max_date.date()),
+                "holdout_days": holdout_days,
+            })
+        df = df[df["date"] < holdout_start].copy()
+
     registry = {
         "trained_at": datetime.now().isoformat(),
         "data_range": {
             "start": str(df["date"].min().date()),
             "end": str(df["date"].max().date()),
         },
+        "holdout_period": holdout_period,
         "models": {},
     }
 

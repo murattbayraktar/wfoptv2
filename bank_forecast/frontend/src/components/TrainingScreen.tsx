@@ -3,8 +3,23 @@ import UploadDropzone from './UploadDropzone'
 import TrainingProgress from './TrainingProgress'
 import { MODEL_LABELS } from '../constants'
 
+const HOLDOUT_OPTIONS = [
+  { value: 0, label: 'Yok' },
+  { value: 10, label: '10 gün' },
+  { value: 30, label: '30 gün' },
+]
+
 function DatasetSummaryCard() {
-  const { dataset, trainModels, startTraining, startingTraining, trainingStartError, retrainStatus } = useData()
+  const {
+    dataset,
+    trainModels,
+    holdoutDays,
+    setHoldoutDays,
+    startTraining,
+    startingTraining,
+    trainingStartError,
+    retrainStatus,
+  } = useData()
   if (!dataset?.loaded) return null
 
   const isRunning = retrainStatus?.status === 'running'
@@ -27,7 +42,35 @@ function DatasetSummaryCard() {
       </p>
 
       {dataset.source_kind === 'upload' && (
-        <div className="mt-4 flex flex-col items-start gap-2 border-t border-navy-800 pt-4">
+        <div className="mt-4 flex flex-col items-start gap-4 border-t border-navy-800 pt-4">
+          {/* Holdout seçeneği */}
+          <div>
+            <div className="mb-2 text-xs font-medium text-slate-400">Doğrulama için son günler</div>
+            <div className="flex gap-2">
+              {HOLDOUT_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setHoldoutDays(opt.value)}
+                  disabled={isRunning}
+                  className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                    holdoutDays === opt.value
+                      ? 'border-gold-500 bg-gold-500/20 text-gold-300'
+                      : 'border-navy-600 bg-navy-800 text-slate-400 hover:border-navy-500 hover:text-slate-300'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {holdoutDays > 0 && (
+              <p className="mt-1.5 text-xs text-slate-500">
+                En son {holdoutDays} gün eğitime dahil edilmez; eğitim bitince bu günler için
+                otomatik tahmin yapılır ve MAPE hesaplanır.
+              </p>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => void startTraining()}

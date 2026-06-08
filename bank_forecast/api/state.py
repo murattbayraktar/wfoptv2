@@ -38,6 +38,8 @@ class RetrainStatus:
         self.progress: float = 0.0
         self.total_units: int = 0
         self.completed_units: int = 0
+        self.holdout_days: int = 0
+        self.holdout_result: dict | None = None
 
     def reset(self) -> None:
         self.__init__()

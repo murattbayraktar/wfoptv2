@@ -96,6 +96,23 @@ export interface TrainingStep {
   feature_importance_top5?: string[]
 }
 
+export interface HoldoutRow {
+  date: string
+  actual: number
+  predicted: number
+}
+
+export interface HoldoutTypeResult {
+  mape: number | null
+  rows: HoldoutRow[]
+}
+
+export interface HoldoutResult {
+  holdout_range: DateRange
+  by_type: Record<string, HoldoutTypeResult>
+  overall_mape: number | null
+}
+
 export interface RetrainStatus {
   status: 'idle' | 'running' | 'done' | 'error'
   message: string
@@ -105,4 +122,6 @@ export interface RetrainStatus {
   total_units: number
   completed_units: number
   steps: TrainingStep[]
+  holdout_days?: number
+  holdout_result?: HoldoutResult | null
 }

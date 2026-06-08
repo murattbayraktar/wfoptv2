@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
-import type { RetrainStatus, TrainingStep } from '../types'
+import type { HoldoutResult, RetrainStatus, TrainingStep } from '../types'
 
 const KIND_ICON: Record<string, string> = {
   data_ready: '📥',
+  holdout_set: '✂️',
   plan: '🗂️',
   unit_start: '▶️',
   selection_start: '🔍',
@@ -11,13 +12,20 @@ const KIND_ICON: Record<string, string> = {
   unit_done: '🏁',
   unit_failed: '⚠️',
   completed: '🎉',
+  holdout_forecast: '🔮',
+  holdout_done: '📊',
+  holdout_failed: '⚠️',
   error: '❌',
 }
 
 function StepRow({ step }: { step: TrainingStep }) {
   const icon = KIND_ICON[step.kind] ?? '•'
   const time = new Date(step.at).toLocaleTimeString('tr-TR')
-  const emphasized = step.kind === 'model_selected' || step.kind === 'unit_done' || step.kind === 'completed'
+  const emphasized =
+    step.kind === 'model_selected' ||
+    step.kind === 'unit_done' ||
+    step.kind === 'completed' ||
+    step.kind === 'holdout_done'
   return (
     <li className="flex items-start gap-3 py-1.5">
       <span className="mt-0.5 text-sm leading-none">{icon}</span>
@@ -29,6 +37,116 @@ function StepRow({ step }: { step: TrainingStep }) {
 
 function unitSummaries(steps: TrainingStep[]) {
   return steps.filter((s) => s.kind === 'unit_done')
+}
+
+function mapeQuality(mape: number): { label: string; cls: string } {
+  if (mape < 10) return { label: 'İyi', cls: 'text-emerald-400' }
+  if (mape < 20) return { label: 'Kabul', cls: 'text-yellow-400' }
+  return { label: 'Zayıf', cls: 'text-red-400' }
+}
+
+function HoldoutPanel({ result }: { result: HoldoutResult }) {
+  const types = Object.entries(result.by_type)
+
+  return (
+    <div className="mt-4 rounded-lg border border-blue-500/30 bg-blue-500/5 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-medium text-blue-300">
+          Doğrulama Sonuçları — MAPE
+        </div>
+        <span className="text-xs text-slate-500">
+          {result.holdout_range.start} – {result.holdout_range.end}
+        </span>
+      </div>
+
+      {result.overall_mape !== null && result.overall_mape !== undefined && (
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-xs text-slate-400">Genel MAPE:</span>
+          <span className={`text-sm font-semibold ${mapeQuality(result.overall_mape).cls}`}>
+            {result.overall_mape.toFixed(1)}%
+          </span>
+          <span className={`text-xs ${mapeQuality(result.overall_mape).cls}`}>
+            ({mapeQuality(result.overall_mape).label})
+          </span>
+        </div>
+      )}
+
+      {types.length > 0 && (
+        <table className="w-full text-left text-xs text-slate-300">
+          <thead>
+            <tr className="text-slate-500">
+              <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
+              <th className="pb-1 pr-4 font-medium">MAPE</th>
+              <th className="pb-1 pr-4 font-medium">Yorum</th>
+              <th className="pb-1 font-medium">Gün sayısı</th>
+            </tr>
+          </thead>
+          <tbody>
+            {types.map(([tt, info]) => {
+              const q = info.mape !== null ? mapeQuality(info.mape) : null
+              return (
+                <tr key={tt} className="border-t border-navy-800">
+                  <td className="py-1 pr-4">{tt}</td>
+                  <td className={`py-1 pr-4 font-medium ${q?.cls ?? 'text-slate-500'}`}>
+                    {info.mape !== null ? `${info.mape.toFixed(1)}%` : '—'}
+                  </td>
+                  <td className={`py-1 pr-4 ${q?.cls ?? 'text-slate-500'}`}>
+                    {q?.label ?? '—'}
+                  </td>
+                  <td className="py-1 text-slate-400">{info.rows.length}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {/* Detay satırları: ilk eşleşen tip için gerçekleşen vs tahmin */}
+      {types.map(([tt, info]) =>
+        info.rows.length > 0 ? (
+          <details key={tt} className="mt-3">
+            <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400">
+              {tt} — gün bazlı gerçekleşen vs tahmin
+            </summary>
+            <div className="mt-2 max-h-48 overflow-y-auto rounded border border-navy-800">
+              <table className="w-full text-left text-xs">
+                <thead className="sticky top-0 bg-navy-900">
+                  <tr className="text-slate-500">
+                    <th className="px-3 py-1 font-medium">Tarih</th>
+                    <th className="px-3 py-1 font-medium">Gerçekleşen</th>
+                    <th className="px-3 py-1 font-medium">Tahmin</th>
+                    <th className="px-3 py-1 font-medium">Fark %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {info.rows.map((row) => {
+                    const diff =
+                      row.actual !== 0
+                        ? Math.abs((row.actual - row.predicted) / row.actual) * 100
+                        : null
+                    return (
+                      <tr key={row.date} className="border-t border-navy-800 text-slate-300">
+                        <td className="px-3 py-1">{row.date}</td>
+                        <td className="px-3 py-1">{row.actual.toLocaleString('tr-TR')}</td>
+                        <td className="px-3 py-1">{row.predicted.toLocaleString('tr-TR')}</td>
+                        <td className={`px-3 py-1 ${diff !== null && diff > 20 ? 'text-red-400' : 'text-slate-400'}`}>
+                          {diff !== null ? `${diff.toFixed(1)}%` : '—'}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        ) : null,
+      )}
+
+      <p className="mt-3 text-xs text-slate-500">
+        MAPE = Ortalama Mutlak Yüzde Hata. &lt;10%: iyi, 10–20%: kabul edilebilir, &gt;20%: zayıf.
+      </p>
+    </div>
+  )
 }
 
 export default function TrainingProgress({ status }: { status: RetrainStatus | null }) {
@@ -98,9 +216,14 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
               </tbody>
             </table>
           )}
-          <p className="mt-3 text-xs text-slate-500">
-            Modeller kaydedildi — "Tahmin" sekmesine geçip güncel modellerle tahmin oluşturabilirsiniz.
-          </p>
+
+          {status.holdout_result && <HoldoutPanel result={status.holdout_result} />}
+
+          {!status.holdout_result && (
+            <p className="mt-3 text-xs text-slate-500">
+              Modeller kaydedildi — "Tahmin" sekmesine geçip güncel modellerle tahmin oluşturabilirsiniz.
+            </p>
+          )}
         </div>
       )}
 

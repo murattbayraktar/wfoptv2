@@ -51,7 +51,7 @@ export async function getAvailableModels(): Promise<AvailableModelsResponse> {
   return handleJson<AvailableModelsResponse>(res)
 }
 
-export async function startRetrain(params: { freq?: string; types?: string[]; models?: string[] }): Promise<{ status: string }> {
+export async function startRetrain(params: { freq?: string; types?: string[]; models?: string[]; holdout_days?: number }): Promise<{ status: string }> {
   const res = await fetch('/api/retrain', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

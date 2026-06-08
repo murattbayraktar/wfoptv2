@@ -15,6 +15,8 @@ interface DataContextValue {
 
   trainModels: string[]
   toggleTrainModel: (v: string) => void
+  holdoutDays: number
+  setHoldoutDays: (v: number) => void
   startTraining: () => Promise<void>
   startingTraining: boolean
   trainingStartError: string | null
@@ -68,6 +70,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [datasetError, setDatasetError] = useState<string | null>(null)
   const [loadingDataset, setLoadingDataset] = useState(false)
   const [trainModels, setTrainModels] = useState<string[]>(['auto'])
+  const [holdoutDays, setHoldoutDays] = useState<number>(0)
   const [startingTraining, setStartingTraining] = useState(false)
   const [trainingStartError, setTrainingStartError] = useState<string | null>(null)
   const [retrainStatus, setRetrainStatus] = useState<RetrainStatus | null>(null)
@@ -215,14 +218,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setTrainingStartError(null)
     try {
       const models = trainModels.includes('auto') ? undefined : trainModels
-      await api.startRetrain({ freq: 'both', models })
+      await api.startRetrain({ freq: 'both', models, holdout_days: holdoutDays > 0 ? holdoutDays : undefined })
       setRetrainStatus(await api.getRetrainStatus())
     } catch (e) {
       setTrainingStartError(e instanceof Error ? e.message : 'Eğitim başlatılamadı.')
     } finally {
       setStartingTraining(false)
     }
-  }, [trainModels, retrainStatus])
+  }, [trainModels, holdoutDays, retrainStatus])
 
   const createForecast = useCallback(async () => {
     setForecastError(null)
@@ -252,6 +255,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     upload,
     trainModels,
     toggleTrainModel,
+    holdoutDays,
+    setHoldoutDays,
     startTraining,
     startingTraining,
     trainingStartError,
