@@ -26,7 +26,25 @@ ML_MODELS = {"xgboost", "lightgbm", "random_forest"}
 NEEDS_FEATURES = {"xgboost", "lightgbm", "random_forest", "ridge"}
 
 
+def _effective_cfg(freq: str, cfg: dict) -> dict:
+    """`freq == "hourly"` ise `models.hourly_overrides` değerlerini `cfg` üzerine uygular.
+
+    Saatlik veri günlüğe göre çok daha fazla satır içerdiğinden (her model.fit()
+    orantısız pahalıdır), ayrı bir override bloğu ile CV-fold/arama bütçesi
+    config üzerinden (şeffaf, geri alınabilir şekilde) küçültülebilir.
+    """
+    if freq != "hourly":
+        return cfg
+    overrides = cfg.get("hourly_overrides")
+    if not overrides:
+        return cfg
+    eff = dict(cfg)
+    eff.update(overrides)
+    return eff
+
+
 def _make_model(name: str, transaction_type: str, freq: str, cfg: dict) -> BaseForecaster:
+    cfg = _effective_cfg(freq, cfg)
     cls = MODEL_REGISTRY[name]
     kwargs = {"transaction_type": transaction_type, "freq": freq}
     if name in ML_MODELS:
@@ -107,6 +125,7 @@ class ModelSelector:
                 candidates = ["holt_winters"]
 
         all_scores = {}
+        search_artifacts: dict = {}
         console.print(f"\n[cyan]Model seçimi: {transaction_type} / {freq}[/cyan]")
         if progress_callback:
             progress_callback({
@@ -118,10 +137,28 @@ class ModelSelector:
 
         for model_name in candidates:
             try:
-                score = _cv_score(
-                    model_name, transaction_type, freq,
-                    X_train, y_train, cfg, metric, cv_folds
-                )
+                if model_name in ML_MODELS:
+                    # ML modelleri (xgboost/lightgbm/random_forest) `fit()` içinde
+                    # zaten kendi RandomizedSearchCV'sini (kendi iç-CV'siyle) çalıştırıp
+                    # bir CV-RMSE (`search.best_score_`) üretiyor. Bu skoru tekrar
+                    # ayrı bir dış cross-validation döngüsünden (_cv_score) geçirmek
+                    # iç içe CV anlamına gelir ve fit-sayısını ~5 kat şişirir — bu
+                    # yüzden burada arama sonucu doğrudan kullanılır ve final
+                    # tam-veri eğitiminde aynı parametrelerle (aramasız) yeniden
+                    # kullanılmak üzere saklanır (bkz. train_best/train_selected).
+                    m = _make_model(model_name, transaction_type, freq, cfg)
+                    m.fit(X_train, y_train)
+                    score = m.metrics["cv_rmse"]
+                    search_artifacts[model_name] = {
+                        "params": m.metrics.get("best_params"),
+                        "cv_rmse": score,
+                    }
+                else:
+                    # Holt-Winters / Ridge: ucuz modeller, iç içe arama problemi yok
+                    score = _cv_score(
+                        model_name, transaction_type, freq,
+                        X_train, y_train, cfg, metric, cv_folds
+                    )
                 all_scores[model_name] = round(score, 4)
                 console.print(f"  {model_name:20s} {metric.upper()} = {score:.4f}")
             except Exception as e:
@@ -157,7 +194,34 @@ class ModelSelector:
             "best_score": best_score,
             "all_scores": all_scores,
             "selection_reason": reason,
+            "_search_artifacts": search_artifacts,
         }
+
+    def _train_one(
+        self,
+        name: str,
+        transaction_type: str,
+        freq: str,
+        X_train: pd.DataFrame,
+        y_train: pd.Series,
+        cfg: dict,
+        search_artifacts: dict,
+    ) -> BaseForecaster:
+        """Tek bir modeli tüm veri üzerinde final-fit eder.
+
+        Eğer `select_best` aşamasında bu model için zaten bir hiperparametre
+        araması yapıldıysa (`search_artifacts`), aramayı TEKRARLAMADAN bulunan
+        `best_params` ile doğrudan `fit_from_params` çağrılır — bu, ML modelleri
+        için final eğitim maliyetini ~150 fit'ten ~4 fit'e indirir. Aksi halde
+        (holt_winters/ridge gibi arama yapmayan modeller) normal `fit()` kullanılır.
+        """
+        model = _make_model(name, transaction_type, freq, cfg)
+        artifact = search_artifacts.get(name)
+        if artifact and artifact.get("params") is not None and hasattr(model, "fit_from_params"):
+            model.fit_from_params(X_train, y_train, artifact["params"], cv_rmse=artifact.get("cv_rmse"))
+        else:
+            model.fit(X_train, y_train)
+        return model
 
     def train_best(
         self,
@@ -171,9 +235,8 @@ class ModelSelector:
         if cfg is None:
             cfg = {}
         name = selection_result["best_model"]
-        model = _make_model(name, transaction_type, freq, cfg)
-        model.fit(X_train, y_train)
-        return model
+        search_artifacts = selection_result.get("_search_artifacts", {})
+        return self._train_one(name, transaction_type, freq, X_train, y_train, cfg, search_artifacts)
 
     def train_selected(
         self,
@@ -183,20 +246,23 @@ class ModelSelector:
         y_train: pd.Series,
         candidate_names: list[str],
         cfg: dict = None,
+        search_artifacts: dict = None,
     ) -> dict:
         """candidate_names listesindeki HER modeli tüm veri üzerinde eğitir.
 
         CV skorlaması (`select_best`) zaten her aday için ayrı ayrı yapıldığından
         burada tekrarlanmaz — sadece tam veri ile final-fit gerçekleştirilir.
+        ML modelleri için, `select_best` sırasında bulunan hiperparametreler
+        (`search_artifacts`) varsa arama tekrarlanmadan doğrudan kullanılır.
         Döner: {model_name: fitted_model}
         """
         if cfg is None:
             cfg = {}
+        if search_artifacts is None:
+            search_artifacts = {}
         trained = {}
         for name in candidate_names:
-            model = _make_model(name, transaction_type, freq, cfg)
-            model.fit(X_train, y_train)
-            trained[name] = model
+            trained[name] = self._train_one(name, transaction_type, freq, X_train, y_train, cfg, search_artifacts)
         return trained
 
 

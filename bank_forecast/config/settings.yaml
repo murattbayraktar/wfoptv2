@@ -18,6 +18,14 @@ models:
   xgboost_n_iter: 30
   lightgbm_n_iter: 30
   rf_n_iter: 20
+  # Saatlik veri günlüğe göre ~10x daha fazla satır içerir (her model.fit() orantısız
+  # pahalıdır). Bu blok yalnızca freq == "hourly" olduğunda yukarıdaki değerlerin
+  # üzerine uygulanır — kaldırılırsa/boş bırakılırsa davranış değişmez.
+  hourly_overrides:
+    cv_folds: 3
+    xgboost_n_iter: 15
+    lightgbm_n_iter: 15
+    rf_n_iter: 10
 
 forecast:
   confidence_method: quantile

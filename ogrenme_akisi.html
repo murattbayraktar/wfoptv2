@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Öğrenme (Eğitim) Akışı — Banka İşlem Tahmin Sistemi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6fb;
+    color: #1a1a2e;
+    line-height: 1.6;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a4731 0%, #27ae60 100%);
+    color: white;
+    padding: 40px 48px 32px;
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .header p { font-size: 15px; opacity: 0.85; max-width: 680px; }
+  .header-meta {
+    margin-top: 20px;
+    display: flex;
+    gap: 32px;
+    font-size: 13px;
+    opacity: 0.75;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #27ae60;
+    margin-bottom: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-top: 4px solid;
+  }
+  .summary-card.green  { border-color: #27ae60; }
+  .summary-card.blue   { border-color: #2e86ab; }
+  .summary-card.orange { border-color: #f39c12; }
+  .summary-card.red    { border-color: #e74c3c; }
+  .summary-card .num { font-size: 28px; font-weight: 700; color: #1a4731; }
+  .summary-card .lbl { font-size: 12px; color: #666; margin-top: 4px; }
+
+  .flow-section {
+    background: white;
+    border-radius: 16px;
+    padding: 36px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .flow-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a4731;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; gap: 0; align-items: stretch; }
+  .flow-connector { display: flex; flex-direction: column; align-items: center; width: 48px; flex-shrink: 0; }
+  .step-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0; font-weight: 700; color: white;
+  }
+  .flow-line {
+    width: 2px;
+    background: linear-gradient(to bottom, #27ae6044, #27ae6022);
+    flex: 1; min-height: 16px; margin: 0 auto;
+  }
+  .step-body { flex: 1; padding: 0 0 28px 16px; }
+  .step-name { font-size: 15px; font-weight: 700; color: #1a4731; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: #555; margin-bottom: 8px; }
+  .step-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .tag-green  { background: #d5f5e3; color: #1a5c32; }
+  .tag-blue   { background: #dceefb; color: #1a6a9a; }
+  .tag-orange { background: #fdebd0; color: #a04000; }
+  .tag-gray   { background: #f0f0f0; color: #555; }
+  .tag-purple { background: #ede1f5; color: #6c2fa0; }
+  .tag-red    { background: #fde8e8; color: #a02020; }
+
+  .decision-box {
+    display: flex; align-items: center; gap: 16px;
+    background: #fff8e6; border: 2px dashed #f39c12;
+    border-radius: 12px; padding: 14px 18px; margin: 8px 0;
+  }
+  .decision-text { font-size: 13px; font-weight: 600; color: #7d4e00; }
+  .decision-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .branch { background: white; border-radius: 8px; padding: 10px 14px; font-size: 12px; border-left: 3px solid; }
+  .branch-yes { border-color: #27ae60; }
+  .branch-no  { border-color: #e74c3c; }
+  .branch-label { font-weight: 700; font-size: 11px; margin-bottom: 2px; }
+  .branch-yes .branch-label { color: #27ae60; }
+  .branch-no  .branch-label { color: #e74c3c; }
+
+  /* MODEL COMPARISON TABLE */
+  .model-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  .model-table th { background: #1a4731; color: white; padding: 10px 14px; text-align: left; }
+  .model-table th:first-child { border-radius: 8px 0 0 0; }
+  .model-table th:last-child  { border-radius: 0 8px 0 0; }
+  .model-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; }
+  .model-table tr:nth-child(even) td { background: #f8fdf9; }
+  .best-row td { background: #d5f5e3 !important; font-weight: 700; }
+  .score-bar-cell { width: 120px; }
+  .score-bar-bg { background: #e8f5e9; border-radius: 4px; height: 10px; overflow: hidden; }
+  .score-bar-fill { height: 100%; background: #27ae60; border-radius: 4px; }
+
+  /* CV DIAGRAM */
+  .cv-visual { margin-top: 12px; }
+  .cv-fold { display: flex; gap: 4px; margin-bottom: 6px; align-items: center; }
+  .cv-label { font-size: 11px; color: #777; width: 50px; flex-shrink: 0; }
+  .cv-block { height: 20px; border-radius: 3px; }
+  .cv-train { background: #85c1e9; }
+  .cv-val   { background: #e74c3c; }
+  .cv-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 11px; }
+  .cv-legend-item { display: flex; align-items: center; gap: 6px; }
+  .cv-dot { width: 12px; height: 12px; border-radius: 2px; }
+
+  /* FEATURE GROUP GRID */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .feature-group { background: #f8fdf9; border-radius: 10px; padding: 14px; border: 1px solid #c8e6c9; }
+  .feature-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .feature-item { font-size: 12px; color: #444; padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+  .feature-item::before { content: '•'; color: #27ae60; font-weight: 700; }
+
+  /* REGISTRY */
+  .registry-box {
+    background: #1a1a2e; border-radius: 10px; padding: 20px;
+    font-family: monospace; font-size: 12px; color: #e0e0e0;
+    margin-top: 12px; line-height: 1.8;
+  }
+  .json-key   { color: #85c1e9; }
+  .json-val   { color: #a9dfbf; }
+  .json-str   { color: #f9e79f; }
+  .json-punct { color: #ccc; }
+
+  .step-icon.s1 { background: #27ae60; }
+  .step-icon.s2 { background: #1a7a45; }
+  .step-icon.s3 { background: #2ecc71; }
+  .step-icon.s4 { background: #1abc9c; }
+  .step-icon.s5 { background: #2e86ab; }
+  .step-icon.s6 { background: #8e44ad; }
+  .step-icon.s7 { background: #e67e22; }
+  .step-icon.s8 { background: #e74c3c; }
+  .step-icon.s9 { background: #27ae60; }
+  .step-icon.serr { background: #e74c3c; font-size: 14px; }
+
+  .footer { text-align: center; padding: 32px; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">Executive Özet</div>
+  <h1>🎓 Öğrenme (Eğitim) Akışı</h1>
+  <p>Ham işlem verisinden makine öğrenmesi modelleri eğitilmesi, en iyi modelin otomatik seçilmesi ve modellerin kaydedilmesi süreci.</p>
+  <div class="header-meta">
+    <span>🏦 Banka İşlem Tahmin Sistemi</span>
+    <span>⚙️ train.py → pipeline.py → train_pipeline()</span>
+    <span>📅 Haziran 2026</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SUMMARY CARDS -->
+  <div class="section-title">Genel Bakış</div>
+  <div class="summary-grid">
+    <div class="summary-card green">
+      <div class="num">5</div>
+      <div class="lbl">Aday Model<br><small style="font-size:10px">XGB·LGB·RF·HW·Ridge</small></div>
+    </div>
+    <div class="summary-card blue">
+      <div class="num">5-fold</div>
+      <div class="lbl">Cross-Validation<br><small style="font-size:10px">TimeSeriesSplit</small></div>
+    </div>
+    <div class="summary-card orange">
+      <div class="num">%80</div>
+      <div class="lbl">Eğitim Bölümü<br><small style="font-size:10px">Son %20 veya 60 gün test</small></div>
+    </div>
+    <div class="summary-card red">
+      <div class="num">3</div>
+      <div class="lbl">Seçim Metriği<br><small style="font-size:10px">RMSE · MAE · MAPE</small></div>
+    </div>
+  </div>
+
+  <!-- MAIN FLOW -->
+  <div class="flow-section">
+    <div class="flow-title">🔄 Öğrenme Akışı — Adım Adım</div>
+    <div class="flow-steps">
+
+      <!-- Step 1 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s1">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Girdi Parametreleri Alınır</div>
+          <div class="step-desc">Kullanıcı CSV dosya yolunu, frekansı, kullanılacak modelleri ve değerlendirme metriğini belirtir. Tüm parametreler isteğe bağlıdır; varsayılanlar otomatik uygulanır.</div>
+          <div class="step-tags">
+            <span class="tag tag-blue">--input data/raw/transactions.csv</span>
+            <span class="tag tag-gray">--freq daily | hourly | both</span>
+            <span class="tag tag-gray">--models auto</span>
+            <span class="tag tag-gray">--metric rmse</span>
+            <span class="tag tag-gray">--cv-folds 5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s2">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Veri Yüklenir ve Doğrulanır</div>
+          <div class="step-desc">CSV dosyası okunur. Kodlama otomatik algılanır (UTF-8, Latin-1 desteği). Sütun adları standartlaştırılır, tarihler parse edilir. Ardından verinin kalite kontrolleri yapılır.</div>
+          <div class="step-tags">
+            <span class="tag tag-green">chardet ile encoding tespiti</span>
+            <span class="tag tag-green">Sütun alias eşleme</span>
+            <span class="tag tag-orange">min 60 günlük veri zorunlu</span>
+            <span class="tag tag-red">Hata → İşlem durur</span>
+          </div>
+          <div class="decision-box" style="margin-top:10px;">
+            <div style="font-size:22px;">🔍</div>
+            <div>
+              <div class="decision-text">Doğrulama geçti mi?</div>
+              <div class="decision-branches">
+                <div class="branch branch-yes">
+                  <div class="branch-label">✅ EVET</div>
+                  İşlem tiplerine göre ayrıştırma başlar.
+                </div>
+                <div class="branch branch-no">
+                  <div class="branch-label">❌ HAYIR — Hata</div>
+                  ValueError fırlatılır, eğitim durur. Eksik sütunlar veya yetersiz veri.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s3">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Veri Toplanır (Aggregation)</div>
+          <div class="step-desc">Ham satır bazlı işlem verisi, seçilen frekansa göre özetlenir. Her (işlem tipi, tarih) veya (işlem tipi, tarih, saat) kombinasyonu için toplam adet ve tutar hesaplanır.</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+            <div style="background:#f8fdf9; border-radius:8px; padding:14px; border:1px solid #c8e6c9;">
+              <div style="font-size:12px; font-weight:700; color:#1a4731; margin-bottom:6px;">📅 Günlük Toplama</div>
+              <div style="font-size:12px; color:#555;">GROUP BY işlem_tipi, tarih<br>→ günlük toplam adet, tutar<br>→ aggregate_daily(df)</div>
+            </div>
+            <div style="background:#f8fdf9; border-radius:8px; padding:14px; border:1px solid #c8e6c9;">
+              <div style="font-size:12px; font-weight:700; color:#1a4731; margin-bottom:6px;">⏰ Saatlik Toplama</div>
+              <div style="font-size:12px; color:#555;">GROUP BY işlem_tipi, tarih, saat<br>→ 07:00–18:00 arası (12 saat)<br>→ aggregate_hourly(df)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s4">4</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Özellikler (Feature) Üretilir</div>
+          <div class="step-desc">Her (işlem tipi, frekans) alt kümesi için üç kategoride özellikler hesaplanır. Bu özellikler modelin mevsimselliği ve takvim etkilerini öğrenmesini sağlar.</div>
+          <div class="feature-grid">
+            <div class="feature-group">
+              <div class="feature-group-title" style="color:#27ae60;">📅 Takvim</div>
+              <div class="feature-item">Haftanın günü (0–6)</div>
+              <div class="feature-item">Ay, çeyrek</div>
+              <div class="feature-item">Resmi tatil bayrağı</div>
+              <div class="feature-item">Dini tatil bayrağı</div>
+              <div class="feature-item">Köprü günü</div>
+              <div class="feature-item">Ay başı / sonu</div>
+              <div class="feature-item">Son Cuma bayrağı</div>
+              <div class="feature-item">Tatile uzaklık (gün)</div>
+            </div>
+            <div class="feature-group">
+              <div class="feature-group-title" style="color:#2e86ab;">🔁 Lag & Rolling</div>
+              <div class="feature-item">1–7 günlük lag değerleri</div>
+              <div class="feature-item">Aynı haftanın günü lag</div>
+              <div class="feature-item">7 günlük rolling ort.</div>
+              <div class="feature-item">14 günlük rolling ort.</div>
+              <div class="feature-item">Rolling std. sapma</div>
+              <div class="feature-item">Sızıntı engeli: her tip kendi grubunda</div>
+            </div>
+            <div class="feature-group">
+              <div class="feature-group-title" style="color:#8e44ad;">〰️ Fourier</div>
+              <div class="feature-item">Haftalık sin/cos (3 terim)</div>
+              <div class="feature-item">Yıllık sin/cos (5 terim)</div>
+              <div class="feature-item">Saatlik sin/cos döngüleri</div>
+              <div class="feature-item">Target encoding (işlem tipi)</div>
+              <div class="feature-item">Smoothing = 1.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s5">5</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Eğitim / Doğrulama Bölünmesi</div>
+          <div class="step-desc">Veri zaman sırasına göre iki parçaya ayrılır. Son %20 veya son 60 gün (hangisi küçükse) doğrulama için ayrılır; kalan eğitim seti olarak kullanılır.</div>
+          <div style="margin-top:12px; background:#f8fdf9; border-radius:10px; padding:16px; border:1px solid #c8e6c9;">
+            <svg viewBox="0 0 620 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+              <rect x="0"   y="15" width="496" height="30" rx="4" fill="#85c1e9"/>
+              <rect x="496" y="15" width="124" height="30" rx="4" fill="#e74c3c" opacity="0.8"/>
+              <text x="248" y="35" text-anchor="middle" font-size="12" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Eğitim Seti (%80 veya ilk N-60 gün)</text>
+              <text x="558" y="35" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Test (%20 / 60 gün)</text>
+              <text x="0"   y="10" font-size="9" fill="#555" font-family="Segoe UI, sans-serif">Başlangıç →</text>
+              <text x="500" y="10" font-size="9" fill="#e74c3c" font-family="Segoe UI, sans-serif">Son 60g</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s6">6</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Walk-Forward Cross-Validation ile Model Seçimi</div>
+          <div class="step-desc">Her aday model, TimeSeriesSplit ile 5 farklı bölünmede eğitilip test edilir. Ortalama hata skoru hesaplanır. En düşük CV skoruna sahip model seçilir. Yeterli veri yoksa yalnızca basit modeller (Holt-Winters, Ridge) denenir.</div>
+
+          <div class="cv-visual">
+            <div class="cv-fold">
+              <div class="cv-label" style="font-size:10px;">Fold 1</div>
+              <div class="cv-block cv-train" style="width:120px;"></div>
+              <div class="cv-block cv-val" style="width:24px; margin-left:4px;"></div>
+            </div>
+            <div class="cv-fold">
+              <div class="cv-label" style="font-size:10px;">Fold 2</div>
+              <div class="cv-block cv-train" style="width:168px;"></div>
+              <div class="cv-block cv-val" style="width:24px; margin-left:4px;"></div>
+            </div>
+            <div class="cv-fold">
+              <div class="cv-label" style="font-size:10px;">Fold 3</div>
+              <div class="cv-block cv-train" style="width:216px;"></div>
+              <div class="cv-block cv-val" style="width:24px; margin-left:4px;"></div>
+            </div>
+            <div class="cv-fold">
+              <div class="cv-label" style="font-size:10px;">Fold 4</div>
+              <div class="cv-block cv-train" style="width:264px;"></div>
+              <div class="cv-block cv-val" style="width:24px; margin-left:4px;"></div>
+            </div>
+            <div class="cv-fold">
+              <div class="cv-label" style="font-size:10px;">Fold 5</div>
+              <div class="cv-block cv-train" style="width:312px;"></div>
+              <div class="cv-block cv-val" style="width:24px; margin-left:4px;"></div>
+            </div>
+            <div class="cv-legend">
+              <div class="cv-legend-item"><div class="cv-dot" style="background:#85c1e9;"></div>Eğitim verisi</div>
+              <div class="cv-legend-item"><div class="cv-dot" style="background:#e74c3c;"></div>Doğrulama verisi</div>
+              <div style="font-size:11px; color:#777; margin-left:8px;">Her fold bir öncekinden daha uzun → gerçekçi zaman serisi testi</div>
+            </div>
+          </div>
+
+          <!-- Model comparison table -->
+          <div style="margin-top:16px;">
+            <div class="section-title" style="margin-bottom:10px;">Örnek Model Karşılaştırması (EFT / Günlük)</div>
+            <table class="model-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>CV RMSE</th>
+                  <th>Görsel Skor</th>
+                  <th>Kullanım Durumu</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="best-row">
+                  <td>🏆 XGBoost</td>
+                  <td>12.4</td>
+                  <td class="score-bar-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:88%;"></div></div></td>
+                  <td>Güçlü trend + haftalık mevsimsellik</td>
+                </tr>
+                <tr>
+                  <td>LightGBM</td>
+                  <td>13.1</td>
+                  <td class="score-bar-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:80%; background:#85c1e9;"></div></div></td>
+                  <td>Yüksek takvim hassasiyeti</td>
+                </tr>
+                <tr>
+                  <td>Random Forest</td>
+                  <td>15.6</td>
+                  <td class="score-bar-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:65%; background:#85c1e9;"></div></div></td>
+                  <td>Stabil, düşük varyans</td>
+                </tr>
+                <tr>
+                  <td>Holt-Winters</td>
+                  <td>21.3</td>
+                  <td class="score-bar-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:45%; background:#f39c12;"></div></div></td>
+                  <td>Az veri / basit mevsimsellik</td>
+                </tr>
+                <tr>
+                  <td>Ridge</td>
+                  <td>28.7</td>
+                  <td class="score-bar-cell"><div class="score-bar-bg"><div class="score-bar-fill" style="width:28%; background:#e74c3c;"></div></div></td>
+                  <td>Takvim baseline</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="font-size:11px; color:#777; margin-top:6px;">✅ En düşük CV RMSE → XGBoost seçildi. Seçim sebebi kayıt defterine yazılır.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s7">7</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Final Model Tüm Veri Üzerinde Eğitilir</div>
+          <div class="step-desc">Model seçimi tamamlandıktan sonra kazanan model, train+test dahil <strong>tüm mevcut veri</strong> üzerinde yeniden eğitilir. Bu, üretime alınacak modelin maksimum veriyle eğitilmesini sağlar.</div>
+          <div class="step-tags">
+            <span class="tag tag-orange">selector.train_best() — tüm X, y ile fit()</span>
+            <span class="tag tag-green">Bayesian hyperparameter optimize edilmiş</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s8">8</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Model ve Encoder Kaydedilir</div>
+          <div class="step-desc">Eğitilen model <code>.pkl</code> dosyası olarak diske yazılır. Target encoder ayrıca kaydedilir. Model registry JSON'u güncellenir; tüm metrikler, seçim gerekçesi ve özellik önem sırası kaydedilir.</div>
+          <div class="registry-box">
+<span class="json-punct">{</span><br>
+&nbsp;&nbsp;<span class="json-key">"EFT_daily"</span><span class="json-punct">:</span> <span class="json-punct">{</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"best_model"</span><span class="json-punct">:</span> <span class="json-str">"xgboost"</span><span class="json-punct">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"cv_rmse"</span><span class="json-punct">:</span> <span class="json-val">12.4</span><span class="json-punct">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"selection_reason"</span><span class="json-punct">:</span> <span class="json-str">"xgboost en düşük CV RMSE'yi verdi (12.4). İkinci sıra: lightgbm (13.1)"</span><span class="json-punct">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"feature_importance_top5"</span><span class="json-punct">:</span> <span class="json-str">["lag_1", "rolling_7", "day_of_week", "days_to_month_end", "fourier_sin_7"]</span><span class="json-punct">,</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"model_path"</span><span class="json-punct">:</span> <span class="json-str">"models/saved/EFT_daily_best.pkl"</span><br>
+&nbsp;&nbsp;<span class="json-punct">}</span><br>
+<span class="json-punct">}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 9 -->
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="step-icon s9">✓</div>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Rapor ve Grafikler Üretilir</div>
+          <div class="step-desc">Tüm eğitim tamamlandığında isteğe bağlı olarak HTML eğitim raporu oluşturulur. Model karşılaştırma grafikleri ve özellik önem sırası grafikleri Plotly ile kaydedilir.</div>
+          <div class="step-tags">
+            <span class="tag tag-green">outputs/reports/training_report.html</span>
+            <span class="tag tag-blue">outputs/plots/model_comparison.html</span>
+            <span class="tag tag-purple">outputs/plots/fi_{tip}.html</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE DIAGRAM -->
+  <div class="flow-section">
+    <div class="flow-title">📐 Mimari Harita — Bileşen Bağımlılıkları</div>
+    <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; border-radius:8px;">
+      <defs>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#27ae60"/>
+        </marker>
+        <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#e74c3c"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="860" height="320" rx="8" fill="#f8fdf9"/>
+
+      <!-- Column headers -->
+      <text x="75"  y="22" text-anchor="middle" font-size="10" fill="#888" font-family="Segoe UI, sans-serif" font-weight="700" letter-spacing="1">VERİ</text>
+      <text x="245" y="22" text-anchor="middle" font-size="10" fill="#888" font-family="Segoe UI, sans-serif" font-weight="700" letter-spacing="1">ÖZELLİK</text>
+      <text x="450" y="22" text-anchor="middle" font-size="10" fill="#888" font-family="Segoe UI, sans-serif" font-weight="700" letter-spacing="1">MODEL SEÇİMİ</text>
+      <text x="680" y="22" text-anchor="middle" font-size="10" fill="#888" font-family="Segoe UI, sans-serif" font-weight="700" letter-spacing="1">ÇIKTI</text>
+
+      <line x1="155" y1="30" x2="155" y2="305" stroke="#d0e8d0" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="340" y1="30" x2="340" y2="305" stroke="#d0e8d0" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="570" y1="30" x2="570" y2="305" stroke="#d0e8d0" stroke-width="1" stroke-dasharray="4"/>
+
+      <!-- Data layer -->
+      <rect x="10" y="45" width="130" height="35" rx="7" fill="#27ae60"/>
+      <text x="75" y="63" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">CSV Yükle</text>
+      <text x="75" y="74" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">loader.py</text>
+
+      <rect x="10" y="100" width="130" height="35" rx="7" fill="#1a7a45"/>
+      <text x="75" y="118" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Doğrula</text>
+      <text x="75" y="129" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">validator.py</text>
+
+      <rect x="10" y="155" width="130" height="35" rx="7" fill="#2ecc71"/>
+      <text x="75" y="173" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Topla (Agg)</text>
+      <text x="75" y="184" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">aggregator.py</text>
+
+      <!-- Arrows data → feature -->
+      <line x1="140" y1="63" x2="165" y2="140" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <line x1="140" y1="117" x2="165" y2="145" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <line x1="140" y1="172" x2="165" y2="155" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <!-- Feature layer -->
+      <rect x="165" y="55" width="160" height="200" rx="7" fill="white" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="245" y="78" text-anchor="middle" font-size="12" fill="#1a4731" font-family="Segoe UI, sans-serif" font-weight="700">Özellik Üretimi</text>
+      <text x="245" y="95" text-anchor="middle" font-size="10" fill="#27ae60" font-family="Segoe UI, sans-serif">feature_pipeline.py</text>
+      <rect x="178" y="105" width="134" height="22" rx="4" fill="#f0faf3"/>
+      <text x="245" y="120" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">📅 calendar_features.py</text>
+      <rect x="178" y="132" width="134" height="22" rx="4" fill="#f0faf3"/>
+      <text x="245" y="147" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">🔁 lag_features.py</text>
+      <rect x="178" y="159" width="134" height="22" rx="4" fill="#f0faf3"/>
+      <text x="245" y="174" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">〰️ seasonal_features.py</text>
+      <rect x="178" y="186" width="134" height="22" rx="4" fill="#f0faf3"/>
+      <text x="245" y="201" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">🏷️ TargetEncoder</text>
+      <rect x="178" y="213" width="134" height="22" rx="4" fill="#f0faf3"/>
+      <text x="245" y="228" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">X matrix, y series</text>
+
+      <!-- Arrow feature → selector -->
+      <line x1="325" y1="155" x2="355" y2="155" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <!-- Model selector -->
+      <rect x="355" y="55" width="200" height="200" rx="7" fill="#1a4731"/>
+      <text x="455" y="80" text-anchor="middle" font-size="12" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Model Seçici</text>
+      <text x="455" y="95" text-anchor="middle" font-size="10" fill="#a9dfbf" font-family="Segoe UI, sans-serif">model_selector.py</text>
+
+      <rect x="368" y="105" width="174" height="22" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="455" y="120" text-anchor="middle" font-size="10" fill="#5dade2" font-family="Segoe UI, sans-serif">XGBoost (BayesOpt)</text>
+      <rect x="368" y="131" width="174" height="22" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="455" y="146" text-anchor="middle" font-size="10" fill="#5dade2" font-family="Segoe UI, sans-serif">LightGBM (BayesOpt)</text>
+      <rect x="368" y="157" width="174" height="22" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="455" y="172" text-anchor="middle" font-size="10" fill="#5dade2" font-family="Segoe UI, sans-serif">Random Forest</text>
+      <rect x="368" y="183" width="174" height="22" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="455" y="198" text-anchor="middle" font-size="10" fill="#f9e79f" font-family="Segoe UI, sans-serif">Holt-Winters (az veri)</text>
+      <rect x="368" y="209" width="174" height="22" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="455" y="224" text-anchor="middle" font-size="10" fill="#f9e79f" font-family="Segoe UI, sans-serif">Ridge (baseline)</text>
+
+      <!-- CV label -->
+      <text x="455" y="248" text-anchor="middle" font-size="9" fill="#a9dfbf" font-family="Segoe UI, sans-serif">⟳ 5-fold TimeSeriesSplit CV</text>
+
+      <!-- Arrow selector → outputs -->
+      <line x1="555" y1="155" x2="585" y2="155" stroke="#27ae60" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <!-- Output layer -->
+      <rect x="585" y="50" width="130" height="35" rx="7" fill="#27ae60"/>
+      <text x="650" y="68" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Model .pkl</text>
+      <text x="650" y="79" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">models/saved/</text>
+
+      <rect x="585" y="100" width="130" height="35" rx="7" fill="#1a7a45"/>
+      <text x="650" y="118" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Encoder .pkl</text>
+      <text x="650" y="129" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">models/saved/</text>
+
+      <rect x="585" y="150" width="130" height="35" rx="7" fill="#2e86ab"/>
+      <text x="650" y="168" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">Registry JSON</text>
+      <text x="650" y="179" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">model_registry.json</text>
+
+      <rect x="585" y="200" width="130" height="35" rx="7" fill="#8e44ad"/>
+      <text x="650" y="218" text-anchor="middle" font-size="11" fill="white" font-family="Segoe UI, sans-serif" font-weight="700">HTML Rapor</text>
+      <text x="650" y="229" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, sans-serif">training_report.html</text>
+
+      <!-- Arrows -->
+      <line x1="580" y1="130" x2="582" y2="72" stroke="#27ae60" stroke-width="1" stroke-dasharray="3"/>
+      <line x1="582" y1="72" x2="584" y2="67" stroke="#27ae60" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="580" y1="180" x2="582" y2="215" stroke="#8e44ad" stroke-width="1" stroke-dasharray="3"/>
+      <line x1="582" y1="215" x2="584" y2="218" stroke="#8e44ad" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- Loop arrow -->
+      <text x="455" y="290" text-anchor="middle" font-size="10" fill="#555" font-family="Segoe UI, sans-serif">↻ Her (işlem tipi × frekans) çifti için tekrar edilir</text>
+    </svg>
+  </div>
+
+  <!-- KEY DESIGN DECISIONS -->
+  <div class="flow-section">
+    <div class="flow-title">⚙️ Tasarım Kararları & Önemli Notlar</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div style="background:#f8fdf9; border-left:4px solid #27ae60; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#1a4731; margin-bottom:6px;">🔒 Data Leakage Koruması</div>
+        <div style="font-size:12px; color:#555;">Lag özellikleri her işlem tipi için ayrı ayrı hesaplanır. Bu, farklı tiplerin birbirinin geçmiş değerlerinden bilgi sızdırmasını engeller.</div>
+      </div>
+      <div style="background:#f8fdf9; border-left:4px solid #2e86ab; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#1a4731; margin-bottom:6px;">📊 Otomatik Model Seçimi</div>
+        <div style="font-size:12px; color:#555;">Her (tip, frekans) çifti için en iyi model bağımsız olarak seçilir. EFT günlük için XGBoost, SWIFT saatlik için LightGBM seçilebilir.</div>
+      </div>
+      <div style="background:#fff8e6; border-left:4px solid #f39c12; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#7d4e00; margin-bottom:6px;">⚡ Az Veri Fallback</div>
+        <div style="font-size:12px; color:#555;">Eğitim seti 60 günden azsa yalnızca Holt-Winters ve Ridge modelleri denenir. ML modeller yetersiz veriyle aşırı uydurma riski taşır.</div>
+      </div>
+      <div style="background:#fde8e8; border-left:4px solid #e74c3c; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#7d0000; margin-bottom:6px;">🛡️ Hata İzolasyonu</div>
+        <div style="font-size:12px; color:#555;">Bir (tip, frekans) çiftinde hata oluşursa try/except ile yakalanır, hata loglanır ve diğer çiftler eğitilmeye devam eder. Sistem kısmi hatayla çalışabilir.</div>
+      </div>
+      <div style="background:#ede1f5; border-left:4px solid #8e44ad; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#5b1f85; margin-bottom:6px;">🌐 API Desteği</div>
+        <div style="font-size:12px; color:#555;">train_pipeline() fonksiyonu bir <code>progress_callback</code> parametresi kabul eder. FastAPI üzerinden WebSocket ile canlı eğitim ilerleme takibi yapılabilir.</div>
+      </div>
+      <div style="background:#f8fdf9; border-left:4px solid #1abc9c; border-radius:0 10px 10px 0; padding:14px 16px;">
+        <div style="font-size:13px; font-weight:700; color:#0e6655; margin-bottom:6px;">📈 Feature Importance</div>
+        <div style="font-size:12px; color:#555;">Her modelin top-5 en önemli özelliği registry'e kaydedilir. Hangi takvim etkisinin en belirleyici olduğu görülebilir (örn. lag_1, day_of_week).</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Banka İşlem Tahmin Sistemi · wfoptv2 · train_pipeline() · Haziran 2026
+</div>
+
+</body>
+</html>

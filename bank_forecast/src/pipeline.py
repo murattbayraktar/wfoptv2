@@ -227,6 +227,13 @@ def train_pipeline(
     selector = ModelSelector()
     all_scores_for_plot = {}
 
+    # Aggregation, transaction_type'tan bağımsızdır (tüm tipler için tek seferde
+    # hesaplanıp sonradan filtrelenir — bkz. aggregator.py). Tip-döngüsü içinde
+    # tekrar tekrar çağırmak yerine her frekans için bir kez hesaplayıp önbelleğe al.
+    agg_cache: dict[str, pd.DataFrame] = {}
+    for f in freqs:
+        agg_cache[f] = aggregate_daily(df) if f == "daily" else aggregate_hourly(df, working_hours=working_hours)
+
     unit_index = 0
     for transaction_type in types:
         for f in freqs:
@@ -244,11 +251,7 @@ def train_pipeline(
                 })
 
             try:
-                if f == "daily":
-                    agg = aggregate_daily(df)
-                else:
-                    agg = aggregate_hourly(df, working_hours=working_hours)
-
+                agg = agg_cache[f]
                 subset = agg[agg["transaction_type"] == transaction_type].copy()
 
                 feat_df, feat_cols, encoder = build_features(
@@ -284,7 +287,8 @@ def train_pipeline(
                 if multi_save:
                     # Açıkça seçilen HER modeli tam veri ile eğit ve ayrı dosyaya kaydet
                     trained = selector.train_selected(
-                        transaction_type, f, X, y, candidate_models, models_cfg
+                        transaction_type, f, X, y, candidate_models, models_cfg,
+                        search_artifacts=sel_result.get("_search_artifacts", {}),
                     )
                     for name, model in trained.items():
                         m_path = best_model_path if name == best_name else os.path.join(output_dir, f"{key}_{name}.pkl")
