@@ -9,7 +9,7 @@ COLUMN_ALIASES = {
     "date": ["tarih", "DATE", "TARIH", "dt"],
     "hour": ["saat", "SAAT", "HOUR", "hr"],
     "transaction_type": ["islem_tipi", "TIP", "type", "TYPE"],
-    "count": ["adet", "ADET", "COUNT", "volume"],
+    "count": ["islem_hacmi", "ISLEM_HACMI", "islem_hacmı", "hacim", "adet", "ADET", "COUNT", "volume"],
     "amount": ["tutar", "TUTAR", "AMOUNT"],
 }
 
@@ -48,11 +48,15 @@ def parse_date_column(series: pd.Series) -> pd.Series:
 
 
 def load_transactions(filepath: str) -> pd.DataFrame:
-    enc = detect_encoding(filepath)
-    try:
-        df = pd.read_csv(filepath, encoding=enc)
-    except UnicodeDecodeError:
-        df = pd.read_csv(filepath, encoding="latin-1")
+    df = None
+    for enc in ["utf-8", detect_encoding(filepath), "latin-1"]:
+        try:
+            df = pd.read_csv(filepath, encoding=enc)
+            break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    if df is None:
+        raise ValueError("Dosya okunamadı: desteklenen bir karakter kodlaması bulunamadı.")
 
     df = standardize_columns(df)
 

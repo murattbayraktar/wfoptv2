@@ -20,11 +20,20 @@ class BaseForecaster(ABC):
     def predict(self, X: pd.DataFrame) -> np.ndarray: ...
 
     def predict_quantiles(self, X: pd.DataFrame, quantiles: list[float] = [0.1, 0.5, 0.9]) -> dict:
-        """Varsayılan: bootstrap benzeri fallback — alt sınıf override edebilir."""
+        """
+        Varsayılan: eğitim rezidüellerinin bootstrap dağılımından quantile ekle
+        (Yöntem 2 — Bootstrap fallback, model agnostik).
+        `self._residuals` set edilmemişse düz tahmine düşer.
+        """
         preds = self.predict(X)
+        residuals = getattr(self, "_residuals", None)
+        if residuals is None or len(residuals) == 0:
+            return {q: preds for q in quantiles}
+
         result = {}
         for q in quantiles:
-            result[q] = preds
+            offset = np.quantile(residuals, q)
+            result[q] = np.maximum(preds + offset, 0)
         return result
 
     def save(self, path: str) -> None:

@@ -1,6 +1,14 @@
 import pandas as pd
 import numpy as np
 
+# Fourier özellikleri için sabit referans tarih (bir Pazartesi).
+# Eğitimde ve tahminde aynı epoch kullanılmazsa (örn. veri kümesinin başlangıcı),
+# `t` farklı ofsetlerle hesaplanır ve haftalık/yıllık periyodik terimlerde
+# eğitim ile tahmin arasında faz kayması oluşur — bu da özellikle saatlik
+# tahminlerde (gün içi düzeni doğrudan bir "saat" özelliği değil, yalnızca
+# bu Fourier terimleri taşıdığından) belirgin sapmalara yol açar.
+FOURIER_EPOCH = pd.Timestamp("2000-01-03")
+
 
 def add_fourier_features(df: pd.DataFrame, period: int, n_terms: int, t_col: str = "t") -> pd.DataFrame:
     df = df.copy()
@@ -13,8 +21,7 @@ def add_fourier_features(df: pd.DataFrame, period: int, n_terms: int, t_col: str
 
 def add_daily_fourier(df: pd.DataFrame, weekly_terms: int = 3, yearly_terms: int = 5) -> pd.DataFrame:
     df = df.copy()
-    t0 = df["date"].min()
-    df["t"] = (df["date"] - t0).dt.days
+    df["t"] = (df["date"] - FOURIER_EPOCH).dt.days
 
     df = add_fourier_features(df, period=7, n_terms=weekly_terms)
     df = add_fourier_features(df, period=365, n_terms=yearly_terms)
@@ -25,8 +32,7 @@ def add_daily_fourier(df: pd.DataFrame, weekly_terms: int = 3, yearly_terms: int
 
 def add_hourly_fourier(df: pd.DataFrame, daily_terms: int = 4, weekly_terms: int = 3) -> pd.DataFrame:
     df = df.copy()
-    t0 = df["date"].min()
-    df["t"] = (df["date"] - t0).dt.days * 24 + df["hour"]
+    df["t"] = (df["date"] - FOURIER_EPOCH).dt.days * 24 + df["hour"]
 
     df = add_fourier_features(df, period=24, n_terms=daily_terms)
     df = add_fourier_features(df, period=168, n_terms=weekly_terms)

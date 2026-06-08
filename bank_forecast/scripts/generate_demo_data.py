@@ -135,23 +135,21 @@ def generate(output_path: str, seed: int = 42) -> None:
             for h, cnt in enumerate(hourly_counts):
                 if cnt == 0:
                     continue
-                avg_amount = rng.lognormal(mean=12, sigma=1.5) * (1 + 0.3 * rng.standard_normal())
                 rows.append({
+                    "islem_tipi": tt,
                     "tarih": d.strftime("%Y-%m-%d"),
                     "saat": h,
-                    "islem_tipi": tt,
-                    "adet": cnt,
-                    "tutar": round(abs(avg_amount * cnt), 0),
+                    "islem_hacmi": int(cnt),
                 })
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows, columns=["islem_tipi", "tarih", "saat", "islem_hacmi"])
     os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else ".", exist_ok=True)
     df.to_csv(output_path, index=False, encoding="utf-8")
     print(f"Demo veri oluşturuldu: {output_path}")
     print(f"  Toplam satır  : {len(df):,}")
     print(f"  İşlem tipleri : {sorted(df['islem_tipi'].unique())}")
     print(f"  Tarih araligi : {df['tarih'].min()} - {df['tarih'].max()}")
-    print(f"  Toplam adet   : {df['adet'].sum():,}")
+    print(f"  Toplam hacim  : {df['islem_hacmi'].sum():,}")
 
 
 def main():

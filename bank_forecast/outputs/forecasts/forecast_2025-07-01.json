@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-06T11:56:13.309054",
+  "generated_at": "2026-06-07T18:26:40.137682",
   "forecast_range": {
     "start": "2025-07-01",
-    "end": "2025-07-31"
+    "end": "2025-07-07"
   },
   "by_type": {
     "EFT": {
@@ -10,9 +10,9 @@
       "daily": [
         {
           "date": "2025-07-01",
-          "predicted_count": 252.8,
-          "lower_80": 252.8,
-          "upper_80": 252.8,
+          "predicted_count": 250.8,
+          "lower_80": 250.8,
+          "upper_80": 250.8,
           "confidence": "high",
           "calendar_flags": [
             "is_month_start"
@@ -20,25 +20,25 @@
         },
         {
           "date": "2025-07-02",
-          "predicted_count": 226.7,
-          "lower_80": 226.7,
-          "upper_80": 226.7,
+          "predicted_count": 229.3,
+          "lower_80": 229.3,
+          "upper_80": 229.3,
           "confidence": "high",
           "calendar_flags": []
         },
         {
           "date": "2025-07-03",
-          "predicted_count": 211.6,
-          "lower_80": 211.6,
-          "upper_80": 211.6,
+          "predicted_count": 214.7,
+          "lower_80": 214.7,
+          "upper_80": 214.7,
           "confidence": "high",
           "calendar_flags": []
         },
         {
           "date": "2025-07-04",
-          "predicted_count": 196.5,
-          "lower_80": 196.5,
-          "upper_80": 196.5,
+          "predicted_count": 200.1,
+          "lower_80": 200.1,
+          "upper_80": 200.1,
           "confidence": "high",
           "calendar_flags": []
         },
@@ -52,478 +52,19 @@
         },
         {
           "date": "2025-07-06",
-          "predicted_count": 5.2,
-          "lower_80": 5.2,
-          "upper_80": 5.2,
+          "predicted_count": 14.1,
+          "lower_80": 14.1,
+          "upper_80": 14.1,
           "confidence": "high",
           "calendar_flags": []
         },
         {
           "date": "2025-07-07",
-          "predicted_count": 279.6,
-          "lower_80": 279.6,
-          "upper_80": 279.6,
+          "predicted_count": 295.4,
+          "lower_80": 295.4,
+          "upper_80": 295.4,
           "confidence": "high",
           "calendar_flags": []
-        },
-        {
-          "date": "2025-07-08",
-          "predicted_count": 252.7,
-          "lower_80": 252.7,
-          "upper_80": 252.7,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-09",
-          "predicted_count": 234.1,
-          "lower_80": 234.1,
-          "upper_80": 234.1,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-10",
-          "predicted_count": 219.0,
-          "lower_80": 219.0,
-          "upper_80": 219.0,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-11",
-          "predicted_count": 193.6,
-          "lower_80": 193.6,
-          "upper_80": 193.6,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-12",
-          "predicted_count": 0.0,
-          "lower_80": 0.0,
-          "upper_80": 0.0,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-13",
-          "predicted_count": 2.3,
-          "lower_80": 2.3,
-          "upper_80": 2.3,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-14",
-          "predicted_count": 358.1,
-          "lower_80": 358.1,
-          "upper_80": 358.1,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_eve_of_holiday"
-          ]
-        },
-        {
-          "date": "2025-07-15",
-          "predicted_count": 37.2,
-          "lower_80": 37.2,
-          "upper_80": 37.2,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_public_holiday"
-          ]
-        },
-        {
-          "date": "2025-07-16",
-          "predicted_count": 259.9,
-          "lower_80": 259.9,
-          "upper_80": 259.9,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-17",
-          "predicted_count": 224.3,
-          "lower_80": 224.3,
-          "upper_80": 224.3,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-18",
-          "predicted_count": 205.7,
-          "lower_80": 205.7,
-          "upper_80": 205.7,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-19",
-          "predicted_count": 5.3,
-          "lower_80": 5.3,
-          "upper_80": 5.3,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-20",
-          "predicted_count": 14.3,
-          "lower_80": 14.3,
-          "upper_80": 14.3,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-21",
-          "predicted_count": 278.5,
-          "lower_80": 278.5,
-          "upper_80": 278.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-22",
-          "predicted_count": 251.5,
-          "lower_80": 251.5,
-          "upper_80": 251.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-23",
-          "predicted_count": 232.9,
-          "lower_80": 232.9,
-          "upper_80": 232.9,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-24",
-          "predicted_count": 217.8,
-          "lower_80": 217.8,
-          "upper_80": 217.8,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-25",
-          "predicted_count": 233.8,
-          "lower_80": 233.8,
-          "upper_80": 233.8,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-26",
-          "predicted_count": 2.4,
-          "lower_80": 2.4,
-          "upper_80": 2.4,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-27",
-          "predicted_count": 11.4,
-          "lower_80": 11.4,
-          "upper_80": 11.4,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-28",
-          "predicted_count": 285.9,
-          "lower_80": 285.9,
-          "upper_80": 285.9,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-29",
-          "predicted_count": 258.9,
-          "lower_80": 258.9,
-          "upper_80": 258.9,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-30",
-          "predicted_count": 240.3,
-          "lower_80": 240.3,
-          "upper_80": 240.3,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-31",
-          "predicted_count": 257.0,
-          "lower_80": 257.0,
-          "upper_80": 257.0,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_month_end"
-          ]
-        }
-      ]
-    },
-    "Havale": {
-      "model_used": "xgboost",
-      "daily": [
-        {
-          "date": "2025-07-01",
-          "predicted_count": 339.20001220703125,
-          "lower_80": 208.3000030517578,
-          "upper_80": 415.1000061035156,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_month_start"
-          ]
-        },
-        {
-          "date": "2025-07-02",
-          "predicted_count": 340.5,
-          "lower_80": 211.5,
-          "upper_80": 432.6000061035156,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-03",
-          "predicted_count": 342.79998779296875,
-          "lower_80": 212.60000610351562,
-          "upper_80": 426.6000061035156,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-04",
-          "predicted_count": 291.70001220703125,
-          "lower_80": 211.89999389648438,
-          "upper_80": 373.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-05",
-          "predicted_count": 3.0,
-          "lower_80": 1.2999999523162842,
-          "upper_80": 54.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-06",
-          "predicted_count": 3.0,
-          "lower_80": 1.100000023841858,
-          "upper_80": 53.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-07",
-          "predicted_count": 422.0,
-          "lower_80": 205.8000030517578,
-          "upper_80": 489.70001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-08",
-          "predicted_count": 360.3999938964844,
-          "lower_80": 220.0,
-          "upper_80": 412.1000061035156,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-09",
-          "predicted_count": 360.29998779296875,
-          "lower_80": 224.39999389648438,
-          "upper_80": 421.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-10",
-          "predicted_count": 366.8999938964844,
-          "lower_80": 228.8000030517578,
-          "upper_80": 420.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-11",
-          "predicted_count": 322.70001220703125,
-          "lower_80": 227.3000030517578,
-          "upper_80": 370.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-12",
-          "predicted_count": 3.200000047683716,
-          "lower_80": 1.899999976158142,
-          "upper_80": 49.0,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-13",
-          "predicted_count": 3.200000047683716,
-          "lower_80": 1.7000000476837158,
-          "upper_80": 48.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-14",
-          "predicted_count": 429.70001220703125,
-          "lower_80": 225.0,
-          "upper_80": 458.6000061035156,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_eve_of_holiday"
-          ]
-        },
-        {
-          "date": "2025-07-15",
-          "predicted_count": 30.100000381469727,
-          "lower_80": 5.099999904632568,
-          "upper_80": 369.6000061035156,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_public_holiday"
-          ]
-        },
-        {
-          "date": "2025-07-16",
-          "predicted_count": 381.5,
-          "lower_80": 235.10000610351562,
-          "upper_80": 419.29998779296875,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-17",
-          "predicted_count": 377.5,
-          "lower_80": 234.6999969482422,
-          "upper_80": 425.70001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-18",
-          "predicted_count": 332.5,
-          "lower_80": 233.60000610351562,
-          "upper_80": 370.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-19",
-          "predicted_count": 3.0999999046325684,
-          "lower_80": 2.4000000953674316,
-          "upper_80": 49.400001525878906,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-20",
-          "predicted_count": 3.0999999046325684,
-          "lower_80": 2.5999999046325684,
-          "upper_80": 49.5,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-21",
-          "predicted_count": 436.79998779296875,
-          "lower_80": 224.10000610351562,
-          "upper_80": 474.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-22",
-          "predicted_count": 359.0,
-          "lower_80": 226.5,
-          "upper_80": 405.79998779296875,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-23",
-          "predicted_count": 359.6000061035156,
-          "lower_80": 228.39999389648438,
-          "upper_80": 422.6000061035156,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-24",
-          "predicted_count": 361.29998779296875,
-          "lower_80": 231.0,
-          "upper_80": 425.20001220703125,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-25",
-          "predicted_count": 313.8999938964844,
-          "lower_80": 230.60000610351562,
-          "upper_80": 369.3999938964844,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-26",
-          "predicted_count": 3.0999999046325684,
-          "lower_80": 1.2000000476837158,
-          "upper_80": 50.599998474121094,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-27",
-          "predicted_count": 3.0999999046325684,
-          "lower_80": 1.600000023841858,
-          "upper_80": 50.70000076293945,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-28",
-          "predicted_count": 394.70001220703125,
-          "lower_80": 220.6999969482422,
-          "upper_80": 480.8999938964844,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-29",
-          "predicted_count": 359.29998779296875,
-          "lower_80": 222.60000610351562,
-          "upper_80": 406.8999938964844,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-30",
-          "predicted_count": 368.70001220703125,
-          "lower_80": 226.6999969482422,
-          "upper_80": 434.1000061035156,
-          "confidence": "high",
-          "calendar_flags": []
-        },
-        {
-          "date": "2025-07-31",
-          "predicted_count": 372.6000061035156,
-          "lower_80": 227.1999969482422,
-          "upper_80": 428.0,
-          "confidence": "high",
-          "calendar_flags": [
-            "is_month_end"
-          ]
         }
       ]
     }

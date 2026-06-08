@@ -1,0 +1,107 @@
+import { useMemo, useState } from 'react'
+import { useData } from '../context/DataContext'
+import ModelSummaryCard from './ModelSummaryCard'
+import TotalCountCard from './TotalCountCard'
+import DailyForecastChart from './DailyForecastChart'
+import HourlyBreakdownChart from './HourlyBreakdownChart'
+import ActualVsPredictedChart from './ActualVsPredictedChart'
+
+export default function ResultsPanel() {
+  const { forecastResult, resetResults } = useData()
+  const [showHourly, setShowHourly] = useState(false)
+
+  const types = useMemo(
+    () => (forecastResult ? Object.keys(forecastResult.forecast.by_type) : []),
+    [forecastResult],
+  )
+  const [activeType, setActiveType] = useState(types[0] ?? '')
+
+  if (!forecastResult) return null
+
+  const selected = types.includes(activeType) ? activeType : types[0]
+  const info = forecastResult.forecast.by_type[selected]
+  const hasHourly = !!info?.hourly && Object.keys(info.hourly).length > 0
+  const dailyComparisonHasType = forecastResult.comparison.daily.by_type[selected]
+  const hourlyComparisonHasType = forecastResult.comparison.hourly.by_type[selected]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-lg font-semibold text-slate-100">Tahmin Sonuçları</div>
+          <div className="text-xs text-slate-500">
+            Oluşturulma zamanı: {new Date(forecastResult.forecast.generated_at).toLocaleString('tr-TR')}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={resetResults}
+          className="rounded-md border border-navy-600 px-3 py-1.5 text-xs text-slate-300 hover:border-gold-500"
+        >
+          Yeni tahmin
+        </button>
+      </div>
+
+      <TotalCountCard result={forecastResult} />
+
+      <div>
+        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          İşlem Tipi ve Kullanılan Algoritma
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {types.map((tt) => (
+            <ModelSummaryCard
+              key={tt}
+              type={tt}
+              info={forecastResult.forecast.by_type[tt]}
+              active={tt === selected}
+              onSelect={() => setActiveType(tt)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wider text-slate-400">Grafik görünümü — {selected}</span>
+          {hasHourly && (
+            <div className="flex gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setShowHourly(false)}
+                className={`rounded-full px-3 py-1 transition-colors ${
+                  !showHourly ? 'bg-gold-500 text-navy-950' : 'border border-navy-600 text-slate-300'
+                }`}
+              >
+                Günlük
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowHourly(true)}
+                className={`rounded-full px-3 py-1 transition-colors ${
+                  showHourly ? 'bg-gold-500 text-navy-950' : 'border border-navy-600 text-slate-300'
+                }`}
+              >
+                Saatlik Kırılım
+              </button>
+            </div>
+          )}
+        </div>
+
+        {showHourly && hasHourly ? (
+          <HourlyBreakdownChart type={selected} info={info} comparison={forecastResult.comparison.hourly} />
+        ) : (
+          <DailyForecastChart type={selected} info={info} />
+        )}
+      </div>
+
+      {(dailyComparisonHasType || hourlyComparisonHasType) && (
+        <ActualVsPredictedChart
+          type={selected}
+          info={info}
+          comparison={showHourly && hourlyComparisonHasType ? forecastResult.comparison.hourly : forecastResult.comparison.daily}
+        />
+      )}
+    </div>
+  )
+}

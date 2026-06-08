@@ -31,10 +31,19 @@ class LightGBMForecaster(BaseForecaster):
         self._q_models: dict = {}
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> None:
-        self.feature_names = list(X.columns)
-        tscv = TimeSeriesSplit(n_splits=self.cv_folds)
+        """Hiperparametre araması (RandomizedSearchCV, kendi iç-CV'siyle CV-RMSE üretir)
+        + bulunan en iyi parametrelerle quantile modelleri eğitir.
 
-        cat_cols = [c for c in CATEGORICAL_FEATURES if c in X.columns]
+        Not: `search.best_score_` zaten bir CV-temelli RMSE tahminidir — bu yüzden
+        `ModelSelector` bu skoru doğrudan model-karşılaştırma metriği olarak kullanır
+        (ayrı bir dış cross-validation döngüsüne gerek kalmaz).
+        """
+        self.feature_names = list(X.columns)
+        best_params = self._search_best_params(X, y)
+        self._fit_quantiles(X, y, best_params)
+
+    def _search_best_params(self, X: pd.DataFrame, y: pd.Series) -> dict:
+        tscv = TimeSeriesSplit(n_splits=self.cv_folds)
 
         base_estimator = lgb.LGBMRegressor(
             objective="regression",
@@ -57,9 +66,10 @@ class LightGBMForecaster(BaseForecaster):
         search.fit(X, y)
         self.model = search.best_estimator_
         self.metrics["cv_rmse"] = -search.best_score_
-        self.metrics["best_params"] = search.best_params_
+        self.metrics["best_params"] = dict(search.best_params_)
+        return self.metrics["best_params"]
 
-        best_params = {k: v for k, v in search.best_params_.items()}
+    def _fit_quantiles(self, X: pd.DataFrame, y: pd.Series, best_params: dict) -> None:
         for q in [0.1, 0.5, 0.9]:
             qm = lgb.LGBMRegressor(
                 objective="quantile",
@@ -72,6 +82,31 @@ class LightGBMForecaster(BaseForecaster):
             )
             qm.fit(X, y)
             self._q_models[q] = qm
+
+    def fit_from_params(self, X: pd.DataFrame, y: pd.Series, params: dict,
+                        cv_rmse: float | None = None) -> None:
+        """Arama YAPMADAN, verilen hiperparametrelerle tek seferlik tam-veri fit.
+
+        Model-seçim aşamasında zaten bir `RandomizedSearchCV` çalıştırılıp en iyi
+        parametreler bulunduğundan, final (tüm-veri) eğitiminde aramayı tekrarlamak
+        sadece ~150 gereksiz fit ekler. Bu metod o aramayı atlayıp doğrudan
+        bulunan parametrelerle eğitir.
+        """
+        self.feature_names = list(X.columns)
+        params = dict(params)
+        self.model = lgb.LGBMRegressor(
+            objective="regression",
+            metric="rmse",
+            random_state=self.random_state,
+            n_jobs=self.n_jobs,
+            verbose=-1,
+            **params,
+        )
+        self.model.fit(X, y)
+        if cv_rmse is not None:
+            self.metrics["cv_rmse"] = cv_rmse
+        self.metrics["best_params"] = params
+        self._fit_quantiles(X, y, params)
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         preds = self.model.predict(X[self.feature_names])

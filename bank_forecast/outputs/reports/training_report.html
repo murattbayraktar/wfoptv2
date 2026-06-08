@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Eğitim Raporu — 2026-06-06 14:45</title>
+<title>Eğitim Raporu — 2026-06-07 18:27</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
   h1 { color: #2c3e50; }
@@ -14,7 +14,7 @@
 </head>
 <body>
 <h1>Banka Tahmin Sistemi — Eğitim Raporu</h1>
-<p>Oluşturulma: 2026-06-06 14:45</p>
+<p>Oluşturulma: 2026-06-07 18:27</p>
 <p>Veri aralığı: 2024-01-02 →
    2025-06-30</p>
 
@@ -27,93 +27,12 @@
 
         <tr>
             <td><b>EFT_daily</b></td>
-            <td>random_forest</td>
-            <td>60.26</td>
-            <td>60.26</td>
-            <td>xgboost: 65.89 | lightgbm: 74.03 | random_forest: 60.26 | holt_winters: 79.85 | ridge: 64.25</td>
-            <td>is_weekend, day_of_week, days_from_last_holiday, is_public_holiday, lag_14</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (60.2627). İkinci sıra: ridge (64.2463).</td>
-        </tr>
-        <tr>
-            <td><b>EFT_hourly</b></td>
-            <td>random_forest</td>
-            <td>12.74</td>
-            <td>12.74</td>
-            <td>xgboost: 12.90 | lightgbm: 12.91 | random_forest: 12.74 | holt_winters: 20.15 | ridge: 13.76</td>
-            <td>lag_1, sin_168_1, day_of_week, is_weekend, lag_168</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (12.7372). İkinci sıra: xgboost (12.9014).</td>
-        </tr>
-        <tr>
-            <td><b>Havale_daily</b></td>
-            <td>random_forest</td>
-            <td>77.91</td>
-            <td>77.91</td>
-            <td>xgboost: 82.02 | lightgbm: 91.22 | random_forest: 77.91 | holt_winters: 106.07 | ridge: 97.01</td>
-            <td>is_weekend, day_of_week, days_from_last_holiday, is_public_holiday, lag_21</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (77.9109). İkinci sıra: xgboost (82.0192).</td>
-        </tr>
-        <tr>
-            <td><b>Havale_hourly</b></td>
-            <td>random_forest</td>
-            <td>19.48</td>
-            <td>19.48</td>
-            <td>xgboost: 19.65 | lightgbm: 19.69 | random_forest: 19.48 | holt_winters: 38.84 | ridge: 21.16</td>
-            <td>lag_1, day_of_week, sin_168_1, is_weekend, lag_2</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (19.4850). İkinci sıra: xgboost (19.6544).</td>
-        </tr>
-        <tr>
-            <td><b>Kredi Ãdemesi_daily</b></td>
             <td>ridge</td>
-            <td>119.29</td>
-            <td>119.29</td>
-            <td>xgboost: 123.72 | lightgbm: 126.43 | random_forest: 120.17 | holt_winters: 124.14 | ridge: 119.29</td>
-            <td>is_weekend, day_of_week, is_public_holiday, is_month_end, post_holiday_day1</td>
-            <td>ridge en düşük CV RMSE'yi verdi (119.2885). İkinci sıra: random_forest (120.1717).</td>
-        </tr>
-        <tr>
-            <td><b>Kredi Ãdemesi_hourly</b></td>
-            <td>random_forest</td>
-            <td>13.98</td>
-            <td>13.98</td>
-            <td>xgboost: 14.17 | lightgbm: 14.21 | random_forest: 13.98 | holt_winters: 22.47 | ridge: 15.93</td>
-            <td>lag_1, lag_2, sin_168_1, is_weekend, lag_3</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (13.9807). İkinci sıra: xgboost (14.1652).</td>
-        </tr>
-        <tr>
-            <td><b>Mevduat_daily</b></td>
-            <td>ridge</td>
-            <td>46.14</td>
-            <td>46.14</td>
-            <td>xgboost: 49.18 | lightgbm: 52.51 | random_forest: 46.88 | holt_winters: 52.11 | ridge: 46.14</td>
+            <td>61.79</td>
+            <td>61.79</td>
+            <td>ridge: 61.79</td>
             <td>is_weekend, is_public_holiday, day_of_week, post_holiday_day1, quarter</td>
-            <td>ridge en düşük CV RMSE'yi verdi (46.1426). İkinci sıra: random_forest (46.8849).</td>
-        </tr>
-        <tr>
-            <td><b>Mevduat_hourly</b></td>
-            <td>random_forest</td>
-            <td>8.33</td>
-            <td>8.33</td>
-            <td>xgboost: 8.42 | lightgbm: 8.44 | random_forest: 8.33 | holt_winters: 11.36 | ridge: 8.93</td>
-            <td>lag_1, sin_168_1, day_of_week, is_weekend, lag_2</td>
-            <td>random_forest en düşük CV RMSE'yi verdi (8.3322). İkinci sıra: xgboost (8.4229).</td>
-        </tr>
-        <tr>
-            <td><b>Ãek Tahsilat_daily</b></td>
-            <td>ridge</td>
-            <td>49.79</td>
-            <td>49.79</td>
-            <td>xgboost: 52.17 | lightgbm: 51.95 | random_forest: 51.89 | holt_winters: 50.26 | ridge: 49.79</td>
-            <td>day_of_week, is_weekend, is_public_holiday, post_holiday_day1, is_month_end</td>
-            <td>ridge en düşük CV RMSE'yi verdi (49.7931). İkinci sıra: holt_winters (50.2624).</td>
-        </tr>
-        <tr>
-            <td><b>Ãek Tahsilat_hourly</b></td>
-            <td>lightgbm</td>
-            <td>5.71</td>
-            <td>5.71</td>
-            <td>xgboost: 5.75 | lightgbm: 5.71 | random_forest: 5.72 | holt_winters: 8.72 | ridge: 6.45</td>
-            <td>sin_24_1, rolling_std_24, sin_168_1, lag_3, lag_2</td>
-            <td>lightgbm en düşük CV RMSE'yi verdi (5.7067). İkinci sıra: random_forest (5.7202).</td>
+            <td>ridge en düşük CV RMSE'yi verdi (61.7872).</td>
         </tr>
 </table>
 
@@ -4003,7 +3922,7 @@ maplibre-gl/dist/maplibre-gl.js:
 
 window.Plotly = Plotly;
 return Plotly;
-}));</script>                <div id="93d1e6e6-f5ac-453c-a10b-74e380aff929" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("93d1e6e6-f5ac-453c-a10b-74e380aff929")) {                    Plotly.newPlot(                        "93d1e6e6-f5ac-453c-a10b-74e380aff929",                        [{"alignmentgroup":"True","hovertemplate":"Model=xgboost\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"xgboost","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"xgboost","offsetgroup":"xgboost","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT","Havale","Kredi \u00c3\u0096demesi","Mevduat","\u00c3\u0087ek Tahsilat"],"xaxis":"x","y":{"dtype":"f8","bdata":"kzoBTYTNKUCdgCbChqczQDGZKhiVVCxA8fRKWYbYIEDcaABvgQQXQA=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Model=lightgbm\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"lightgbm","marker":{"color":"#EF553B","pattern":{"shape":""}},"name":"lightgbm","offsetgroup":"lightgbm","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT","Havale","Kredi \u00c3\u0096demesi","Mevduat","\u00c3\u0087ek Tahsilat"],"xaxis":"x","y":{"dtype":"f8","bdata":"+n5qvHTTKUCoNc07TrEzQM3MzMzMbCxAF7fRAN7iIEAyVTAqqdMWQA=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Model=random_forest\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"random_forest","marker":{"color":"#00cc96","pattern":{"shape":""}},"name":"random_forest","offsetgroup":"random_forest","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT","Havale","Kredi \u00c3\u0096demesi","Mevduat","\u00c3\u0087ek Tahsilat"],"xaxis":"x","y":{"dtype":"f8","bdata":"7zhFR3J5KUBcj8L1KHwzQNlfdk8e9itAYHZPHhaqIEAaUdobfOEWQA=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Model=holt_winters\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"holt_winters","marker":{"color":"#ab63fa","pattern":{"shape":""}},"name":"holt_winters","offsetgroup":"holt_winters","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT","Havale","Kredi \u00c3\u0096demesi","Mevduat","\u00c3\u0087ek Tahsilat"],"xaxis":"x","y":{"dtype":"f8","bdata":"LUMc6+ImNECk374OnGtDQNO84xQdeTZA0LNZ9bm6JkCRfvs6cG4hQA=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Model=ridge\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"ridge","marker":{"color":"#FFA15A","pattern":{"shape":""}},"name":"ridge","offsetgroup":"ridge","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT","Havale","Kredi \u00c3\u0096demesi","Mevduat","\u00c3\u0087ek Tahsilat"],"xaxis":"x","y":{"dtype":"f8","bdata":"nzws1JqGK0AnMQisHCo1QOoENBE23C9A0LNZ9bnaIUCYbhKDwMoZQA=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Tip"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"RMSE"}},"legend":{"title":{"text":"Model"},"tracegroupgap":0},"title":{"text":"Model Kar\u015f\u0131la\u015ft\u0131rmas\u0131 (RMSE)"},"barmode":"group"},                        {"responsive": true}                    )                };            </script>        </div>
+}));</script>                <div id="e961b29c-c4d0-40b0-9264-7bb89c2b8b5a" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("e961b29c-c4d0-40b0-9264-7bb89c2b8b5a")) {                    Plotly.newPlot(                        "e961b29c-c4d0-40b0-9264-7bb89c2b8b5a",                        [{"alignmentgroup":"True","hovertemplate":"Model=ridge\u003cbr\u003eTip=%{x}\u003cbr\u003eRMSE=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"ridge","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"ridge","offsetgroup":"ridge","orientation":"v","showlegend":true,"textposition":"auto","x":["EFT"],"xaxis":"x","y":{"dtype":"f8","bdata":"orQ3+MLkTkA="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"white","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"#C8D4E3","linecolor":"#C8D4E3","minorgridcolor":"#C8D4E3","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"white","showlakes":true,"showland":true,"subunitcolor":"#C8D4E3"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"white","polar":{"angularaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""},"bgcolor":"white","radialaxis":{"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"yaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"},"zaxis":{"backgroundcolor":"white","gridcolor":"#DFE8F3","gridwidth":2,"linecolor":"#EBF0F8","showbackground":true,"ticks":"","zerolinecolor":"#EBF0F8"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"baxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""},"bgcolor":"white","caxis":{"gridcolor":"#DFE8F3","linecolor":"#A2B1C6","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#EBF0F8","linecolor":"#EBF0F8","ticks":"","title":{"standoff":15},"zerolinecolor":"#EBF0F8","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Tip"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"RMSE"}},"legend":{"title":{"text":"Model"},"tracegroupgap":0},"title":{"text":"Model Kar\u015f\u0131la\u015ft\u0131rmas\u0131 (RMSE)"},"barmode":"group"},                        {"responsive": true}                    )                };            </script>        </div>
 </body>
 </html>
 
