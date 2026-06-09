@@ -262,7 +262,12 @@ class ModelSelector:
             search_artifacts = {}
         trained = {}
         for name in candidate_names:
-            trained[name] = self._train_one(name, transaction_type, freq, X_train, y_train, cfg, search_artifacts)
+            try:
+                trained[name] = self._train_one(name, transaction_type, freq, X_train, y_train, cfg, search_artifacts)
+            except Exception as e:
+                console.print(f"  [red]{name}: final eğitim hatası — {e}[/red]")
+        if not trained:
+            raise RuntimeError(f"{transaction_type}/{freq}: seçilen modellerden hiçbiri eğitilemedi.")
         return trained
 
 

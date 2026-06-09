@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { HoldoutResult, RetrainStatus, TrainingStep } from '../types'
+import { MODEL_LABELS } from '../constants'
 
 const KIND_ICON: Record<string, string> = {
   data_ready: '📥',
@@ -140,6 +141,82 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
             </div>
           </details>
         ) : null,
+      )}
+
+      {/* Model karşılaştırma bölümü: birden fazla model eğitildiyse */}
+      {result.model_overall_mapes && Object.keys(result.model_overall_mapes).length > 1 && (
+        <div className="mt-4 border-t border-navy-800 pt-4">
+          <div className="mb-2 text-xs font-medium text-slate-400">Model Karşılaştırması — Genel MAPE</div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(result.model_overall_mapes)
+              .sort(([, a], [, b]) => (a ?? 999) - (b ?? 999))
+              .map(([model, mape]) => {
+                const q = mape !== null ? mapeQuality(mape) : null
+                return (
+                  <div
+                    key={model}
+                    className="flex items-center gap-1.5 rounded-md border border-navy-700 bg-navy-950 px-2.5 py-1.5 text-xs"
+                  >
+                    <span className="text-slate-400">{MODEL_LABELS[model] ?? model}:</span>
+                    <span className={`font-semibold ${q?.cls ?? 'text-slate-500'}`}>
+                      {mape !== null ? `${mape.toFixed(1)}%` : '—'}
+                    </span>
+                    {q && (
+                      <span className={`${q.cls} opacity-75`}>({q.label})</span>
+                    )}
+                  </div>
+                )
+              })}
+          </div>
+
+          {/* İşlem tipi bazında model karşılaştırması */}
+          {(() => {
+            const typesWithModelMapes = Object.entries(result.by_type).filter(
+              ([, info]) => info.model_mapes && Object.keys(info.model_mapes).length > 1,
+            )
+            if (typesWithModelMapes.length === 0) return null
+            const modelNames = Object.keys(result.model_overall_mapes).sort(
+              (a, b) => (result.model_overall_mapes![a] ?? 999) - (result.model_overall_mapes![b] ?? 999),
+            )
+            return (
+              <details className="mt-3">
+                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400">
+                  İşlem tipi bazında model karşılaştırması
+                </summary>
+                <div className="mt-2 overflow-x-auto rounded border border-navy-800">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-navy-900">
+                      <tr className="text-slate-500">
+                        <th className="px-3 py-1.5 font-medium">İşlem Tipi</th>
+                        {modelNames.map((m) => (
+                          <th key={m} className="px-3 py-1.5 font-medium">
+                            {MODEL_LABELS[m] ?? m}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {typesWithModelMapes.map(([tt, info]) => (
+                        <tr key={tt} className="border-t border-navy-800 text-slate-300">
+                          <td className="px-3 py-1.5">{tt}</td>
+                          {modelNames.map((m) => {
+                            const v = info.model_mapes?.[m] ?? null
+                            const q = v !== null ? mapeQuality(v) : null
+                            return (
+                              <td key={m} className={`px-3 py-1.5 font-medium ${q?.cls ?? 'text-slate-500'}`}>
+                                {v !== null ? `${v.toFixed(1)}%` : '—'}
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )
+          })()}
+        </div>
       )}
 
       <p className="mt-3 text-xs text-slate-500">
