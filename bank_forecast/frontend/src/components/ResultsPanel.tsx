@@ -28,15 +28,15 @@ export default function ResultsPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-lg font-semibold text-slate-100">Tahmin Sonuçları</div>
-          <div className="text-xs text-slate-500">
+          <div className="text-lg font-semibold text-slate-900">Tahmin Sonuçları</div>
+          <div className="text-xs text-slate-400">
             Oluşturulma zamanı: {new Date(forecastResult.forecast.generated_at).toLocaleString('tr-TR')}
           </div>
         </div>
         <button
           type="button"
           onClick={resetResults}
-          className="rounded-md border border-navy-600 px-3 py-1.5 text-xs text-slate-300 hover:border-gold-500"
+          className="rounded-md border border-slate-200 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:border-blue-300 hover:text-blue-600"
         >
           Yeni tahmin
         </button>
@@ -45,7 +45,7 @@ export default function ResultsPanel() {
       <TotalCountCard result={forecastResult} />
 
       <div>
-        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
           İşlem Tipi ve Kullanılan Algoritma
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -61,16 +61,16 @@ export default function ResultsPanel() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <span className="text-xs uppercase tracking-wider text-slate-400">Grafik görünümü — {selected}</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-slate-500">Grafik görünümü — {selected}</span>
           {hasHourly && (
             <div className="flex gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => setShowHourly(false)}
                 className={`rounded-full px-3 py-1 transition-colors ${
-                  !showHourly ? 'bg-gold-500 text-navy-950' : 'border border-navy-600 text-slate-300'
+                  !showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
                 Günlük
@@ -79,7 +79,7 @@ export default function ResultsPanel() {
                 type="button"
                 onClick={() => setShowHourly(true)}
                 className={`rounded-full px-3 py-1 transition-colors ${
-                  showHourly ? 'bg-gold-500 text-navy-950' : 'border border-navy-600 text-slate-300'
+                  showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
                 Saatlik Kırılım

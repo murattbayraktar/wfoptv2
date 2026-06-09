@@ -20,23 +20,23 @@ export default function ForecastModelPicker() {
 
   return (
     <div className="mt-8">
-      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
         Tahmin Algoritması
       </div>
-      <div className="flex flex-col gap-1.5 rounded-md border border-navy-600 bg-navy-800 px-3 py-2.5">
+      <div className="flex flex-col gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5">
         {modelNames.map((name) => (
-          <label key={name} className="flex cursor-pointer items-center gap-2 text-sm text-slate-200">
+          <label key={name} className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
             <input
               type="checkbox"
               checked={forecastModels.includes(name)}
               onChange={() => toggleForecastModel(name)}
-              className="h-4 w-4 rounded border-navy-600 bg-navy-900 accent-gold-500"
+              className="h-4 w-4 rounded border-slate-300 bg-white accent-blue-600"
             />
             {MODEL_LABELS[name] ?? name}
           </label>
         ))}
       </div>
-      <p className="mt-1.5 text-xs text-slate-500">
+      <p className="mt-1.5 text-xs text-slate-400">
         Boş bırakırsanız her tip için otomatik en iyi model kullanılır. Birden fazla algoritma
         seçerseniz sonuçlar grafik üzerinde renkli çizgiler olarak üst üste karşılaştırmalı gösterilir.
       </p>

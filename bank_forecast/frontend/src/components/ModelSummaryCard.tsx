@@ -29,18 +29,20 @@ export default function ModelSummaryCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`rounded-xl border p-4 text-left transition-colors ${
-        active ? 'border-gold-500 bg-navy-800' : 'border-navy-700 bg-navy-900 hover:border-navy-600'
+      className={`rounded-xl border p-4 text-left transition-all ${
+        active
+          ? 'border-blue-400 bg-blue-50 shadow-sm ring-1 ring-blue-200'
+          : 'border-slate-200 bg-white shadow-sm hover:border-slate-300 hover:shadow'
       }`}
     >
-      <div className="text-sm font-semibold text-slate-100">{type}</div>
-      <div className="mt-1 text-xs text-slate-400">
-        Kullanılan algoritma: <span className="text-gold-400">{info.model_used}</span>
+      <div className="text-sm font-semibold text-slate-900">{type}</div>
+      <div className="mt-1 text-xs text-slate-500">
+        Kullanılan algoritma: <span className="font-medium text-amber-600">{MODEL_LABELS[info.model_used] ?? info.model_used}</span>
       </div>
       {info.models && Object.keys(info.models).length > 1 && (
-        <div className="mt-1 text-xs text-slate-400">
+        <div className="mt-1 text-xs text-slate-500">
           Karşılaştırılan algoritmalar:{' '}
-          <span className="text-slate-300">
+          <span className="text-slate-700">
             {Object.keys(info.models)
               .sort()
               .map((m) => MODEL_LABELS[m] ?? m)
@@ -51,7 +53,7 @@ export default function ModelSummaryCard({
       {flagSet.size > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[...flagSet].map((flag) => (
-            <span key={flag} className="rounded-full bg-navy-700 px-2 py-0.5 text-[11px] text-slate-300">
+            <span key={flag} className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
               {FLAG_LABELS[flag] ?? flag}
             </span>
           ))}

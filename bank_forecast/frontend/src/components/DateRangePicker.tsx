@@ -5,25 +5,25 @@ export default function DateRangePicker() {
 
   return (
     <div>
-      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
         Tahmin Aralığı
       </div>
       <label className="mb-3 block">
-        <span className="mb-1 block text-xs text-slate-400">Başlangıç</span>
+        <span className="mb-1 block text-xs text-slate-500">Başlangıç</span>
         <input
           type="date"
           value={rangeStart}
           onChange={(e) => setRangeStart(e.target.value)}
-          className="w-full rounded-md border border-navy-600 bg-navy-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-gold-500"
+          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
         />
       </label>
       <label className="block">
-        <span className="mb-1 block text-xs text-slate-400">Bitiş</span>
+        <span className="mb-1 block text-xs text-slate-500">Bitiş</span>
         <input
           type="date"
           value={rangeEnd}
           onChange={(e) => setRangeEnd(e.target.value)}
-          className="w-full rounded-md border border-navy-600 bg-navy-800 px-3 py-2 text-sm text-slate-100 outline-none focus:border-gold-500"
+          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
         />
       </label>
     </div>

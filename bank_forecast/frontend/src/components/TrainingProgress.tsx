@@ -30,8 +30,8 @@ function StepRow({ step }: { step: TrainingStep }) {
   return (
     <li className="flex items-start gap-3 py-1.5">
       <span className="mt-0.5 text-sm leading-none">{icon}</span>
-      <span className={`flex-1 text-sm ${emphasized ? 'text-slate-100' : 'text-slate-400'}`}>{step.message}</span>
-      <span className="shrink-0 text-[11px] text-slate-600">{time}</span>
+      <span className={`flex-1 text-sm ${emphasized ? 'text-slate-900' : 'text-slate-500'}`}>{step.message}</span>
+      <span className="shrink-0 text-[11px] text-slate-400">{time}</span>
     </li>
   )
 }
@@ -41,18 +41,18 @@ function unitSummaries(steps: TrainingStep[]) {
 }
 
 function mapeQuality(mape: number): { label: string; cls: string } {
-  if (mape < 10) return { label: 'İyi', cls: 'text-emerald-400' }
-  if (mape < 20) return { label: 'Kabul', cls: 'text-yellow-400' }
-  return { label: 'Zayıf', cls: 'text-red-400' }
+  if (mape < 10) return { label: 'İyi', cls: 'text-emerald-600' }
+  if (mape < 20) return { label: 'Kabul', cls: 'text-amber-600' }
+  return { label: 'Zayıf', cls: 'text-red-500' }
 }
 
 function HoldoutPanel({ result }: { result: HoldoutResult }) {
   const types = Object.entries(result.by_type)
 
   return (
-    <div className="mt-4 rounded-lg border border-blue-500/30 bg-blue-500/5 p-4">
+    <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-medium text-blue-300">
+        <div className="text-sm font-medium text-blue-700">
           Doğrulama Sonuçları — MAPE
         </div>
         <span className="text-xs text-slate-500">
@@ -62,7 +62,7 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
 
       {result.overall_mape !== null && result.overall_mape !== undefined && (
         <div className="mb-3 flex items-center gap-2">
-          <span className="text-xs text-slate-400">Genel MAPE:</span>
+          <span className="text-xs text-slate-500">Genel MAPE:</span>
           <span className={`text-sm font-semibold ${mapeQuality(result.overall_mape).cls}`}>
             {result.overall_mape.toFixed(1)}%
           </span>
@@ -73,7 +73,7 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
       )}
 
       {types.length > 0 && (
-        <table className="w-full text-left text-xs text-slate-300">
+        <table className="w-full text-left text-xs text-slate-700">
           <thead>
             <tr className="text-slate-500">
               <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
@@ -86,15 +86,15 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
             {types.map(([tt, info]) => {
               const q = info.mape !== null ? mapeQuality(info.mape) : null
               return (
-                <tr key={tt} className="border-t border-navy-800">
+                <tr key={tt} className="border-t border-blue-100">
                   <td className="py-1 pr-4">{tt}</td>
-                  <td className={`py-1 pr-4 font-medium ${q?.cls ?? 'text-slate-500'}`}>
+                  <td className={`py-1 pr-4 font-medium ${q?.cls ?? 'text-slate-400'}`}>
                     {info.mape !== null ? `${info.mape.toFixed(1)}%` : '—'}
                   </td>
-                  <td className={`py-1 pr-4 ${q?.cls ?? 'text-slate-500'}`}>
+                  <td className={`py-1 pr-4 ${q?.cls ?? 'text-slate-400'}`}>
                     {q?.label ?? '—'}
                   </td>
-                  <td className="py-1 text-slate-400">{info.rows.length}</td>
+                  <td className="py-1 text-slate-500">{info.rows.length}</td>
                 </tr>
               )
             })}
@@ -102,16 +102,15 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
         </table>
       )}
 
-      {/* Detay satırları: ilk eşleşen tip için gerçekleşen vs tahmin */}
       {types.map(([tt, info]) =>
         info.rows.length > 0 ? (
           <details key={tt} className="mt-3">
-            <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400">
+            <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
               {tt} — gün bazlı gerçekleşen vs tahmin
             </summary>
-            <div className="mt-2 max-h-48 overflow-y-auto rounded border border-navy-800">
+            <div className="mt-2 max-h-48 overflow-y-auto rounded border border-slate-200">
               <table className="w-full text-left text-xs">
-                <thead className="sticky top-0 bg-navy-900">
+                <thead className="sticky top-0 bg-white">
                   <tr className="text-slate-500">
                     <th className="px-3 py-1 font-medium">Tarih</th>
                     <th className="px-3 py-1 font-medium">Gerçekleşen</th>
@@ -126,11 +125,11 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
                         ? Math.abs((row.actual - row.predicted) / row.actual) * 100
                         : null
                     return (
-                      <tr key={row.date} className="border-t border-navy-800 text-slate-300">
+                      <tr key={row.date} className="border-t border-slate-100 text-slate-700">
                         <td className="px-3 py-1">{row.date}</td>
                         <td className="px-3 py-1">{row.actual.toLocaleString('tr-TR')}</td>
                         <td className="px-3 py-1">{row.predicted.toLocaleString('tr-TR')}</td>
-                        <td className={`px-3 py-1 ${diff !== null && diff > 20 ? 'text-red-400' : 'text-slate-400'}`}>
+                        <td className={`px-3 py-1 ${diff !== null && diff > 20 ? 'text-red-500' : 'text-slate-500'}`}>
                           {diff !== null ? `${diff.toFixed(1)}%` : '—'}
                         </td>
                       </tr>
@@ -143,10 +142,9 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
         ) : null,
       )}
 
-      {/* Model karşılaştırma bölümü: birden fazla model eğitildiyse */}
       {result.model_overall_mapes && Object.keys(result.model_overall_mapes).length > 1 && (
-        <div className="mt-4 border-t border-navy-800 pt-4">
-          <div className="mb-2 text-xs font-medium text-slate-400">Model Karşılaştırması — Genel MAPE</div>
+        <div className="mt-4 border-t border-blue-100 pt-4">
+          <div className="mb-2 text-xs font-medium text-slate-500">Model Karşılaştırması — Genel MAPE</div>
           <div className="flex flex-wrap gap-2">
             {Object.entries(result.model_overall_mapes)
               .sort(([, a], [, b]) => (a ?? 999) - (b ?? 999))
@@ -155,10 +153,10 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
                 return (
                   <div
                     key={model}
-                    className="flex items-center gap-1.5 rounded-md border border-navy-700 bg-navy-950 px-2.5 py-1.5 text-xs"
+                    className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-sm"
                   >
-                    <span className="text-slate-400">{MODEL_LABELS[model] ?? model}:</span>
-                    <span className={`font-semibold ${q?.cls ?? 'text-slate-500'}`}>
+                    <span className="text-slate-500">{MODEL_LABELS[model] ?? model}:</span>
+                    <span className={`font-semibold ${q?.cls ?? 'text-slate-400'}`}>
                       {mape !== null ? `${mape.toFixed(1)}%` : '—'}
                     </span>
                     {q && (
@@ -169,7 +167,6 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
               })}
           </div>
 
-          {/* İşlem tipi bazında model karşılaştırması */}
           {(() => {
             const typesWithModelMapes = Object.entries(result.by_type).filter(
               ([, info]) => info.model_mapes && Object.keys(info.model_mapes).length > 1,
@@ -180,12 +177,12 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
             )
             return (
               <details className="mt-3">
-                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400">
+                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
                   İşlem tipi bazında model karşılaştırması
                 </summary>
-                <div className="mt-2 overflow-x-auto rounded border border-navy-800">
+                <div className="mt-2 overflow-x-auto rounded border border-slate-200">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-navy-900">
+                    <thead className="bg-slate-50">
                       <tr className="text-slate-500">
                         <th className="px-3 py-1.5 font-medium">İşlem Tipi</th>
                         {modelNames.map((m) => (
@@ -197,13 +194,13 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
                     </thead>
                     <tbody>
                       {typesWithModelMapes.map(([tt, info]) => (
-                        <tr key={tt} className="border-t border-navy-800 text-slate-300">
+                        <tr key={tt} className="border-t border-slate-100 text-slate-700">
                           <td className="px-3 py-1.5">{tt}</td>
                           {modelNames.map((m) => {
                             const v = info.model_mapes?.[m] ?? null
                             const q = v !== null ? mapeQuality(v) : null
                             return (
-                              <td key={m} className={`px-3 py-1.5 font-medium ${q?.cls ?? 'text-slate-500'}`}>
+                              <td key={m} className={`px-3 py-1.5 font-medium ${q?.cls ?? 'text-slate-400'}`}>
                                 {v !== null ? `${v.toFixed(1)}%` : '—'}
                               </td>
                             )
@@ -219,7 +216,7 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
         </div>
       )}
 
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-slate-400">
         MAPE = Ortalama Mutlak Yüzde Hata. &lt;10%: iyi, 10–20%: kabul edilebilir, &gt;20%: zayıf.
       </p>
     </div>
@@ -239,29 +236,29 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
   const summaries = unitSummaries(status.steps)
 
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-1 flex items-center justify-between">
-        <div className="text-sm font-medium text-slate-200">Model eğitimi — adım adım ilerleme</div>
+        <div className="text-sm font-medium text-slate-800">Model eğitimi — adım adım ilerleme</div>
         {status.total_units > 0 && (
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-500">
             {status.completed_units}/{status.total_units} model eğitildi
           </span>
         )}
       </div>
 
-      <div className="mb-4 h-2 overflow-hidden rounded-full bg-navy-700">
+      <div className="mb-4 h-2 overflow-hidden rounded-full bg-slate-200">
         <div
           className={`h-full rounded-full transition-all duration-500 ease-out ${
-            status.status === 'error' ? 'bg-red-500' : status.status === 'done' ? 'bg-emerald-400' : 'bg-gold-500'
+            status.status === 'error' ? 'bg-red-500' : status.status === 'done' ? 'bg-emerald-500' : 'bg-blue-600'
           }`}
           style={{ width: `${Math.max(pct, status.status === 'running' ? 4 : 0)}%` }}
         />
       </div>
 
-      <p className="mb-4 text-xs text-slate-400">{status.message || 'Eğitim başlatılıyor…'}</p>
+      <p className="mb-4 text-xs text-slate-500">{status.message || 'Eğitim başlatılıyor…'}</p>
 
       {status.steps.length > 0 && (
-        <ol ref={logRef} className="mb-4 max-h-64 divide-y divide-navy-800 overflow-y-auto rounded-lg border border-navy-800 bg-navy-950/60 px-4">
+        <ol ref={logRef} className="mb-4 max-h-64 divide-y divide-slate-100 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 px-4">
           {status.steps.map((step, i) => (
             <StepRow key={`${step.at}-${i}`} step={step} />
           ))}
@@ -269,10 +266,10 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
       )}
 
       {status.status === 'done' && (
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4">
-          <div className="mb-2 text-sm font-medium text-emerald-400">Eğitim tamamlandı</div>
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <div className="mb-2 text-sm font-medium text-emerald-700">Eğitim tamamlandı</div>
           {summaries.length > 0 && (
-            <table className="w-full text-left text-xs text-slate-300">
+            <table className="w-full text-left text-xs text-slate-700">
               <thead>
                 <tr className="text-slate-500">
                   <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
@@ -283,10 +280,10 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
               </thead>
               <tbody>
                 {summaries.map((s, i) => (
-                  <tr key={i} className="border-t border-navy-800">
+                  <tr key={i} className="border-t border-emerald-100">
                     <td className="py-1 pr-4">{s.type}</td>
                     <td className="py-1 pr-4">{s.freq === 'daily' ? 'Günlük' : 'Saatlik'}</td>
-                    <td className="py-1 pr-4 text-gold-400">{s.model}</td>
+                    <td className="py-1 pr-4 font-medium text-amber-600">{s.model}</td>
                     <td className="py-1">{s.cv_rmse?.toFixed(2)}</td>
                   </tr>
                 ))}
@@ -305,7 +302,7 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
       )}
 
       {status.status === 'error' && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-400">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
           {status.message}
         </div>
       )}
