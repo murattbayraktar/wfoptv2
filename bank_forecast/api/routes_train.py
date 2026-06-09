@@ -7,7 +7,7 @@ import pandas as pd
 from fastapi import APIRouter, HTTPException
 
 from src.evaluation.metrics import mape as calc_mape
-from src.pipeline import REGISTRY_FILE, forecast_pipeline, train_pipeline
+from src.pipeline import REGISTRY_FILE, _load_registry, forecast_pipeline, train_pipeline
 
 from .schemas import RetrainRequest
 from .state import RETRAIN_STATUS, STATE
@@ -80,7 +80,11 @@ def _on_event(event: dict) -> None:
 
 
 def _run_holdout_forecast(holdout_days: int) -> None:
-    """Eğitim sonrası holdout dönemi için otomatik tahmin + MAPE hesabı."""
+    """Eğitim sonrası holdout dönemi için otomatik tahmin + MAPE hesabı.
+
+    Kayıtlı tüm modeller için ayrı ayrı tahmin üretir; her modelin MAPE değerini
+    hesaplayıp karşılaştırma yapılabilmesi için sonuca ekler.
+    """
     if STATE.daily_agg is None or STATE.daily_agg.empty:
         return
 
@@ -95,6 +99,20 @@ def _run_holdout_forecast(holdout_days: int) -> None:
     })
     RETRAIN_STATUS.message = f"Doğrulama tahmini hesaplanıyor ({holdout_start_str} – {max_date_str})…"
 
+    # Kayıtlı tüm model isimlerini bul (daily frekans için)
+    models_to_run = None
+    try:
+        registry = _load_registry(REGISTRY_FILE)
+        avail_names: set = set()
+        for key, entry in registry["models"].items():
+            if key.endswith("_daily"):
+                avail = entry.get("available_models") or {entry["best_model"]: {}}
+                avail_names.update(avail.keys())
+        if len(avail_names) > 1:
+            models_to_run = sorted(avail_names)
+    except Exception:
+        pass
+
     try:
         forecast_result = forecast_pipeline(
             start=holdout_start_str,
@@ -104,6 +122,7 @@ def _run_holdout_forecast(holdout_days: int) -> None:
             plot=False,
             registry_path=REGISTRY_FILE,
             historical_data={"daily": STATE.daily_agg, "hourly": STATE.hourly_agg},
+            models=models_to_run,
         )
     except Exception as e:
         RETRAIN_STATUS.add_step({
@@ -115,6 +134,9 @@ def _run_holdout_forecast(holdout_days: int) -> None:
     by_type_result: dict = {}
     all_y_true: list = []
     all_y_pred: list = []
+    # Model bazında tüm işlem tipleri toplamı için biriktiriciler
+    model_all_true: dict = {}
+    model_all_pred: dict = {}
 
     for tt, info in forecast_result.get("by_type", {}).items():
         daily_list = info.get("daily", [])
@@ -145,9 +167,28 @@ def _run_holdout_forecast(holdout_days: int) -> None:
                 y_pred.append(predicted)
 
         mape_val = calc_mape(np.array(y_true), np.array(y_pred)) if y_true else None
+
+        # Her model için bu işlem tipi MAPE'sini hesapla
+        model_mapes: dict = {}
+        for model_name, model_info in info.get("models", {}).items():
+            yt_m: list = []
+            yp_m: list = []
+            for entry in model_info.get("daily", []):
+                d = entry["date"]
+                if d in actual_by_date:
+                    yt_m.append(actual_by_date[d])
+                    yp_m.append(entry["predicted_count"])
+            mape_m = calc_mape(np.array(yt_m), np.array(yp_m)) if yt_m else None
+            model_mapes[model_name] = (
+                round(mape_m, 2) if mape_m is not None and not np.isnan(mape_m) else None
+            )
+            model_all_true.setdefault(model_name, []).extend(yt_m)
+            model_all_pred.setdefault(model_name, []).extend(yp_m)
+
         by_type_result[tt] = {
             "mape": round(mape_val, 2) if mape_val is not None and not np.isnan(mape_val) else None,
             "rows": rows,
+            "model_mapes": model_mapes,
         }
         all_y_true.extend(y_true)
         all_y_pred.extend(y_pred)
@@ -155,10 +196,20 @@ def _run_holdout_forecast(holdout_days: int) -> None:
     overall = calc_mape(np.array(all_y_true), np.array(all_y_pred)) if all_y_true else None
     overall_clean = round(float(overall), 2) if overall is not None and not np.isnan(overall) else None
 
+    # Model bazında genel MAPE (tüm işlem tipleri birleşik)
+    model_overall_mapes: dict = {}
+    for model_name, yt_list in model_all_true.items():
+        yp_list = model_all_pred.get(model_name, [])
+        m = calc_mape(np.array(yt_list), np.array(yp_list)) if yt_list else None
+        model_overall_mapes[model_name] = (
+            round(float(m), 2) if m is not None and not np.isnan(m) else None
+        )
+
     RETRAIN_STATUS.holdout_result = {
         "holdout_range": {"start": holdout_start_str, "end": max_date_str},
         "by_type": by_type_result,
         "overall_mape": overall_clean,
+        "model_overall_mapes": model_overall_mapes,
     }
 
     mape_txt = f"{overall_clean:.1f}%" if overall_clean is not None else "—"

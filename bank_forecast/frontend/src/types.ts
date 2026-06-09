@@ -105,12 +105,16 @@ export interface HoldoutRow {
 export interface HoldoutTypeResult {
   mape: number | null
   rows: HoldoutRow[]
+  /** Birden fazla model eğitildiyse her model için bu işlem tipi MAPE değeri */
+  model_mapes?: Record<string, number | null>
 }
 
 export interface HoldoutResult {
   holdout_range: DateRange
   by_type: Record<string, HoldoutTypeResult>
   overall_mape: number | null
+  /** Birden fazla model eğitildiyse her model için genel (tüm tipler) MAPE değeri */
+  model_overall_mapes?: Record<string, number | null>
 }
 
 export interface RetrainStatus {

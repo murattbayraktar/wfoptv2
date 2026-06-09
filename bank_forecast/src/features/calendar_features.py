@@ -1,6 +1,7 @@
+import functools
 import pandas as pd
 import numpy as np
-from datetime import date, timedelta
+from datetime import timedelta
 
 
 TR_PUBLIC_HOLIDAYS = {
@@ -37,107 +38,111 @@ RELIGIOUS_HOLIDAYS = {
 }
 
 
-def _build_holiday_set(years: list[int]) -> set:
-    holidays = set()
-    for year in years:
+@functools.lru_cache(maxsize=16)
+def _build_holiday_data(years_tuple: tuple) -> tuple:
+    """(frozenset of holidays, tuple of sorted holidays) — lru_cache ile önbelleklenmiş."""
+    hs: set = set()
+    for year in years_tuple:
         for mmdd in TR_PUBLIC_HOLIDAYS:
-            holidays.add(pd.Timestamp(f"{year}-{mmdd}"))
+            hs.add(pd.Timestamp(f"{year}-{mmdd}"))
         if year in RELIGIOUS_HOLIDAYS:
             for days in RELIGIOUS_HOLIDAYS[year].values():
                 for d in days:
-                    holidays.add(pd.Timestamp(d))
-    return holidays
+                    hs.add(pd.Timestamp(d))
+    return frozenset(hs), tuple(sorted(hs))
+
+
+def _build_holiday_set(years: list) -> set:
+    """Geriye dönük uyumluluk için korunuyor."""
+    holiday_set, _ = _build_holiday_data(tuple(sorted(set(years))))
+    return set(holiday_set)
 
 
 def add_calendar_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     dates = pd.to_datetime(df["date"])
+    date_ts = dates.dt.normalize()  # pd.Timestamp(d.date()) eşdeğeri, saat kısmı sıfır
 
     years = list(dates.dt.year.unique())
-    # Komşu yılları da ekle (köprü gün ve tatil mesafeleri için)
-    all_years = sorted(set(years + [y - 1 for y in years] + [y + 1 for y in years]))
-    holiday_set = _build_holiday_set(all_years)
-    holiday_sorted = sorted(holiday_set)
+    all_years = tuple(sorted(set(years + [y - 1 for y in years] + [y + 1 for y in years])))
 
-    df["is_public_holiday"] = dates.apply(
-        lambda d: int(pd.Timestamp(d.date()) in holiday_set)
-    )
+    holiday_set, holiday_sorted_tuple = _build_holiday_data(all_years)
+    holiday_sorted = list(holiday_sorted_tuple)
 
-    religious_dates = set()
+    religious_dates: set = set()
     for year in all_years:
         if year in RELIGIOUS_HOLIDAYS:
             for days in RELIGIOUS_HOLIDAYS[year].values():
                 for d in days:
                     religious_dates.add(pd.Timestamp(d))
 
-    df["is_religious_holiday"] = dates.apply(
-        lambda d: int(pd.Timestamp(d.date()) in religious_dates)
-    )
+    # ── Vektörel isin kontrolleri ────────────────────────────────────────────
+    df["is_public_holiday"] = date_ts.isin(holiday_set).astype(int)
+    df["is_religious_holiday"] = date_ts.isin(religious_dates).astype(int)
 
-    # Arife: tatil öncesi son iş günü
-    df["is_eve_of_holiday"] = dates.apply(
-        lambda d: _is_eve_of_holiday(d, holiday_set)
-    )
-
-    # Köprü günü: tatil ile hafta sonu arasında kalan tek iş günü
-    df["is_bridge_day"] = dates.apply(
-        lambda d: _is_bridge_day(d, holiday_set)
-    )
+    # is_eve_of_holiday / is_bridge_day: iş günü mantığı içerdiğinden
+    # unique tarih başına bir kez hesapla, sonra map ile uygula
+    unique_ts = list(pd.DatetimeIndex(date_ts.unique()))
+    eve_map = {ts: _is_eve_of_holiday(ts, holiday_set) for ts in unique_ts}
+    bridge_map = {ts: _is_bridge_day(ts, holiday_set) for ts in unique_ts}
+    df["is_eve_of_holiday"] = date_ts.map(eve_map)
+    df["is_bridge_day"] = date_ts.map(bridge_map)
 
     df["is_weekend"] = (dates.dt.dayofweek >= 5).astype(int)
-    df["day_of_week"] = dates.dt.dayofweek  # 0=Pazartesi, 6=Pazar
+    df["day_of_week"] = dates.dt.dayofweek
     df["day_of_month"] = dates.dt.day
     df["month"] = dates.dt.month
     df["quarter"] = dates.dt.quarter
     df["week_of_month"] = ((dates.dt.day - 1) // 7 + 1).astype(int)
 
-    df["month_quarter"] = dates.dt.day.apply(
-        lambda d: 0 if d <= 10 else (1 if d <= 20 else 2)
-    )
+    day = dates.dt.day
+    df["month_quarter"] = np.where(day <= 10, 0, np.where(day <= 20, 1, 2))
 
-    # Ay başı/sonu
     df["is_month_start"] = (dates.dt.day == 1).astype(int)
-    df["is_month_end"] = dates.apply(
-        lambda d: int(d.day == (d + pd.offsets.MonthEnd(0)).day)
-    )
+    df["is_month_end"] = dates.dt.is_month_end.astype(int)
 
-    df["is_last_friday"] = dates.apply(
-        lambda d: int(d.dayofweek == 4 and (d + timedelta(days=7)).month != d.month)
-    )
+    is_friday = dates.dt.dayofweek == 4
+    next_week_month = (dates + pd.Timedelta(days=7)).dt.month
+    df["is_last_friday"] = (is_friday & (next_week_month != dates.dt.month)).astype(int)
 
-    # Ay sonuna ve başına uzaklık
-    df["days_to_month_end"] = dates.apply(
-        lambda d: (d + pd.offsets.MonthEnd(0)).day - d.day
-    )
+    df["days_to_month_end"] = dates.dt.days_in_month - dates.dt.day
     df["days_from_month_start"] = dates.dt.day - 1
 
-    # Tatile mesafe
-    df["days_to_next_holiday"] = dates.apply(
-        lambda d: _days_to_next_holiday(d, holiday_sorted)
-    )
-    df["days_from_last_holiday"] = dates.apply(
-        lambda d: _days_from_last_holiday(d, holiday_sorted)
-    )
+    # ── Tatil mesafeleri: np.searchsorted ile O(log n) ───────────────────────
+    d_ords = date_ts.values.astype("datetime64[D]").astype(np.int64)
+    n_h = len(holiday_sorted)
+    if n_h > 0:
+        h_ords = pd.DatetimeIndex(holiday_sorted).normalize().values.astype("datetime64[D]").astype(np.int64)
+        next_idx = np.searchsorted(h_ords, d_ords, side="right")
 
-    # Tatil sonrası yığılma
-    df["post_holiday_day1"] = dates.apply(
-        lambda d: _is_post_holiday(d, holiday_set, offset=1)
-    )
-    df["post_holiday_day2"] = dates.apply(
-        lambda d: _is_post_holiday(d, holiday_set, offset=2)
-    )
+        has_next = next_idx < n_h
+        safe_next = np.clip(next_idx, 0, n_h - 1)
+        df["days_to_next_holiday"] = np.where(has_next, h_ords[safe_next] - d_ords, 999).astype(int)
+
+        has_prev = next_idx > 0
+        safe_prev = np.clip(next_idx - 1, 0, n_h - 1)
+        df["days_from_last_holiday"] = np.where(has_prev, d_ords - h_ords[safe_prev], 999).astype(int)
+    else:
+        df["days_to_next_holiday"] = 999
+        df["days_from_last_holiday"] = 999
+
+    # post_holiday: unique date map
+    ph1_map = {ts: _is_post_holiday(ts, holiday_set, offset=1) for ts in unique_ts}
+    ph2_map = {ts: _is_post_holiday(ts, holiday_set, offset=2) for ts in unique_ts}
+    df["post_holiday_day1"] = date_ts.map(ph1_map)
+    df["post_holiday_day2"] = date_ts.map(ph2_map)
 
     return df
 
 
-def _is_eve_of_holiday(d: pd.Timestamp, holiday_set: set) -> int:
+def _is_eve_of_holiday(d: pd.Timestamp, holiday_set: frozenset) -> int:
     next_day = d + timedelta(days=1)
     while next_day.dayofweek >= 5:
         next_day += timedelta(days=1)
     return int(pd.Timestamp(next_day.date()) in holiday_set)
 
 
-def _is_bridge_day(d: pd.Timestamp, holiday_set: set) -> int:
+def _is_bridge_day(d: pd.Timestamp, holiday_set: frozenset) -> int:
     if d.dayofweek >= 5:
         return 0
     if pd.Timestamp(d.date()) in holiday_set:
@@ -170,9 +175,7 @@ def _days_from_last_holiday(d: pd.Timestamp, holiday_sorted: list) -> int:
     return (dt - last).days
 
 
-def _is_post_holiday(d: pd.Timestamp, holiday_set: set, offset: int) -> int:
-    target = d - timedelta(days=offset)
-    # Geriye doğru offset gün say, hafta sonlarını atla
+def _is_post_holiday(d: pd.Timestamp, holiday_set: frozenset, offset: int) -> int:
     steps = 0
     cur = d - timedelta(days=1)
     while steps < offset - 1:

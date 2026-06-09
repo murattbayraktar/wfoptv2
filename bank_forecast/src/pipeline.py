@@ -1,6 +1,10 @@
 """Ana orkestratör: train | forecast | evaluate akışlarını yönetir."""
 import json
 import os
+import shutil
+import tempfile
+import concurrent.futures
+import multiprocessing
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -133,6 +137,11 @@ def _recursive_predict(
     preds = np.zeros(len(grid_keys), dtype=float)
     filled_lags: dict[str, list] = {col: [] for col in lag_cols}
 
+    # Döngü öncesi tek template DataFrame — her iterasyonda iat ile güncellenir,
+    # yeni pd.DataFrame() constructor çağrısının overhead'i ortadan kalkar.
+    template_df = pd.DataFrame([base_rows[0]], columns=feat_cols)
+    feat_idx = {col: i for i, col in enumerate(feat_cols)}
+
     for i, _key in enumerate(grid_keys):
         pos = offset + i
         row = base_rows[i]
@@ -141,8 +150,9 @@ def _recursive_predict(
             row[col] = val
             filled_lags[col].append(val)
 
-        x_row = pd.DataFrame([row], columns=feat_cols)
-        pred = float(model.predict(x_row)[0])
+        for col, val in row.items():
+            template_df.iat[0, feat_idx[col]] = val
+        pred = float(model.predict(template_df)[0])
         preds[i] = pred
 
         # Gerçek geçmişte yoksa (gelecekteki nokta), sonraki satırların lag
@@ -154,6 +164,127 @@ def _recursive_predict(
         grid_df[col] = filled_lags[col]
 
     return preds
+
+
+def _train_unit(args: tuple) -> dict:
+    """ProcessPoolExecutor worker — modül seviyesinde tanımlı (pickle uyumlu).
+
+    Her (transaction_type, freq) birimi için: feature engineering, model seçimi,
+    final fit ve kaydetme işlemlerini bağımsız bir process'te yürütür.
+    progress_callback ana thread'e geri dönüş sonucuyla iletilir.
+    """
+    (transaction_type, freq, agg_pkl_path, features_cfg, models_cfg,
+     candidate_models, multi_save, cv_folds, metric, min_days, output_dir, report_flag) = args
+
+    key = f"{transaction_type}_{freq}"
+    try:
+        import joblib as _joblib
+        import traceback as _tb
+
+        agg_df = pd.read_pickle(agg_pkl_path)
+        subset = agg_df[agg_df["transaction_type"] == transaction_type].copy()
+
+        feat_df, feat_cols, encoder = build_features(
+            subset, freq=freq, target_col="count",
+            fit_encoder=True, cfg=features_cfg,
+        )
+        X, y = get_feature_matrix(feat_df, feat_cols)
+
+        n = len(X)
+        split_idx = max(int(n * 0.8), n - 60)
+        X_tr, y_tr = X.iloc[:split_idx], y.iloc[:split_idx]
+
+        selector = ModelSelector()
+        sel_result = selector.select_best(
+            transaction_type=transaction_type,
+            freq=freq,
+            X_train=X_tr,
+            y_train=y_tr,
+            cv_folds=cv_folds,
+            metric=metric,
+            candidates=candidate_models,
+            cfg=models_cfg,
+            min_training_days=min_days,
+            progress_callback=None,
+        )
+
+        os.makedirs(output_dir, exist_ok=True)
+        encoder_path = os.path.join(output_dir, f"{key}_encoder.pkl")
+        best_name = sel_result["best_model"]
+        best_model_path = os.path.join(output_dir, f"{key}_best.pkl")
+        available_models: dict = {}
+
+        if multi_save:
+            trained = selector.train_selected(
+                transaction_type, freq, X, y, candidate_models, models_cfg,
+                search_artifacts=sel_result.get("_search_artifacts", {}),
+            )
+            # best_name eğitilememiş olabilir — önce diğerlerini kaydet,
+            # sonra gerçek best'i belirle
+            effective_best = best_name if best_name in trained else min(
+                trained, key=lambda n: sel_result["all_scores"].get(n, float("inf"))
+            )
+            for name, model in trained.items():
+                m_path = best_model_path if name == effective_best else os.path.join(output_dir, f"{key}_{name}.pkl")
+                model.save(m_path)
+                available_models[name] = {
+                    "model_path": m_path,
+                    "encoder_path": encoder_path,
+                    "cv_rmse": sel_result["all_scores"].get(name),
+                    "feature_names": feat_cols,
+                }
+            best_name = effective_best
+            final_model = trained[best_name]
+            model_path = best_model_path
+        else:
+            final_model = selector.train_best(sel_result, transaction_type, freq, X, y, models_cfg)
+            model_path = best_model_path
+            final_model.save(model_path)
+            available_models[best_name] = {
+                "model_path": model_path,
+                "encoder_path": encoder_path,
+                "cv_rmse": sel_result["all_scores"].get(best_name),
+                "feature_names": feat_cols,
+            }
+
+        fi_df = final_model.get_feature_importance()
+        top5 = fi_df["feature"].head(5).tolist() if not fi_df.empty else []
+
+        _joblib.dump(encoder, encoder_path)
+
+        if not fi_df.empty and report_flag:
+            fi_path = f"outputs/plots/fi_{key}.html"
+            plot_feature_importance(fi_df, f"Feature Önemi: {key}", fi_path)
+
+        return {
+            "key": key,
+            "transaction_type": transaction_type,
+            "freq": freq,
+            "success": True,
+            "registry_entry": {
+                "best_model": best_name,
+                "cv_rmse": sel_result["best_score"],
+                "cv_mae": sel_result["all_scores"].get(best_name, 0),
+                "all_scores": sel_result["all_scores"],
+                "selection_reason": sel_result["selection_reason"],
+                "feature_importance_top5": top5,
+                "model_path": model_path,
+                "encoder_path": encoder_path,
+                "feature_names": feat_cols,
+                "available_models": available_models,
+            },
+            "all_scores": sel_result["all_scores"],
+        }
+    except Exception as e:
+        import traceback as _tb
+        return {
+            "key": key,
+            "transaction_type": transaction_type,
+            "freq": freq,
+            "success": False,
+            "error": str(e),
+            "traceback": _tb.format_exc(),
+        }
 
 
 def train_pipeline(
@@ -244,7 +375,6 @@ def train_pipeline(
             "freqs": freqs,
         })
 
-    selector = ModelSelector()
     all_scores_for_plot = {}
 
     # Aggregation, transaction_type'tan bağımsızdır (tüm tipler için tek seferde
@@ -254,134 +384,77 @@ def train_pipeline(
     for f in freqs:
         agg_cache[f] = aggregate_daily(df) if f == "daily" else aggregate_hourly(df, working_hours=working_hours)
 
-    unit_index = 0
-    for transaction_type in types:
-        for f in freqs:
-            key = f"{transaction_type}_{f}"
-            unit_index += 1
-            console.print(f"\n[bold]{'─'*50}[/bold]")
-            console.print(f"[bold yellow]Eğitim: {key}[/bold yellow]")
-            if progress_callback:
-                progress_callback({
-                    "kind": "unit_start",
-                    "type": transaction_type,
-                    "freq": f,
-                    "index": unit_index,
-                    "total": len(types) * len(freqs),
-                })
+    # Her (transaction_type, freq) birimini ProcessPoolExecutor ile paralel eğit.
+    # Aggregation DataFrame'leri geçici pickle dosyaları üzerinden aktarılır —
+    # spawn context'te her worker'a ayrı ayrı serialize etmek yerine disk üzerinden okuma.
+    tmp_dir = tempfile.mkdtemp()
+    try:
+        agg_pkl_paths: dict[str, str] = {}
+        for f, agg_df in agg_cache.items():
+            pkl_path = os.path.join(tmp_dir, f"{f}_agg.pkl")
+            agg_df.to_pickle(pkl_path)
+            agg_pkl_paths[f] = pkl_path
 
-            try:
-                agg = agg_cache[f]
-                subset = agg[agg["transaction_type"] == transaction_type].copy()
+        unit_args = [
+            (tt, f, agg_pkl_paths[f], features_cfg, models_cfg,
+             candidate_models, multi_save, cv_folds, metric, min_days, output_dir, report)
+            for tt in types for f in freqs
+        ]
+        total_units = len(unit_args)
 
-                feat_df, feat_cols, encoder = build_features(
-                    subset, freq=f, target_col="count",
-                    fit_encoder=True, cfg=features_cfg,
-                )
-                X, y = get_feature_matrix(feat_df, feat_cols)
+        os.makedirs(output_dir, exist_ok=True)
+        mp_ctx = multiprocessing.get_context("spawn")
+        max_workers = min(total_units, os.cpu_count() or 1)
 
-                # Eğitim / doğrulama bölünmesi (son %20 veya son 60 gün)
-                n = len(X)
-                split_idx = max(int(n * 0.8), n - 60)
-                X_tr, y_tr = X.iloc[:split_idx], y.iloc[:split_idx]
+        unit_index = 0
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers, mp_context=mp_ctx) as pool:
+            future_map = {}
+            for args in unit_args:
+                tt, f_freq = args[0], args[1]
+                unit_index += 1
+                console.print(f"\n[bold]{'─'*50}[/bold]")
+                console.print(f"[bold yellow]Kuyruğa alındı: {tt}_{f_freq}[/bold yellow]")
+                if progress_callback:
+                    progress_callback({
+                        "kind": "unit_start",
+                        "type": tt,
+                        "freq": f_freq,
+                        "index": unit_index,
+                        "total": total_units,
+                    })
+                future_map[pool.submit(_train_unit, args)] = (tt, f_freq)
 
-                # Model seçimi
-                sel_result = selector.select_best(
-                    transaction_type=transaction_type,
-                    freq=f,
-                    X_train=X_tr,
-                    y_train=y_tr,
-                    cv_folds=cv_folds,
-                    metric=metric,
-                    candidates=candidate_models,
-                    cfg=models_cfg,
-                    min_training_days=min_days,
-                    progress_callback=progress_callback,
-                )
+            for future in concurrent.futures.as_completed(future_map):
+                res = future.result()
+                key = res["key"]
+                tt = res["transaction_type"]
+                f_freq = res["freq"]
 
-                encoder_path = os.path.join(output_dir, f"{key}_encoder.pkl")
-                best_name = sel_result["best_model"]
-                best_model_path = os.path.join(output_dir, f"{key}_best.pkl")
-                available_models: dict = {}
-
-                if multi_save:
-                    # Açıkça seçilen HER modeli tam veri ile eğit ve ayrı dosyaya kaydet
-                    trained = selector.train_selected(
-                        transaction_type, f, X, y, candidate_models, models_cfg,
-                        search_artifacts=sel_result.get("_search_artifacts", {}),
-                    )
-                    for name, model in trained.items():
-                        m_path = best_model_path if name == best_name else os.path.join(output_dir, f"{key}_{name}.pkl")
-                        model.save(m_path)
-                        available_models[name] = {
-                            "model_path": m_path,
-                            "encoder_path": encoder_path,
-                            "cv_rmse": sel_result["all_scores"].get(name),
-                            "feature_names": feat_cols,
-                        }
-                    final_model = trained[best_name]
-                    model_path = best_model_path
+                if res["success"]:
+                    registry["models"][key] = res["registry_entry"]
+                    all_scores_for_plot[key] = res["all_scores"]
+                    console.print(f"[green]Tamamlandı: {key} — model: {res['registry_entry']['best_model']}[/green]")
+                    if progress_callback:
+                        re = res["registry_entry"]
+                        progress_callback({
+                            "kind": "unit_done",
+                            "type": tt,
+                            "freq": f_freq,
+                            "model": re["best_model"],
+                            "cv_rmse": re["cv_rmse"],
+                            "feature_importance_top5": re["feature_importance_top5"],
+                        })
                 else:
-                    # Mevcut davranış: sadece kazanan model tam veri ile eğitilip kaydedilir
-                    final_model = selector.train_best(sel_result, transaction_type, f, X, y, models_cfg)
-                    model_path = best_model_path
-                    final_model.save(model_path)
-                    available_models[best_name] = {
-                        "model_path": model_path,
-                        "encoder_path": encoder_path,
-                        "cv_rmse": sel_result["all_scores"].get(best_name),
-                        "feature_names": feat_cols,
-                    }
-
-                # Feature importance (kazanan model üzerinden)
-                fi_df = final_model.get_feature_importance()
-                top5 = fi_df["feature"].head(5).tolist() if not fi_df.empty else []
-
-                registry["models"][key] = {
-                    "best_model": best_name,
-                    "cv_rmse": sel_result["best_score"],
-                    "cv_mae": sel_result["all_scores"].get(best_name, 0),
-                    "all_scores": sel_result["all_scores"],
-                    "selection_reason": sel_result["selection_reason"],
-                    "feature_importance_top5": top5,
-                    "model_path": model_path,
-                    "encoder_path": encoder_path,
-                    "feature_names": feat_cols,
-                    "available_models": available_models,
-                }
-
-                # Encoder kaydet (tüm modeller tarafından paylaşılır)
-                import joblib
-                joblib.dump(encoder, encoder_path)
-
-                all_scores_for_plot[key] = sel_result["all_scores"]
-
-                # Feature importance grafiği
-                if not fi_df.empty and report:
-                    fi_path = f"outputs/plots/fi_{key}.html"
-                    plot_feature_importance(fi_df, f"Feature Önemi: {key}", fi_path)
-
-                if progress_callback:
-                    progress_callback({
-                        "kind": "unit_done",
-                        "type": transaction_type,
-                        "freq": f,
-                        "model": sel_result["best_model"],
-                        "cv_rmse": sel_result["best_score"],
-                        "feature_importance_top5": top5,
-                    })
-
-            except Exception as e:
-                console.print(f"[red]Hata ({key}): {e}[/red]")
-                import traceback
-                traceback.print_exc()
-                if progress_callback:
-                    progress_callback({
-                        "kind": "unit_failed",
-                        "type": transaction_type,
-                        "freq": f,
-                        "error": str(e),
-                    })
+                    console.print(f"[red]Hata ({key}): {res['error']}[/red]")
+                    if progress_callback:
+                        progress_callback({
+                            "kind": "unit_failed",
+                            "type": tt,
+                            "freq": f_freq,
+                            "error": res["error"],
+                        })
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     registry_path = os.path.join(output_dir, "model_registry.json")
     _save_registry(registry, registry_path)

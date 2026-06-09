@@ -8,39 +8,42 @@ ROLLING_WINDOWS_H = [24, 48, 168]
 
 
 def add_lag_features(df: pd.DataFrame, target_col: str, freq: str) -> pd.DataFrame:
-    df = df.copy()
     lags = LAG_DAYS if freq == "daily" else LAG_HOURS
     windows = ROLLING_WINDOWS if freq == "daily" else ROLLING_WINDOWS_H
+    sort_cols = ["date", "hour"] if (freq != "daily" and "hour" in df.columns) else ["date"]
 
-    groups = df.groupby("transaction_type")[target_col]
+    # Her işlem tipi için grubu numpy düzeyinde hesapla, sonra birleştir
+    parts = []
+    for _tt, grp in df.groupby("transaction_type", sort=False):
+        grp = grp.sort_values(sort_cols).copy()
+        s = grp[target_col].values
+        n = len(s)
 
-    for lag in lags:
-        col = f"lag_{lag}"
-        df[col] = groups.shift(lag)
+        for lag in lags:
+            arr = np.full(n, np.nan)
+            if lag < n:
+                arr[lag:] = s[:-lag]
+            grp[f"lag_{lag}"] = arr
 
-    for w in windows:
-        col_mean = f"rolling_mean_{w}"
-        col_std = f"rolling_std_{w}"
-        col_max = f"rolling_max_{w}"
-        df[col_mean] = groups.transform(
-            lambda x: x.shift(1).rolling(w, min_periods=1).mean()
-        )
-        df[col_std] = groups.transform(
-            lambda x: x.shift(1).rolling(w, min_periods=2).std()
-        )
-        df[col_max] = groups.transform(
-            lambda x: x.shift(1).rolling(w, min_periods=1).max()
-        )
+        # shift(1) bir kez hesaplanır, tüm rolling window'lar bu seri üzerinden
+        s_shifted = pd.Series(s).shift(1)
+        for w in windows:
+            grp[f"rolling_mean_{w}"] = s_shifted.rolling(w, min_periods=1).mean().values
+            grp[f"rolling_std_{w}"]  = s_shifted.rolling(w, min_periods=2).std().values
+            grp[f"rolling_max_{w}"]  = s_shifted.rolling(w, min_periods=1).max().values
 
-    # Eksik lag değerlerini grup medyanı ile doldur
-    lag_cols = [f"lag_{l}" for l in lags]
-    for col in lag_cols:
-        medians = df.groupby("transaction_type")[col].transform("median")
-        df[col] = df[col].fillna(medians)
+        parts.append(grp)
 
-    roll_cols = [c for c in df.columns if c.startswith("rolling_")]
-    for col in roll_cols:
-        medians = df.groupby("transaction_type")[col].transform("median")
-        df[col] = df[col].fillna(medians)
+    df = pd.concat(parts).loc[df.index]  # orijinal satır sıralamasını koru
+
+    # Tüm özellik sütunları için tek groupby+transform ile median fill
+    all_feat_cols = (
+        [f"lag_{l}" for l in lags]
+        + [f"rolling_{stat}_{w}" for w in windows for stat in ("mean", "std", "max")]
+    )
+    existing = [c for c in all_feat_cols if c in df.columns]
+    if existing:
+        medians = df.groupby("transaction_type")[existing].transform("median")
+        df[existing] = df[existing].fillna(medians)
 
     return df
