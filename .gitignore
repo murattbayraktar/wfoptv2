@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env
+
+# Trained model files (büyük binary dosyalar — gerekirse Git LFS kullanın)
+bank_forecast/models/saved/*.pkl
+bank_forecast/models/saved/model_registry.json
+
+# Geçici upload dosyaları
+bank_forecast/data/raw/_uploads/
+
+# Frontend build & cache
+bank_forecast/frontend/node_modules/
+bank_forecast/frontend/dist/
+bank_forecast/frontend/.vite/
+
+# Outputs (rapor ve grafik çıktıları)
+bank_forecast/outputs/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.swp
+
+# Logs
+*.log
+
+# Dev sunucu PID takip dosyası
+.dev-pids

@@ -10,11 +10,6 @@ const STEPS = [
 
 const STEP_INTERVAL_MS = 500
 
-/**
- * forecast_pipeline kayıtlı modellerle saniyeler içinde tamamlanır; gerçek
- * adım bazlı backend event'i olmadığından adımlar istemci tarafında
- * zamanlanır ve gerçek istek tamamlanınca anında "done" durumuna geçilir.
- */
 export default function ProgressStepper() {
   const { uiStep, forecastResult } = useData()
   const [activeIndex, setActiveIndex] = useState(0)
@@ -33,8 +28,8 @@ export default function ProgressStepper() {
   const done = uiStep === 'results' || forecastResult !== null
 
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-900 p-8">
-      <div className="mb-6 text-sm font-medium text-slate-200">
+    <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="mb-6 text-sm font-medium text-slate-700">
         Tahmin oluşturuluyor — öğrenme ve tahminleme adımları
       </div>
       <ol className="space-y-4">
@@ -43,25 +38,25 @@ export default function ProgressStepper() {
           return (
             <li key={label} className="flex items-center gap-3">
               <span
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs ${
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-medium ${
                   state === 'done'
-                    ? 'border-emerald-400 bg-emerald-400/10 text-emerald-400'
+                    ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
                     : state === 'active'
-                      ? 'border-gold-400 bg-gold-400/10 text-gold-400'
-                      : 'border-navy-600 text-slate-500'
+                      ? 'border-blue-300 bg-blue-50 text-blue-600'
+                      : 'border-slate-300 text-slate-400'
                 }`}
               >
                 {state === 'done' ? '✓' : i + 1}
               </span>
               <span
                 className={`text-sm ${
-                  state === 'pending' ? 'text-slate-500' : 'text-slate-200'
+                  state === 'pending' ? 'text-slate-400' : 'text-slate-800'
                 }`}
               >
                 {label}
               </span>
               {state === 'active' && (
-                <span className="ml-1 inline-block h-3 w-3 animate-spin rounded-full border-2 border-gold-400 border-t-transparent" />
+                <span className="ml-1 inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
               )}
             </li>
           )

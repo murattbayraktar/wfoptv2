@@ -2,7 +2,14 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import type { ComparisonResult, ForecastByType } from '../types'
 import { MODEL_COLORS, MODEL_LABELS } from '../constants'
 
-const ACTUAL_COLOR = '#94a3b8'
+const ACTUAL_COLOR = '#64748b'
+
+const CHART_STYLE = {
+  grid: '#e2e8f0',
+  tick: '#64748b',
+  tooltip: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 },
+  tooltipLabel: { color: '#0f172a' },
+}
 
 export default function ActualVsPredictedChart({
   type,
@@ -39,21 +46,18 @@ export default function ActualVsPredictedChart({
   })
 
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
-      <div className="mb-1 text-sm font-medium text-slate-200">{type} — Gerçekleşen vs Tahmin</div>
-      <div className="mb-3 text-xs text-slate-500">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-1 text-sm font-medium text-slate-800">{type} — Gerçekleşen vs Tahmin</div>
+      <div className="mb-3 text-xs text-slate-400">
         Seçilen aralık geçmiş veriyle örtüşüyor ({comparison.overlap_range?.start} – {comparison.overlap_range?.end});
         gerçekleşen ve tahmin edilen değerler karşılaştırılıyor.
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1b2740" />
-          <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 11 }} minTickGap={24} />
-          <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
-          <Tooltip
-            contentStyle={{ background: '#0c1322', border: '1px solid #2a3a5c', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: '#e2e8f0' }}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_STYLE.grid} />
+          <XAxis dataKey="label" tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} minTickGap={24} />
+          <YAxis tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} />
+          <Tooltip contentStyle={CHART_STYLE.tooltip} labelStyle={CHART_STYLE.tooltipLabel} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           <Line
             dataKey="actual"
@@ -67,7 +71,7 @@ export default function ActualVsPredictedChart({
             <Line
               dataKey="predicted"
               name="Tahmin edilen"
-              stroke="#e8b54a"
+              stroke="#2563eb"
               strokeWidth={2}
               strokeDasharray="5 4"
               dot={false}

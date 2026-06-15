@@ -5,6 +5,13 @@ import { MODEL_COLORS, MODEL_LABELS } from '../constants'
 
 const ACTUAL_COLOR = '#94a3b8'
 
+const CHART_STYLE = {
+  grid: '#e2e8f0',
+  tick: '#64748b',
+  tooltip: { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 },
+  tooltipLabel: { color: '#0f172a' },
+}
+
 function OverlayHourlyChart({
   type,
   models,
@@ -24,7 +31,7 @@ function OverlayHourlyChart({
   const [selectedDate, setSelectedDate] = useState(dates[0] ?? '')
 
   if (dates.length === 0) {
-    return <p className="text-sm text-slate-500">Bu tip için saatlik kırılım verisi yok.</p>
+    return <p className="text-sm text-slate-400">Bu tip için saatlik kırılım verisi yok.</p>
   }
 
   const activeDate = dates.includes(selectedDate) ? selectedDate : dates[0]
@@ -56,11 +63,11 @@ function OverlayHourlyChart({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-medium text-slate-200">{type} — Saatlik Kırılım Karşılaştırması</div>
+        <div className="text-sm font-medium text-slate-700">{type} — Saatlik Kırılım Karşılaştırması</div>
         <select
           value={activeDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="rounded-md border border-navy-600 bg-navy-800 px-2 py-1 text-xs text-slate-200 outline-none focus:border-gold-500"
+          className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-blue-400"
         >
           {dates.map((d) => (
             <option key={d} value={d}>
@@ -71,13 +78,10 @@ function OverlayHourlyChart({
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1b2740" />
-          <XAxis dataKey="hour" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-          <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
-          <Tooltip
-            contentStyle={{ background: '#0c1322', border: '1px solid #2a3a5c', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: '#e2e8f0' }}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_STYLE.grid} />
+          <XAxis dataKey="hour" tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} />
+          <YAxis tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} />
+          <Tooltip contentStyle={CHART_STYLE.tooltip} labelStyle={CHART_STYLE.tooltipLabel} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {names.map((name, i) => (
             <Bar
@@ -116,7 +120,7 @@ export default function HourlyBreakdownChart({
   }
 
   if (!hourly || dates.length === 0) {
-    return <p className="text-sm text-slate-500">Bu tip için saatlik kırılım verisi yok.</p>
+    return <p className="text-sm text-slate-400">Bu tip için saatlik kırılım verisi yok.</p>
   }
 
   const activeDate = dates.includes(selectedDate) ? selectedDate : dates[0]
@@ -137,11 +141,11 @@ export default function HourlyBreakdownChart({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-medium text-slate-200">{type} — Saatlik Kırılım</div>
+        <div className="text-sm font-medium text-slate-700">{type} — Saatlik Kırılım</div>
         <select
           value={activeDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="rounded-md border border-navy-600 bg-navy-800 px-2 py-1 text-xs text-slate-200 outline-none focus:border-gold-500"
+          className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-blue-400"
         >
           {dates.map((d) => (
             <option key={d} value={d}>
@@ -152,17 +156,14 @@ export default function HourlyBreakdownChart({
       </div>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1b2740" />
-          <XAxis dataKey="hour" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-          <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
-          <Tooltip
-            contentStyle={{ background: '#0c1322', border: '1px solid #2a3a5c', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: '#e2e8f0' }}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_STYLE.grid} />
+          <XAxis dataKey="hour" tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} />
+          <YAxis tick={{ fill: CHART_STYLE.tick, fontSize: 11 }} />
+          <Tooltip contentStyle={CHART_STYLE.tooltip} labelStyle={CHART_STYLE.tooltipLabel} />
           {hasActual && <Legend wrapperStyle={{ fontSize: 12 }} />}
-          <Bar dataKey="count" name="Tahmin edilen kayıt" fill="#60a5fa" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          <Bar dataKey="count" name="Tahmin edilen kayıt" fill="#3b82f6" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           {hasActual && (
-            <Bar dataKey="actual" name="Gerçekleşen kayıt" fill="#34d399" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="actual" name="Gerçekleşen kayıt" fill="#10b981" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           )}
         </BarChart>
       </ResponsiveContainer>

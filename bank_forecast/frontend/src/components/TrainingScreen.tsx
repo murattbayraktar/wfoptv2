@@ -25,10 +25,10 @@ function DatasetSummaryCard() {
   const isRunning = retrainStatus?.status === 'running'
 
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
-      <div className="mb-1 text-sm font-semibold text-slate-100">Yüklenen veri</div>
-      <p className="text-sm text-slate-300">
-        <span className="font-medium text-slate-100">{dataset.filename}</span>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-1 text-sm font-semibold text-slate-900">Yüklenen veri</div>
+      <p className="text-sm text-slate-600">
+        <span className="font-medium text-slate-900">{dataset.filename}</span>
         {dataset.date_range && (
           <>
             {' '}— {dataset.date_range.start} – {dataset.date_range.end} arası{' '}
@@ -42,10 +42,9 @@ function DatasetSummaryCard() {
       </p>
 
       {dataset.source_kind === 'upload' && (
-        <div className="mt-4 flex flex-col items-start gap-4 border-t border-navy-800 pt-4">
-          {/* Holdout seçeneği */}
+        <div className="mt-4 flex flex-col items-start gap-4 border-t border-slate-100 pt-4">
           <div>
-            <div className="mb-2 text-xs font-medium text-slate-400">Doğrulama için son günler</div>
+            <div className="mb-2 text-xs font-medium text-slate-500">Doğrulama için son günler</div>
             <div className="flex gap-2">
               {HOLDOUT_OPTIONS.map((opt) => (
                 <button
@@ -55,8 +54,8 @@ function DatasetSummaryCard() {
                   disabled={isRunning}
                   className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
                     holdoutDays === opt.value
-                      ? 'border-gold-500 bg-gold-500/20 text-gold-300'
-                      : 'border-navy-600 bg-navy-800 text-slate-400 hover:border-navy-500 hover:text-slate-300'
+                      ? 'border-blue-400 bg-blue-100 text-blue-700'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'
                   }`}
                 >
                   {opt.label}
@@ -64,7 +63,7 @@ function DatasetSummaryCard() {
               ))}
             </div>
             {holdoutDays > 0 && (
-              <p className="mt-1.5 text-xs text-slate-500">
+              <p className="mt-1.5 text-xs text-slate-400">
                 En son {holdoutDays} gün eğitime dahil edilmez; eğitim bitince bu günler için
                 otomatik tahmin yapılır ve MAPE hesaplanır.
               </p>
@@ -75,7 +74,7 @@ function DatasetSummaryCard() {
             type="button"
             onClick={() => void startTraining()}
             disabled={startingTraining || isRunning}
-            className="rounded-md border border-gold-500/60 bg-gold-500/10 px-5 py-2.5 text-sm font-medium text-gold-400 transition-colors hover:bg-gold-500/20 disabled:opacity-50"
+            className="rounded-md border border-blue-300 bg-blue-50 px-5 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-50"
           >
             {isRunning
               ? 'Eğitim devam ediyor…'
@@ -84,16 +83,16 @@ function DatasetSummaryCard() {
                 : `Eğitimi Başlat — ${trainModels.map((m) => MODEL_LABELS[m] ?? m).join(' + ')}`}
           </button>
           {isRunning && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Devam eden eğitim tamamlanmadan yeni bir eğitim başlatılamaz — ilerlemeyi aşağıdan izleyebilirsiniz.
             </p>
           )}
-          {!isRunning && trainingStartError && <p className="text-xs text-red-400">{trainingStartError}</p>}
+          {!isRunning && trainingStartError && <p className="text-xs text-red-500">{trainingStartError}</p>}
         </div>
       )}
 
       {dataset.source_kind === 'demo' && (
-        <p className="mt-3 rounded-lg border border-navy-700 bg-navy-950/60 px-4 py-2.5 text-xs text-slate-400">
+        <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-500">
           Bu örnek (demo) veri ile model eğitimi desteklenmiyor. Modelleri yeniden eğitmek için
           gerçek bir CSV dosyası yükleyin.
         </p>
@@ -108,9 +107,9 @@ export default function TrainingScreen() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-navy-700 bg-navy-900 p-6">
-        <h1 className="mb-2 text-base font-semibold text-slate-100">Veri & Model Eğitimi</h1>
-        <p className="text-sm text-slate-400">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="mb-2 text-base font-semibold text-slate-900">Veri & Model Eğitimi</h1>
+        <p className="text-sm text-slate-500">
           Buradan yeni bir CSV yükleyin, eğitim için kullanılacak algoritmayı seçin ve ardından
           "Eğitimi Başlat" butonuna tıklayın. Sistem veriyi analiz edip işlem tipi ve frekans
           (günlük / saatlik) başına seçtiğiniz algoritmayı (veya "Tümü" seçiliyse en uygununu
