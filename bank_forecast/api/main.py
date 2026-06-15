@@ -3,10 +3,14 @@
 Çalıştırma (bank_forecast/ dizininden — registry/config göreli yollar buna bağlı):
     uvicorn api.main:app --reload --port 8000
 """
+import os
 import sys
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from . import routes_data, routes_forecast, routes_train
 
@@ -19,9 +23,10 @@ if hasattr(sys.stdout, "reconfigure"):
 
 app = FastAPI(title="WFOpt İşlem Hacmi Tahmin API")
 
+_allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -34,3 +39,13 @@ app.include_router(routes_train.router)
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+
+# Production'da Vite build çıktısını serve et
+_static_dir = Path(__file__).parent.parent / "frontend" / "dist"
+if _static_dir.exists():
+    app.mount("/assets", StaticFiles(directory=_static_dir / "assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        return FileResponse(_static_dir / "index.html")
