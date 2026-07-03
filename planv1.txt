@@ -1,0 +1,7 @@
+1. İlk olarak csv olarak gelecek olan sistem datasında yeni alanlar eklenecek. Şimdilik 2 format var aklımda ileride değişebilir
+    1. tarih, saat, işlem tipi, ekip_adi, talimat_adet
+    2. tarih, saat, işlem tipi, ekip_adi, islem_adet
+2. Üstteki 2 format olduğu için artık hem talimat hem de islem adedi için ekip bazlı ve günlük ve saatlik tahmin yapmamız gerekiyor. 
+3. Tahmin sonuçlarını daha doğru görebilmek adına hem ekip bazlı hem de total tahmin - mape oranlarını görmek istiyorum.
+4. Yine tahmin ekranındaki grafiklerde de ekip - talimat - islem kırılımlı olması gerekiyor bu ihtiyaca göre onları da revize etmeni istiyorum.
+5. Tahmin yaptığım ekranda tahmin sonuçlarını excel e aktarma özelliği de eklersen süper olur. Ekip - işlem tipi bazlı referans ve işlem adetlerini görmek isterim excelde.

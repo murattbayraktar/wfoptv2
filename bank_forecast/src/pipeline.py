@@ -176,6 +176,13 @@ def _train_unit(args: tuple) -> dict:
     (transaction_type, freq, agg_pkl_path, features_cfg, models_cfg,
      candidate_models, multi_save, cv_folds, metric, min_days, output_dir, report_flag) = args
 
+    # Birim başına zaten ayrı bir process ayrılmış durumda (bkz. ProcessPoolExecutor
+    # çağrısı); modellerin kendi içindeki n_jobs=-1 paralelliği bununla çakışıp tüm
+    # çekirdekleri N kat aşırı abone ederek (oversubscription) eğitimi durmuş gibi
+    # yavaşlatıyordu. Process-içi paralelliği kapatıp tüm çekirdekleri unit-düzeyindeki
+    # paralellikte kullanıyoruz.
+    models_cfg = {**models_cfg, "n_jobs": 1}
+
     key = f"{transaction_type}_{freq}"
     try:
         import joblib as _joblib
