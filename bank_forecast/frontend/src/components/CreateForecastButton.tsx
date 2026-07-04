@@ -1,8 +1,8 @@
 import { useData } from '../context/DataContext'
 
 export default function CreateForecastButton() {
-  const { dataset, uiStep, createForecast, forecastError } = useData()
-  const disabled = !dataset?.loaded || uiStep === 'progress'
+  const { anyLoaded, uiStep, createForecast, forecastError } = useData()
+  const disabled = !anyLoaded || uiStep === 'progress'
 
   return (
     <div>
@@ -14,7 +14,7 @@ export default function CreateForecastButton() {
       >
         {uiStep === 'progress' ? 'Tahmin oluşturuluyor…' : 'Tahmin Oluştur'}
       </button>
-      {!dataset?.loaded && (
+      {!anyLoaded && (
         <p className="mt-2 text-center text-xs text-slate-400">Önce CSV yükleyin</p>
       )}
       {forecastError && (

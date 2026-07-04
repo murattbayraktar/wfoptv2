@@ -1,6 +1,6 @@
 """
 Kullanım:
-  python evaluate.py --input data/raw/transactions.csv --backtest-days 60 --plot
+  python evaluate.py --input data/raw/transactions_talimat.csv --backtest-days 60 --plot
 """
 import argparse
 import sys
@@ -17,6 +17,7 @@ from rich.console import Console
 from rich.table import Table
 import numpy as np
 
+
 console = Console()
 
 
@@ -25,9 +26,11 @@ def parse_args():
     p.add_argument("--input", required=True, help="CSV giriş dosyası")
     p.add_argument("--backtest-days", type=int, default=60,
                    help="Son N günü test seti olarak ayır")
+    p.add_argument("--teams", default="", help="Virgülle ayrılmış ekip adları")
     p.add_argument("--types", default="", help="Virgülle ayrılmış işlem tipleri")
     p.add_argument("--freq", default="daily", choices=["daily", "hourly", "both"])
-    p.add_argument("--registry", default="models/saved/model_registry.json")
+    p.add_argument("--registry", default=None,
+                   help="Model registry dosyası (boş = models/saved/model_registry_<metric_type>.json)")
     p.add_argument("--plot", action="store_true", help="Grafik üret")
     p.add_argument("--output-dir", default="outputs/reports")
     p.add_argument("--config", default="config/settings.yaml")
@@ -36,73 +39,86 @@ def parse_args():
 
 def main():
     args = parse_args()
+    teams = [t.strip() for t in args.teams.split(",") if t.strip()] or None
     types = [t.strip() for t in args.types.split(",") if t.strip()] or None
 
-    from src.pipeline import load_config
+    from src.pipeline import load_config, registry_filename
     cfg = load_config(args.config)
     data_cfg = cfg.get("data", {})
     features_cfg = cfg.get("features", {})
     models_cfg = cfg.get("models", {})
     working_hours = tuple(data_cfg.get("working_hours", [7, 18]))
 
-    df = load_transactions(args.input)
+    df, metric_type = load_transactions(args.input)
 
+    if not teams:
+        teams = sorted(df["team"].unique().tolist())
     if not types:
         types = sorted(df["transaction_type"].unique().tolist())
 
     freqs = ["daily", "hourly"] if args.freq == "both" else [args.freq]
+    registry_path = args.registry or registry_filename(metric_type)
 
-    # Registry'den en iyi modelleri oku
-    model_map = {}
-    if os.path.exists(args.registry):
-        with open(args.registry, "r") as f:
+    # Registry'den en iyi modelleri oku (nested: team -> type -> freq)
+    model_map: dict = {}
+    if os.path.exists(registry_path):
+        with open(registry_path, "r", encoding="utf-8") as f:
             reg = json.load(f)
-        for key, info in reg.get("models", {}).items():
-            model_map[key] = info.get("best_model", "xgboost")
+        for team, by_type in reg.get("models", {}).items():
+            for tt, by_freq in by_type.items():
+                for f_freq, info in by_freq.items():
+                    model_map[(team, tt, f_freq)] = info.get("best_model", "xgboost")
 
     summary_rows = []
 
-    for transaction_type in types:
-        for f in freqs:
-            key = f"{transaction_type}_{f}"
-            model_name = model_map.get(key, "xgboost")
+    for team in teams:
+        for transaction_type in types:
+            for f in freqs:
+                model_name = model_map.get((team, transaction_type, f), "xgboost")
 
-            if f == "daily":
-                agg = aggregate_daily(df)
-            else:
-                try:
-                    agg = aggregate_hourly(df, working_hours=working_hours)
-                except ValueError:
+                if f == "daily":
+                    agg = aggregate_daily(df)
+                else:
+                    try:
+                        agg = aggregate_hourly(df, working_hours=working_hours)
+                    except ValueError:
+                        continue
+
+                if not ((agg["team"] == team) & (agg["transaction_type"] == transaction_type)).any():
                     continue
 
-            backtester = WalkForwardBacktester(
-                transaction_type=transaction_type,
-                freq=f,
-                cv_folds=models_cfg.get("cv_folds", 5),
-                min_train_days=90,
-                cfg=features_cfg,
-            )
-            summary = backtester.run(agg, model_name=model_name, models_cfg=models_cfg)
+                backtester = WalkForwardBacktester(
+                    transaction_type=transaction_type,
+                    team=team,
+                    freq=f,
+                    cv_folds=models_cfg.get("cv_folds", 5),
+                    min_train_days=90,
+                    cfg=features_cfg,
+                )
+                summary = backtester.run(agg, model_name=model_name, models_cfg=models_cfg)
 
-            if "error" in summary:
-                console.print(f"[yellow]{key}: {summary['error']}[/yellow]")
-                continue
+                label = f"{team} / {transaction_type} / {f}"
+                if "error" in summary:
+                    console.print(f"[yellow]{label}: {summary['error']}[/yellow]")
+                    continue
 
-            backtester.print_summary(summary)
+                backtester.print_summary(summary)
 
-            ov = summary["overall"]
-            summary_rows.append({
-                "tip": transaction_type,
-                "freq": f,
-                "model": model_name,
-                "rmse": ov["rmse"],
-                "mae": ov["mae"],
-                "mape": ov["mape"],
-            })
+                ov = summary["overall"]
+                summary_rows.append({
+                    "ekip": team,
+                    "tip": transaction_type,
+                    "freq": f,
+                    "model": model_name,
+                    "rmse": ov["rmse"],
+                    "mae": ov["mae"],
+                    "mape": ov["mape"],
+                })
 
     # Özet tablo
     if summary_rows:
         table = Table(title="Değerlendirme Özeti")
+        table.add_column("Ekip")
         table.add_column("Tip")
         table.add_column("Frekans")
         table.add_column("Model")
@@ -114,14 +130,14 @@ def main():
             mape_val = r["mape"]
             mape_str = f"{mape_val:.1f}%" if not np.isnan(mape_val) else "-"
             table.add_row(
-                r["tip"], r["freq"], r["model"],
+                r["ekip"], r["tip"], r["freq"], r["model"],
                 f"{r['rmse']:.2f}", f"{r['mae']:.2f}", mape_str,
             )
         console.print(table)
 
         # JSON çıktı
         os.makedirs(args.output_dir, exist_ok=True)
-        out_path = os.path.join(args.output_dir, "evaluation_results.json")
+        out_path = os.path.join(args.output_dir, f"evaluation_results_{metric_type}.json")
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(summary_rows, f, ensure_ascii=False, indent=2, default=str)
         console.print(f"[green]Değerlendirme sonuçları: {out_path}[/green]")

@@ -3,18 +3,22 @@ import { useData } from '../context/DataContext'
 import { MODEL_LABELS } from '../constants'
 
 export default function ForecastModelPicker() {
-  const { availableModels, forecastModels, toggleForecastModel } = useData()
+  const { talimat, islem, forecastModels, toggleForecastModel } = useData()
 
   const modelNames = useMemo(() => {
-    if (!availableModels) return []
     const names = new Set<string>()
-    for (const byFreq of Object.values(availableModels.available)) {
-      for (const entry of Object.values(byFreq)) {
-        for (const name of entry.models) names.add(name)
+    for (const availableModels of [talimat.availableModels, islem.availableModels]) {
+      if (!availableModels) continue
+      for (const byType of Object.values(availableModels.available)) {
+        for (const byFreq of Object.values(byType)) {
+          for (const entry of Object.values(byFreq)) {
+            for (const name of entry.models) names.add(name)
+          }
+        }
       }
     }
     return [...names].sort()
-  }, [availableModels])
+  }, [talimat.availableModels, islem.availableModels])
 
   if (modelNames.length < 2) return null
 
@@ -37,7 +41,7 @@ export default function ForecastModelPicker() {
         ))}
       </div>
       <p className="mt-1.5 text-xs text-slate-400">
-        Boş bırakırsanız her tip için otomatik en iyi model kullanılır. Birden fazla algoritma
+        Boş bırakırsanız her ekip/tip için otomatik en iyi model kullanılır. Birden fazla algoritma
         seçerseniz sonuçlar grafik üzerinde renkli çizgiler olarak üst üste karşılaştırmalı gösterilir.
       </p>
     </div>

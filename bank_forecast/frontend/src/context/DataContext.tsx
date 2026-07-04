@@ -1,18 +1,22 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as api from '../api/client'
-import type { AvailableModelsResponse, DatasetSummary, ForecastResponse, RetrainStatus } from '../types'
+import type { ForecastParams } from '../api/client'
+import type {
+  AvailableModelsResponse,
+  DatasetSummary,
+  DatasetSummaryMap,
+  ForecastResponse,
+  MetricType,
+  RetrainStatus,
+} from '../types'
+import { METRIC_TYPES } from '../types'
 
 const RETRAIN_POLL_INTERVAL_MS = 1500
 
 export type UiStep = 'idle' | 'progress' | 'results'
 
-interface DataContextValue {
+interface MetricUiState {
   dataset: DatasetSummary | null
-  datasetError: string | null
-  loadingDataset: boolean
-  loadDemo: () => Promise<void>
-  upload: (file: File) => Promise<void>
-
   trainModels: string[]
   toggleTrainModel: (v: string) => void
   holdoutDays: number
@@ -21,13 +25,29 @@ interface DataContextValue {
   startingTraining: boolean
   trainingStartError: string | null
   retrainStatus: RetrainStatus | null
+  availableModels: AvailableModelsResponse | null
+}
+
+interface DataContextValue {
+  datasetMap: DatasetSummaryMap
+  anyLoaded: boolean
+  datasetError: string | null
+  loadingDataset: boolean
+  loadDemo: (metricType: MetricType) => Promise<void>
+  upload: (file: File) => Promise<void>
+
+  talimat: MetricUiState
+  islem: MetricUiState
+
+  teamOptions: string[]
+  selectedTeam: string
+  setSelectedTeam: (v: string) => void
 
   rangeStart: string
   rangeEnd: string
   setRangeStart: (v: string) => void
   setRangeEnd: (v: string) => void
 
-  availableModels: AvailableModelsResponse | null
   forecastModels: string[]
   toggleForecastModel: (v: string) => void
 
@@ -36,9 +56,15 @@ interface DataContextValue {
   forecastError: string | null
   createForecast: () => Promise<void>
   resetResults: () => void
+
+  exportExcel: () => Promise<void>
+  exporting: boolean
+  exportError: string | null
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
+
+const EMPTY_DATASET_MAP: DatasetSummaryMap = { talimat: null, islem: null }
 
 function defaultRange(): { start: string; end: string } {
   const today = new Date()
@@ -65,67 +91,33 @@ function rangeFromDataset(dateRange?: { start: string; end: string }): { start: 
   return { start: fmt(start), end: fmt(dataEnd) }
 }
 
-export function DataProvider({ children }: { children: ReactNode }) {
-  const [dataset, setDataset] = useState<DatasetSummary | null>(null)
-  const [datasetError, setDatasetError] = useState<string | null>(null)
-  const [loadingDataset, setLoadingDataset] = useState(false)
+function useMetricState(metricType: MetricType, dataset: DatasetSummary | null) {
   const [trainModels, setTrainModels] = useState<string[]>(['auto'])
   const [holdoutDays, setHoldoutDays] = useState<number>(0)
   const [startingTraining, setStartingTraining] = useState(false)
   const [trainingStartError, setTrainingStartError] = useState<string | null>(null)
   const [retrainStatus, setRetrainStatus] = useState<RetrainStatus | null>(null)
-
-  const initialRange = defaultRange()
-  const [rangeStart, setRangeStart] = useState(initialRange.start)
-  const [rangeEnd, setRangeEnd] = useState(initialRange.end)
-
   const [availableModels, setAvailableModels] = useState<AvailableModelsResponse | null>(null)
-  const [forecastModels, setForecastModels] = useState<string[]>([])
-
-  const [uiStep, setUiStep] = useState<UiStep>('idle')
-  const [forecastResult, setForecastResult] = useState<ForecastResponse | null>(null)
-  const [forecastError, setForecastError] = useState<string | null>(null)
-
-  useEffect(() => {
-    api
-      .getDatasetSummary()
-      .then((summary) => {
-        if (summary.loaded) {
-          setDataset(summary)
-          const suggested = rangeFromDataset(summary.date_range)
-          if (suggested) {
-            setRangeStart(suggested.start)
-            setRangeEnd(suggested.end)
-          }
-        }
-      })
-      .catch(() => {
-        // sayfa açılışında özet alınamazsa sessizce "veri yok" durumunda kalınır
-      })
-  }, [])
 
   const refreshAvailableModels = useCallback(() => {
     api
-      .getAvailableModels()
+      .getAvailableModels(metricType)
       .then(setAvailableModels)
       .catch(() => {
         // model listesi alınamazsa tahmin ekranı varsayılan (best_model) ile çalışmaya devam eder
       })
-  }, [])
+  }, [metricType])
 
   useEffect(() => {
     refreshAvailableModels()
   }, [refreshAvailableModels])
 
-  // Eğitim tamamlandığında (registry değiştiğinde) seçilebilir model listesini tazele
-  const prevRetrainStatusRef = useRef<string | null>(null)
+  const prevStatusRef = useRef<string | null>(null)
   useEffect(() => {
-    const prev = prevRetrainStatusRef.current
+    const prev = prevStatusRef.current
     const current = retrainStatus?.status ?? null
-    if (prev === 'running' && current === 'done') {
-      refreshAvailableModels()
-    }
-    prevRetrainStatusRef.current = current
+    if (prev === 'running' && current === 'done') refreshAvailableModels()
+    prevStatusRef.current = current
   }, [retrainStatus?.status, refreshAvailableModels])
 
   const trackingRetrain = dataset?.loaded && dataset.source_kind === 'upload'
@@ -140,7 +132,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     async function tick() {
       try {
-        const next = await api.getRetrainStatus()
+        const next = await api.getRetrainStatus(metricType)
         if (cancelled) return
         setRetrainStatus(next)
       } finally {
@@ -153,47 +145,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       cancelled = true
       if (timer) clearTimeout(timer)
     }
-  }, [trackingRetrain])
-
-  const loadDemo = useCallback(async () => {
-    setLoadingDataset(true)
-    setDatasetError(null)
-    try {
-      const summary = await api.loadDemoData()
-      setDataset(summary)
-      setForecastResult(null)
-      setUiStep('idle')
-      const suggested = rangeFromDataset(summary.date_range)
-      if (suggested) {
-        setRangeStart(suggested.start)
-        setRangeEnd(suggested.end)
-      }
-    } catch (e) {
-      setDatasetError(e instanceof Error ? e.message : 'Demo veri yüklenemedi.')
-    } finally {
-      setLoadingDataset(false)
-    }
-  }, [])
-
-  const upload = useCallback(async (file: File) => {
-    setLoadingDataset(true)
-    setDatasetError(null)
-    try {
-      const summary = await api.uploadCsv(file)
-      setDataset(summary)
-      setForecastResult(null)
-      setUiStep('idle')
-      const suggested = rangeFromDataset(summary.date_range)
-      if (suggested) {
-        setRangeStart(suggested.start)
-        setRangeEnd(suggested.end)
-      }
-    } catch (e) {
-      setDatasetError(e instanceof Error ? e.message : 'Dosya yüklenemedi.')
-    } finally {
-      setLoadingDataset(false)
-    }
-  }, [])
+  }, [trackingRetrain, metricType])
 
   const toggleTrainModel = useCallback((value: string) => {
     setTrainModels((prev) => {
@@ -206,53 +158,28 @@ export function DataProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const toggleForecastModel = useCallback((value: string) => {
-    setForecastModels((prev) =>
-      prev.includes(value) ? prev.filter((m) => m !== value) : [...prev, value],
-    )
-  }, [])
-
   const startTraining = useCallback(async () => {
     if (retrainStatus?.status === 'running') return
     setStartingTraining(true)
     setTrainingStartError(null)
     try {
       const models = trainModels.includes('auto') ? undefined : trainModels
-      await api.startRetrain({ freq: 'both', models, holdout_days: holdoutDays > 0 ? holdoutDays : undefined })
-      setRetrainStatus(await api.getRetrainStatus())
+      await api.startRetrain({
+        metric_type: metricType,
+        freq: 'both',
+        models,
+        holdout_days: holdoutDays > 0 ? holdoutDays : undefined,
+      })
+      setRetrainStatus(await api.getRetrainStatus(metricType))
     } catch (e) {
       setTrainingStartError(e instanceof Error ? e.message : 'Eğitim başlatılamadı.')
     } finally {
       setStartingTraining(false)
     }
-  }, [trainModels, holdoutDays, retrainStatus])
+  }, [metricType, trainModels, holdoutDays, retrainStatus])
 
-  const createForecast = useCallback(async () => {
-    setForecastError(null)
-    setUiStep('progress')
-    try {
-      const models = forecastModels.length > 0 ? forecastModels : undefined
-      const result = await api.runForecast({ start: rangeStart, end: rangeEnd, freq: 'both', models })
-      setForecastResult(result)
-      setUiStep('results')
-    } catch (e) {
-      setForecastError(e instanceof Error ? e.message : 'Tahmin oluşturulamadı.')
-      setUiStep('idle')
-    }
-  }, [rangeStart, rangeEnd, forecastModels])
-
-  const resetResults = useCallback(() => {
-    setForecastResult(null)
-    setForecastError(null)
-    setUiStep('idle')
-  }, [])
-
-  const value: DataContextValue = {
+  return {
     dataset,
-    datasetError,
-    loadingDataset,
-    loadDemo,
-    upload,
     trainModels,
     toggleTrainModel,
     holdoutDays,
@@ -261,11 +188,172 @@ export function DataProvider({ children }: { children: ReactNode }) {
     startingTraining,
     trainingStartError,
     retrainStatus,
+    availableModels,
+  } satisfies MetricUiState
+}
+
+export function DataProvider({ children }: { children: ReactNode }) {
+  const [datasetMap, setDatasetMap] = useState<DatasetSummaryMap>(EMPTY_DATASET_MAP)
+  const [datasetError, setDatasetError] = useState<string | null>(null)
+  const [loadingDataset, setLoadingDataset] = useState(false)
+
+  const initialRange = defaultRange()
+  const [rangeStart, setRangeStart] = useState(initialRange.start)
+  const [rangeEnd, setRangeEnd] = useState(initialRange.end)
+
+  const [selectedTeam, setSelectedTeam] = useState<string>('')
+  const [forecastModels, setForecastModels] = useState<string[]>([])
+
+  const [uiStep, setUiStep] = useState<UiStep>('idle')
+  const [forecastResult, setForecastResult] = useState<ForecastResponse | null>(null)
+  const [forecastError, setForecastError] = useState<string | null>(null)
+  const [lastForecastParams, setLastForecastParams] = useState<ForecastParams | null>(null)
+
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const talimat = useMetricState('talimat', datasetMap.talimat)
+  const islem = useMetricState('islem', datasetMap.islem)
+
+  useEffect(() => {
+    api
+      .getDatasetSummary()
+      .then((summaryMap) => {
+        setDatasetMap(summaryMap)
+        const anyDataset = summaryMap.talimat ?? summaryMap.islem
+        const suggested = rangeFromDataset(anyDataset?.date_range)
+        if (suggested) {
+          setRangeStart(suggested.start)
+          setRangeEnd(suggested.end)
+        }
+      })
+      .catch(() => {
+        // sayfa açılışında özet alınamazsa sessizce "veri yok" durumunda kalınır
+      })
+  }, [])
+
+  const applySummary = useCallback((summaryMap: DatasetSummaryMap) => {
+    setDatasetMap(summaryMap)
+    setForecastResult(null)
+    setUiStep('idle')
+    const anyDataset = summaryMap.talimat ?? summaryMap.islem
+    const suggested = rangeFromDataset(anyDataset?.date_range)
+    if (suggested) {
+      setRangeStart(suggested.start)
+      setRangeEnd(suggested.end)
+    }
+  }, [])
+
+  const loadDemo = useCallback(async (metricType: MetricType) => {
+    setLoadingDataset(true)
+    setDatasetError(null)
+    try {
+      const summaryMap = await api.loadDemoData(metricType)
+      applySummary(summaryMap)
+    } catch (e) {
+      setDatasetError(e instanceof Error ? e.message : 'Demo veri yüklenemedi.')
+    } finally {
+      setLoadingDataset(false)
+    }
+  }, [applySummary])
+
+  const upload = useCallback(async (file: File) => {
+    setLoadingDataset(true)
+    setDatasetError(null)
+    try {
+      const summaryMap = await api.uploadCsv(file)
+      applySummary(summaryMap)
+    } catch (e) {
+      setDatasetError(e instanceof Error ? e.message : 'Dosya yüklenemedi.')
+    } finally {
+      setLoadingDataset(false)
+    }
+  }, [applySummary])
+
+  const teamOptions = useMemo(() => {
+    const set = new Set<string>()
+    for (const avail of [talimat.availableModels, islem.availableModels]) {
+      if (avail) Object.keys(avail.available).forEach((t) => set.add(t))
+    }
+    if (set.size === 0) {
+      for (const mt of METRIC_TYPES) {
+        datasetMap[mt]?.teams?.forEach((t) => set.add(t))
+      }
+    }
+    return [...set].sort()
+  }, [talimat.availableModels, islem.availableModels, datasetMap])
+
+  const toggleForecastModel = useCallback((value: string) => {
+    setForecastModels((prev) =>
+      prev.includes(value) ? prev.filter((m) => m !== value) : [...prev, value],
+    )
+  }, [])
+
+  const createForecast = useCallback(async () => {
+    setForecastError(null)
+    setUiStep('progress')
+    const params: ForecastParams = {
+      start: rangeStart,
+      end: rangeEnd,
+      freq: 'both',
+      metric_type: 'both',
+      teams: selectedTeam ? [selectedTeam] : undefined,
+      models: forecastModels.length > 0 ? forecastModels : undefined,
+    }
+    try {
+      const result = await api.runForecast(params)
+      setForecastResult(result)
+      setLastForecastParams(params)
+      setUiStep('results')
+    } catch (e) {
+      setForecastError(e instanceof Error ? e.message : 'Tahmin oluşturulamadı.')
+      setUiStep('idle')
+    }
+  }, [rangeStart, rangeEnd, selectedTeam, forecastModels])
+
+  const resetResults = useCallback(() => {
+    setForecastResult(null)
+    setForecastError(null)
+    setUiStep('idle')
+  }, [])
+
+  const exportExcel = useCallback(async () => {
+    if (!lastForecastParams) return
+    setExporting(true)
+    setExportError(null)
+    try {
+      const blob = await api.exportForecastExcel(lastForecastParams)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `tahmin_${lastForecastParams.start}_${lastForecastParams.end}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'Excel dosyası oluşturulamadı.')
+    } finally {
+      setExporting(false)
+    }
+  }, [lastForecastParams])
+
+  const value: DataContextValue = {
+    datasetMap,
+    anyLoaded: !!(datasetMap.talimat?.loaded || datasetMap.islem?.loaded),
+    datasetError,
+    loadingDataset,
+    loadDemo,
+    upload,
+    talimat,
+    islem,
+    teamOptions,
+    selectedTeam,
+    setSelectedTeam,
     rangeStart,
     rangeEnd,
     setRangeStart,
     setRangeEnd,
-    availableModels,
     forecastModels,
     toggleForecastModel,
     uiStep,
@@ -273,6 +361,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     forecastError,
     createForecast,
     resetResults,
+    exportExcel,
+    exporting,
+    exportError,
   }
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>

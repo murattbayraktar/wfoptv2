@@ -13,10 +13,12 @@ const CHART_STYLE = {
 }
 
 function OverlayHourlyChart({
+  team,
   type,
   models,
   comparison,
 }: {
+  team: string
   type: string
   models: Record<string, ForecastByType>
   comparison?: ComparisonResult
@@ -37,7 +39,7 @@ function OverlayHourlyChart({
   const activeDate = dates.includes(selectedDate) ? selectedDate : dates[0]
 
   const actualByHour = new Map<number, number>()
-  for (const row of comparison?.by_type[type] ?? []) {
+  for (const row of comparison?.by_team[team]?.[type] ?? []) {
     if (row.date === activeDate && row.hour !== undefined) {
       actualByHour.set(row.hour, row.actual_count)
     }
@@ -103,10 +105,12 @@ function OverlayHourlyChart({
 }
 
 export default function HourlyBreakdownChart({
+  team,
   type,
   info,
   comparison,
 }: {
+  team: string
   type: string
   info: ForecastByType
   comparison?: ComparisonResult
@@ -116,7 +120,7 @@ export default function HourlyBreakdownChart({
   const [selectedDate, setSelectedDate] = useState(dates[0] ?? '')
 
   if (info.models && Object.keys(info.models).length > 1) {
-    return <OverlayHourlyChart type={type} models={info.models} comparison={comparison} />
+    return <OverlayHourlyChart team={team} type={type} models={info.models} comparison={comparison} />
   }
 
   if (!hourly || dates.length === 0) {
@@ -126,7 +130,7 @@ export default function HourlyBreakdownChart({
   const activeDate = dates.includes(selectedDate) ? selectedDate : dates[0]
 
   const actualByHour = new Map<number, number>()
-  for (const row of comparison?.by_type[type] ?? []) {
+  for (const row of comparison?.by_team[team]?.[type] ?? []) {
     if (row.date === activeDate && row.hour !== undefined) {
       actualByHour.set(row.hour, row.actual_count)
     }

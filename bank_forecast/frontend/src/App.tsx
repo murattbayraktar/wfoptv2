@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { DataProvider, useData } from './context/DataContext'
-import type { DatasetSummary } from './types'
+import type { DatasetSummaryMap } from './types'
+import { METRIC_LABELS, METRIC_TYPES } from './types'
 import TopBar from './components/TopBar'
 import Sidebar from './components/Sidebar'
 import ProgressStepper from './components/ProgressStepper'
@@ -29,18 +30,31 @@ function NoDataCard({ onGoToTraining }: { onGoToTraining: () => void }) {
   )
 }
 
-function ReadyToForecastCard({ dataset }: { dataset: DatasetSummary }) {
+function ReadyToForecastCard({ datasetMap }: { datasetMap: DatasetSummaryMap }) {
   return (
     <div className="rounded-xl border border-blue-200 bg-blue-50 p-6">
       <div className="mb-1 text-sm font-semibold text-blue-700">Veri hazır — sıradaki adım: tahmin</div>
-      <p className="text-sm text-slate-600">
-        <span className="font-medium text-slate-900">{dataset.filename}</span> yüklendi
-        {dataset.date_range && (
-          <>
-            {' '}({dataset.date_range.start} – {dataset.date_range.end} arası {dataset.row_count?.toLocaleString('tr-TR')} kayıt)
-          </>
-        )}
-        . Solda <span className="font-medium text-slate-800">Tahmin Aralığı</span>'nı kontrol edip{' '}
+      <div className="space-y-1 text-sm text-slate-600">
+        {METRIC_TYPES.map((mt) => {
+          const dataset = datasetMap[mt]
+          if (!dataset?.loaded) return null
+          return (
+            <p key={mt}>
+              <span className="font-medium text-slate-800">{METRIC_LABELS[mt]}:</span>{' '}
+              <span className="font-medium text-slate-900">{dataset.filename}</span> yüklendi
+              {dataset.date_range && (
+                <>
+                  {' '}({dataset.date_range.start} – {dataset.date_range.end} arası {dataset.row_count?.toLocaleString('tr-TR')} kayıt)
+                </>
+              )}
+              .
+            </p>
+          )
+        })}
+      </div>
+      <p className="mt-2 text-sm text-slate-600">
+        Solda <span className="font-medium text-slate-800">Tahmin Aralığı</span> ve{' '}
+        <span className="font-medium text-slate-800">Ekip</span>'i kontrol edip{' '}
         <span className="rounded bg-blue-600 px-1.5 py-0.5 text-xs font-semibold text-white">Tahmin Oluştur</span>{' '}
         butonuna tıklayın. Aralık, yüklenen verinin son 30 günüyle örtüşecek şekilde otomatik önerildi —
         böylece sonuçta gerçekleşen ile tahmin edilen değerleri karşılaştırabilirsiniz.
@@ -50,20 +64,22 @@ function ReadyToForecastCard({ dataset }: { dataset: DatasetSummary }) {
 }
 
 function MainContent({ onGoToTraining }: { onGoToTraining: () => void }) {
-  const { dataset, uiStep, forecastResult } = useData()
+  const { datasetMap, anyLoaded, uiStep, forecastResult } = useData()
 
   if (uiStep === 'progress') return <ProgressStepper />
   if (uiStep === 'results' && forecastResult) return <ResultsPanel />
 
   return (
     <div className="space-y-6">
-      {dataset?.loaded ? <ReadyToForecastCard dataset={dataset} /> : <NoDataCard onGoToTraining={onGoToTraining} />}
+      {anyLoaded ? <ReadyToForecastCard datasetMap={datasetMap} /> : <NoDataCard onGoToTraining={onGoToTraining} />}
     </div>
   )
 }
 
 function Layout() {
   const [screen, setScreen] = useState<Screen>('forecast')
+  const { uiStep, forecastResult } = useData()
+  const showingResults = screen === 'forecast' && uiStep === 'results' && !!forecastResult
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -71,7 +87,7 @@ function Layout() {
       <div className="flex flex-1">
         {screen === 'forecast' && <Sidebar />}
         <main className="flex-1 overflow-y-auto p-6">
-          <div className="mx-auto max-w-4xl">
+          <div className={showingResults ? 'mx-auto max-w-7xl' : 'mx-auto max-w-4xl'}>
             {screen === 'forecast' ? (
               <MainContent onGoToTraining={() => setScreen('training')} />
             ) : (

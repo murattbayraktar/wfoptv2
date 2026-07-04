@@ -12,15 +12,17 @@ const CHART_STYLE = {
 }
 
 export default function ActualVsPredictedChart({
+  team,
   type,
   info,
   comparison,
 }: {
+  team: string
   type: string
   info: ForecastByType
   comparison: ComparisonResult
 }) {
-  const rows = comparison.by_type[type]
+  const rows = comparison.by_team[team]?.[type]
   if (!comparison.has_overlap || !rows || rows.length === 0) return null
 
   const modelNames = info.models && Object.keys(info.models).length > 1 ? Object.keys(info.models).sort() : []
@@ -47,7 +49,7 @@ export default function ActualVsPredictedChart({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-1 text-sm font-medium text-slate-800">{type} — Gerçekleşen vs Tahmin</div>
+      <div className="mb-1 text-sm font-medium text-slate-800">{team} / {type} — Gerçekleşen vs Tahmin</div>
       <div className="mb-3 text-xs text-slate-400">
         Seçilen aralık geçmiş veriyle örtüşüyor ({comparison.overlap_range?.start} – {comparison.overlap_range?.end});
         gerçekleşen ve tahmin edilen değerler karşılaştırılıyor.

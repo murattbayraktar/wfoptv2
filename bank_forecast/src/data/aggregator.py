@@ -4,20 +4,31 @@ import numpy as np
 
 def aggregate_daily(df: pd.DataFrame) -> pd.DataFrame:
     grouped = (
-        df.groupby(["date", "transaction_type"])
+        df.groupby(["date", "team", "transaction_type"])
         .agg(count=("count", "sum"), amount=("amount", "sum"))
         .reset_index()
     )
 
+    # Yalnızca gerçekte gözlemlenmiş (team, transaction_type) çiftleri için tarih
+    # boşluklarını doldur — tüm ekip x tip kartezyen çarpımı yapılırsa çoğu ekip
+    # her işlem tipini yapmadığından spurious tüm-sıfır satırlar üretilir ve
+    # eğitim biriminin sayısı (bkz. pipeline.py) gereksiz yere şişer.
+    pairs = grouped[["team", "transaction_type"]].drop_duplicates()
     date_range = pd.date_range(grouped["date"].min(), grouped["date"].max(), freq="D")
-    types = grouped["transaction_type"].unique()
-    full_idx = pd.MultiIndex.from_product([date_range, types], names=["date", "transaction_type"])
-    full_df = pd.DataFrame(index=full_idx).reset_index()
 
-    result = full_df.merge(grouped, on=["date", "transaction_type"], how="left")
+    full_parts = []
+    for _, pair in pairs.iterrows():
+        idx = pd.MultiIndex.from_product(
+            [date_range, [pair["team"]], [pair["transaction_type"]]],
+            names=["date", "team", "transaction_type"],
+        )
+        full_parts.append(pd.DataFrame(index=idx).reset_index())
+    full_df = pd.concat(full_parts, ignore_index=True)
+
+    result = full_df.merge(grouped, on=["date", "team", "transaction_type"], how="left")
     result["count"] = result["count"].fillna(0).astype(int)
     result["amount"] = result["amount"].fillna(0.0)
-    result = result.sort_values(["transaction_type", "date"]).reset_index(drop=True)
+    result = result.sort_values(["team", "transaction_type", "date"]).reset_index(drop=True)
     return result
 
 
@@ -29,22 +40,26 @@ def aggregate_hourly(df: pd.DataFrame, working_hours: tuple = (7, 18)) -> pd.Dat
     df["hour"] = df["hour"].astype(int)
 
     grouped = (
-        df.groupby(["date", "hour", "transaction_type"])
+        df.groupby(["date", "hour", "team", "transaction_type"])
         .agg(count=("count", "sum"), amount=("amount", "sum"))
         .reset_index()
     )
 
+    pairs = grouped[["team", "transaction_type"]].drop_duplicates()
     date_range = pd.date_range(grouped["date"].min(), grouped["date"].max(), freq="D")
     hours = list(range(working_hours[0], working_hours[1] + 1))
-    types = grouped["transaction_type"].unique()
 
-    full_idx = pd.MultiIndex.from_product(
-        [date_range, hours, types], names=["date", "hour", "transaction_type"]
-    )
-    full_df = pd.DataFrame(index=full_idx).reset_index()
+    full_parts = []
+    for _, pair in pairs.iterrows():
+        idx = pd.MultiIndex.from_product(
+            [date_range, hours, [pair["team"]], [pair["transaction_type"]]],
+            names=["date", "hour", "team", "transaction_type"],
+        )
+        full_parts.append(pd.DataFrame(index=idx).reset_index())
+    full_df = pd.concat(full_parts, ignore_index=True)
 
-    result = full_df.merge(grouped, on=["date", "hour", "transaction_type"], how="left")
+    result = full_df.merge(grouped, on=["date", "hour", "team", "transaction_type"], how="left")
     result["count"] = result["count"].fillna(0).astype(int)
     result["amount"] = result["amount"].fillna(0.0)
-    result = result.sort_values(["transaction_type", "date", "hour"]).reset_index(drop=True)
+    result = result.sort_values(["team", "transaction_type", "date", "hour"]).reset_index(drop=True)
     return result

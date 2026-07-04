@@ -10,13 +10,17 @@ from pydantic import BaseModel
 class ForecastRequest(BaseModel):
     start: str  # "YYYY-MM-DD"
     end: str  # "YYYY-MM-DD"
+    metric_type: str = "both"  # "talimat" | "islem" | "both"
+    teams: list[str] | None = None
     types: list[str] | None = None
     freq: str = "daily"  # "daily" | "hourly" | "both"
     models: list[str] | None = None  # None: registry'nin best_model'ı kullanılır; birden fazla verilirse karşılaştırma üretilir
 
 
 class RetrainRequest(BaseModel):
+    metric_type: str  # "talimat" | "islem" — hangi yüklü veri eğitilecek
     freq: str = "daily"  # "daily" | "hourly" | "both"
+    teams: list[str] | None = None
     types: list[str] | None = None
     models: list[str] | None = None  # None/["auto"] = tüm adaylar denenir; tek model verilirse yalnızca o eğitilir
     holdout_days: int = 0  # 0 = devre dışı; >0 = son N günü eğitime dahil etme (doğrulama seti)

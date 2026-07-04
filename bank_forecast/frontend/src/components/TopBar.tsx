@@ -7,11 +7,14 @@ interface TopBarProps {
 }
 
 export default function TopBar({ screen, onScreenChange }: TopBarProps) {
-  const { dataset } = useData()
+  const { datasetMap, anyLoaded } = useData()
 
-  const status = dataset?.loaded
-    ? `${dataset.filename} yüklendi (${dataset.row_count?.toLocaleString('tr-TR')} kayıt)`
-    : 'Veri yüklenmedi'
+  const loadedLabels = (['talimat', 'islem'] as const)
+    .map((mt) => datasetMap[mt])
+    .filter((d) => d?.loaded)
+    .map((d) => `${d!.filename} (${d!.row_count?.toLocaleString('tr-TR')} kayıt)`)
+
+  const status = anyLoaded ? loadedLabels.join(' · ') : 'Veri yüklenmedi'
 
   return (
     <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
@@ -53,7 +56,7 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
 
       <div className="flex items-center gap-3 text-xs">
         <span className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
-          <span className={`h-2 w-2 rounded-full ${dataset?.loaded ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+          <span className={`h-2 w-2 rounded-full ${anyLoaded ? 'bg-emerald-500' : 'bg-slate-300'}`} />
           {status}
         </span>
         <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-400">

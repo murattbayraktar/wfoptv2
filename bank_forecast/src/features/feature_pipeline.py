@@ -58,7 +58,10 @@ def build_features(
         df["transaction_type_enc"] = encoder.transform(df[["transaction_type"]])
 
     # Feature listesi oluştur
-    exclude = {"date", "hour", "transaction_type", target_col, "amount"}
+    # "team" dahil edilmez: her eğitim birimi zaten tek bir ekibe filtrelenmiş
+    # geliyor (bkz. pipeline.py `_train_unit`), bu yüzden sabit bir sütun olur —
+    # ham string olarak modele verilirse XGBoost/LightGBM gibi modeller hata verir.
+    exclude = {"date", "hour", "transaction_type", "team", target_col, "amount"}
     feature_cols = [c for c in df.columns if c not in exclude]
 
     # NaN temizle

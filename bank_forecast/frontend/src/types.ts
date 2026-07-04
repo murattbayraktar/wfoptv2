@@ -3,17 +3,39 @@ export interface DateRange {
   end: string
 }
 
+export type MetricType = 'talimat' | 'islem'
+
+export const METRIC_TYPES: MetricType[] = ['talimat', 'islem']
+
+export const METRIC_LABELS: Record<MetricType, string> = {
+  talimat: 'Talimat',
+  islem: 'İşlem',
+}
+
+export interface PerTeamTypeCount {
+  team: string
+  transaction_type: string
+  count: number
+}
+
 export interface DatasetSummary {
   loaded: boolean
+  metric_type?: MetricType
   filename?: string
   source_kind?: 'upload' | 'demo'
   row_count?: number
   date_range?: DateRange
+  teams?: string[]
   transaction_types?: string[]
+  per_team_counts?: Record<string, number>
   per_type_counts?: Record<string, number>
+  per_team_type_counts?: PerTeamTypeCount[]
   has_hourly?: boolean
   loaded_at?: string
 }
+
+/** `/api/dataset/summary` yanıtı — her iki metrik için de (yüklenmemişse null) özet döner */
+export type DatasetSummaryMap = Record<MetricType, DatasetSummary | null>
 
 export interface DailyForecastEntry {
   date: string
@@ -29,6 +51,7 @@ export interface HourlyForecastEntry {
   count: number
 }
 
+/** Tek bir (ekip, işlem tipi) birimi için tahmin sonucu — ekip/metrik boyutu eklenmeden önceki şekliyle aynı */
 export interface ForecastByType {
   model_used: string
   daily?: DailyForecastEntry[]
@@ -41,9 +64,12 @@ export interface ForecastByType {
   }>
 }
 
+/** ekip -> işlem tipi -> tahmin sonucu */
+export type ByTeam = Record<string, Record<string, ForecastByType>>
+
 export interface AvailableModelsResponse {
-  /** available[işlem_tipi][frekans] = { best_model, models: [...] } */
-  available: Record<string, Record<string, { best_model: string; models: string[] }>>
+  /** available[ekip][işlem_tipi][frekans] = { best_model, models: [...] } */
+  available: Record<string, Record<string, Record<string, { best_model: string; models: string[] }>>>
 }
 
 export interface ComparisonRow {
@@ -56,31 +82,57 @@ export interface ComparisonRow {
 export interface ComparisonResult {
   has_overlap: boolean
   overlap_range: DateRange | null
-  by_type: Record<string, ComparisonRow[]>
+  by_team: Record<string, Record<string, ComparisonRow[]>>
+}
+
+export interface ForecastTotalsByType {
+  model_used: string
+  predicted_count: number
+}
+
+export interface ForecastTotalsByTeam {
+  predicted_count: number
+  by_type: Record<string, ForecastTotalsByType>
 }
 
 export interface ForecastTotals {
   total_predicted: number
-  by_type: Record<string, { model_used: string; predicted_count: number }>
+  by_team: Record<string, ForecastTotalsByTeam>
 }
 
-export interface ForecastResponse {
+export interface MapeByTeam {
+  mape: number | null
+  by_type: Record<string, number | null>
+}
+
+/** Tahmin ekranındaki "gerçekleşen vs tahmin" örtüşmesinden hesaplanan ekip bazlı + toplam MAPE */
+export interface MapeSummary {
+  overall_mape: number | null
+  by_team: Record<string, MapeByTeam>
+}
+
+export interface MetricForecastResult {
   forecast: {
     generated_at: string
     forecast_range: DateRange
-    by_type: Record<string, ForecastByType>
+    by_team: ByTeam
   }
   comparison: {
     daily: ComparisonResult
     hourly: ComparisonResult
   }
   totals: ForecastTotals
+  mape_summary: MapeSummary
 }
+
+/** `/api/forecast` yanıtı — talimat ve işlem aynı anda yüklüyse ikisi de dolu döner */
+export type ForecastResponse = Partial<Record<MetricType, MetricForecastResult | null>>
 
 export interface TrainingStep {
   at: string
   kind: string
   message: string
+  team?: string
   type?: string
   freq?: string
   model?: string
@@ -93,6 +145,7 @@ export interface TrainingStep {
   total?: number
   row_count?: number
   transaction_types?: string[]
+  teams?: string[]
   feature_importance_top5?: string[]
 }
 
@@ -105,19 +158,25 @@ export interface HoldoutRow {
 export interface HoldoutTypeResult {
   mape: number | null
   rows: HoldoutRow[]
-  /** Birden fazla model eğitildiyse her model için bu işlem tipi MAPE değeri */
+  /** Birden fazla model eğitildiyse her model için bu (ekip, işlem tipi) MAPE değeri */
   model_mapes?: Record<string, number | null>
+}
+
+export interface HoldoutTeamResult {
+  mape: number | null
+  by_type: Record<string, HoldoutTypeResult>
 }
 
 export interface HoldoutResult {
   holdout_range: DateRange
-  by_type: Record<string, HoldoutTypeResult>
+  by_team: Record<string, HoldoutTeamResult>
   overall_mape: number | null
-  /** Birden fazla model eğitildiyse her model için genel (tüm tipler) MAPE değeri */
+  /** Birden fazla model eğitildiyse her model için genel (tüm ekip/tip) MAPE değeri */
   model_overall_mapes?: Record<string, number | null>
 }
 
 export interface RetrainStatus {
+  metric_type?: MetricType
   status: 'idle' | 'running' | 'done' | 'error'
   message: string
   started_at: string | null
