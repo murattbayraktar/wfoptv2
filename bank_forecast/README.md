@@ -1,6 +1,7 @@
 # Banka Müşteri Talimat Sistemi — ML Tahmin Uygulaması
 
-İşlem tipi bazında günlük ve saatlik banka işlem hacmini tahmin eden Python ML sistemi.
+Ekip × işlem tipi bazında günlük ve saatlik banka işlem hacmini (talimat ve işlem
+adedi ayrı ayrı) tahmin eden Python ML sistemi.
 
 ## Hızlı Başlangıç
 
@@ -13,30 +14,44 @@ venv\Scripts\activate      # Windows
 # 2. Bağımlılıkları yükle
 pip install -r requirements.txt
 
-# 3. Demo veri üret
-python scripts/generate_demo_data.py --output data/raw/demo.csv
+# 3. Demo veri üret (data/raw/demo_talimat.csv ve data/raw/demo_islem.csv üretir)
+python scripts/generate_demo_data.py --output-dir data/raw
 
-# 4. Modeli eğit
-python train.py --input data/raw/demo.csv --freq both --models auto --report
+# 4. Modeli eğit (her metrik ayrı registry'e yazılır — model_registry_talimat.json / _islem.json)
+python train.py --input data/raw/demo_talimat.csv --freq both --models auto --report
+python train.py --input data/raw/demo_islem.csv --freq both --models auto --report
 
 # 5. Tahmin yap
-python forecast.py --start 2025-07-01 --end 2025-07-31 --freq daily --plot
+python forecast.py --metric-type talimat --start 2025-07-01 --end 2025-07-31 --freq daily --plot
 
 # 6. Değerlendir
-python evaluate.py --input data/raw/demo.csv --backtest-days 60 --plot
+python evaluate.py --input data/raw/demo_talimat.csv --backtest-days 60 --plot
 ```
 
 ## CSV Giriş Formatı
 
+İki format desteklenir — bir CSV yalnızca ikisinden birine ait olabilir, hangisi
+olduğu `talimat_adet`/`islem_adet` sütunundan otomatik tespit edilir:
+
 ```
-islem_tipi,tarih,saat,islem_hacmi
-EFT,2025-06-02,8,71
-EFT,2025-06-02,9,180
-EFT,2025-06-02,18,201
+ekip_adi,islem_tipi,tarih,saat,talimat_adet
+Merkez Ekip,EFT,2025-06-02,8,71
+Merkez Ekip,EFT,2025-06-02,9,180
+İstanbul Ekip,EFT,2025-06-02,9,42
 ```
 
-`tutar` (amount) sütunu opsiyoneldir; yoksa model yalnızca işlem hacmi (`count`) üzerinde eğitilir.
-Sütun adı varyantları otomatik tanınır: `islem_hacmi`, `adet`, `volume`, `count` → standart `count`.
+```
+ekip_adi,islem_tipi,tarih,saat,islem_adet
+Merkez Ekip,EFT,2025-06-02,8,65
+Merkez Ekip,EFT,2025-06-02,9,171
+```
+
+`ekip_adi` (takım) ve `islem_tipi` zorunludur; `tutar` (amount) sütunu opsiyoneldir —
+yoksa model yalnızca adet (`count`) üzerinde eğitilir. Sütun adı varyantları otomatik
+tanınır: `tarih`→`date`, `saat`→`hour`, `islem_tipi`→`transaction_type`, `ekip_adi`→`team`.
+
+Modeller **ekip × işlem tipi × frekans** tam kırılımında eğitilir (her kombinasyon için
+ayrı model) — bu yüzden ekip/tip sayısı arttıkça eğitim süresi de artar.
 
 ## Web Arayüzü (FastAPI + React)
 

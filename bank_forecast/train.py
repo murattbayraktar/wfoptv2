@@ -1,6 +1,6 @@
 """
 Kullanım:
-  python train.py --input data/raw/transactions.csv --freq daily --models auto --report
+  python train.py --input data/raw/transactions_talimat.csv --freq daily --models auto --report
 """
 import argparse
 import sys
@@ -16,16 +16,17 @@ console = Console()
 
 def parse_args():
     p = argparse.ArgumentParser(description="Banka işlem tahmin modeli eğitimi")
-    p.add_argument("--input", required=True, help="CSV giriş dosyası")
+    p.add_argument("--input", required=True, help="CSV giriş dosyası (talimat_adet ya da islem_adet formatında)")
     p.add_argument("--freq", default="daily", choices=["daily", "hourly", "both"],
                    help="Tahmin frekansı")
+    p.add_argument("--teams", default="", help="Virgülle ayrılmış ekip adları (boş = hepsi)")
     p.add_argument("--types", default="", help="Virgülle ayrılmış işlem tipleri (boş = hepsi)")
     p.add_argument("--models", default="auto",
                    help="Virgülle ayrılmış model listesi veya 'auto'")
     p.add_argument("--cv-folds", type=int, default=5, help="Cross-validation fold sayısı")
     p.add_argument("--metric", default="rmse", choices=["rmse", "mae", "mape"],
                    help="Model seçim metriği")
-    p.add_argument("--output-dir", default="models/saved", help="Model çıktı dizini")
+    p.add_argument("--output-dir", default=None, help="Model çıktı dizini (boş = models/saved/<metric_type>)")
     p.add_argument("--report", action="store_true", help="HTML rapor üret")
     p.add_argument("--config", default="config/settings.yaml", help="Ayar dosyası")
     return p.parse_args()
@@ -34,6 +35,7 @@ def parse_args():
 def main():
     args = parse_args()
 
+    teams = [t.strip() for t in args.teams.split(",") if t.strip()] or None
     types = [t.strip() for t in args.types.split(",") if t.strip()] or None
     if args.models.lower() == "auto":
         models = None
@@ -43,12 +45,14 @@ def main():
     console.print(f"\n[bold cyan]Eğitim başlıyor[/bold cyan]")
     console.print(f"  Giriş   : {args.input}")
     console.print(f"  Frekans : {args.freq}")
+    console.print(f"  Ekipler : {teams or 'tüm ekipler'}")
     console.print(f"  Tipler  : {types or 'tüm tipler'}")
     console.print(f"  Modeller: {models or 'otomatik seçim'}")
 
     registry = train_pipeline(
         input_path=args.input,
         freq=args.freq,
+        teams=teams,
         types=types,
         models=models,
         cv_folds=args.cv_folds,
@@ -58,8 +62,12 @@ def main():
         config_path=args.config,
     )
 
-    n_models = len(registry.get("models", {}))
-    console.print(f"\n[bold green]Eğitim tamamlandı. {n_models} model eğitildi.[/bold green]")
+    n_models = sum(
+        len(by_freq)
+        for by_type in registry.get("models", {}).values()
+        for by_freq in by_type.values()
+    )
+    console.print(f"\n[bold green]Eğitim tamamlandı ({registry.get('metric_type')}). {n_models} model eğitildi.[/bold green]")
 
 
 if __name__ == "__main__":

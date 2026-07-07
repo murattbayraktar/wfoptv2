@@ -2,6 +2,8 @@ import { useData } from '../context/DataContext'
 import UploadDropzone from './UploadDropzone'
 import TrainingProgress from './TrainingProgress'
 import { MODEL_LABELS } from '../constants'
+import type { MetricType } from '../types'
+import { METRIC_LABELS } from '../types'
 
 const HOLDOUT_OPTIONS = [
   { value: 0, label: 'Yok' },
@@ -9,7 +11,8 @@ const HOLDOUT_OPTIONS = [
   { value: 30, label: '30 gün' },
 ]
 
-function DatasetSummaryCard() {
+function DatasetSummaryCard({ metricType }: { metricType: MetricType }) {
+  const data = useData()
   const {
     dataset,
     trainModels,
@@ -19,14 +22,14 @@ function DatasetSummaryCard() {
     startingTraining,
     trainingStartError,
     retrainStatus,
-  } = useData()
+  } = data[metricType]
   if (!dataset?.loaded) return null
 
   const isRunning = retrainStatus?.status === 'running'
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-1 text-sm font-semibold text-slate-900">Yüklenen veri</div>
+      <div className="mb-1 text-sm font-semibold text-slate-900">Yüklenen {METRIC_LABELS[metricType]} verisi</div>
       <p className="text-sm text-slate-600">
         <span className="font-medium text-slate-900">{dataset.filename}</span>
         {dataset.date_range && (
@@ -35,6 +38,7 @@ function DatasetSummaryCard() {
             {dataset.row_count?.toLocaleString('tr-TR')} kayıt
           </>
         )}
+        {dataset.teams && dataset.teams.length > 0 && <>, ekipler: {dataset.teams.join(', ')}</>}
         {dataset.transaction_types && dataset.transaction_types.length > 0 && (
           <>, işlem tipleri: {dataset.transaction_types.join(', ')}</>
         )}
@@ -65,7 +69,7 @@ function DatasetSummaryCard() {
             {holdoutDays > 0 && (
               <p className="mt-1.5 text-xs text-slate-400">
                 En son {holdoutDays} gün eğitime dahil edilmez; eğitim bitince bu günler için
-                otomatik tahmin yapılır ve MAPE hesaplanır.
+                otomatik tahmin yapılır ve ekip bazlı/toplam MAPE hesaplanır.
               </p>
             )}
           </div>
@@ -101,26 +105,38 @@ function DatasetSummaryCard() {
   )
 }
 
-export default function TrainingScreen() {
-  const { dataset, retrainStatus } = useData()
+function MetricColumn({ metricType }: { metricType: MetricType }) {
+  const data = useData()
+  const { dataset, retrainStatus } = data[metricType]
   const showProgress = dataset?.loaded && dataset.source_kind === 'upload' && dataset.loaded_at && retrainStatus
 
+  return (
+    <div className="space-y-4">
+      <UploadDropzone metricType={metricType} />
+      <DatasetSummaryCard metricType={metricType} />
+      {showProgress && <TrainingProgress key={dataset.loaded_at} status={retrainStatus} />}
+    </div>
+  )
+}
+
+export default function TrainingScreen() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="mb-2 text-base font-semibold text-slate-900">Veri & Model Eğitimi</h1>
         <p className="text-sm text-slate-500">
-          Buradan yeni bir CSV yükleyin, eğitim için kullanılacak algoritmayı seçin ve ardından
-          "Eğitimi Başlat" butonuna tıklayın. Sistem veriyi analiz edip işlem tipi ve frekans
-          (günlük / saatlik) başına seçtiğiniz algoritmayı (veya "Tümü" seçiliyse en uygununu
-          otomatik olarak) arka planda eğitir. Aşağıda eğitim sürecinin adımlarını ve ilerlemesini
-          canlı olarak izleyebilirsiniz.
+          Talimat ve işlem verileri birbirinden bağımsız olarak yüklenip eğitilir; ikisi de yüklendiğinde
+          Tahmin ekranında yan yana gösterilir. Her CSV'nin içeriğine göre (talimat_adet ya da islem_adet
+          sütunu) hangi metriğe ait olduğu otomatik tespit edilir — doğru dosyayı istediğiniz kutuya
+          sürüklemeniz yeterlidir. Sistem veriyi ekip × işlem tipi × frekans (günlük / saatlik) kırılımında
+          eğitir; aşağıda eğitim sürecinin adımlarını canlı izleyebilirsiniz.
         </p>
       </div>
 
-      <UploadDropzone />
-      <DatasetSummaryCard />
-      {showProgress && <TrainingProgress key={dataset.loaded_at} status={retrainStatus} />}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <MetricColumn metricType="talimat" />
+        <MetricColumn metricType="islem" />
+      </div>
     </div>
   )
 }

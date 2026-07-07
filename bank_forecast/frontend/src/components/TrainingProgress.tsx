@@ -47,13 +47,17 @@ function mapeQuality(mape: number): { label: string; cls: string } {
 }
 
 function HoldoutPanel({ result }: { result: HoldoutResult }) {
-  const types = Object.entries(result.by_type)
+  const teams = Object.entries(result.by_team)
+  // Düz (ekip, tip) satırları — tablo ve detay bölümleri için
+  const flatRows = teams.flatMap(([team, teamInfo]) =>
+    Object.entries(teamInfo.by_type).map(([tt, info]) => ({ team, tt, info })),
+  )
 
   return (
     <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-sm font-medium text-blue-700">
-          Doğrulama Sonuçları — MAPE
+          Doğrulama Sonuçları — Ekip Bazlı ve Toplam MAPE
         </div>
         <span className="text-xs text-slate-500">
           {result.holdout_range.start} – {result.holdout_range.end}
@@ -72,27 +76,51 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
         </div>
       )}
 
-      {types.length > 0 && (
+      {teams.length > 0 && (
+        <table className="mb-3 w-full text-left text-xs text-slate-700">
+          <thead>
+            <tr className="text-slate-500">
+              <th className="pb-1 pr-4 font-medium">Ekip</th>
+              <th className="pb-1 pr-4 font-medium">Ekip MAPE</th>
+              <th className="pb-1 font-medium">Yorum</th>
+            </tr>
+          </thead>
+          <tbody>
+            {teams.map(([team, info]) => {
+              const q = info.mape !== null ? mapeQuality(info.mape) : null
+              return (
+                <tr key={team} className="border-t border-blue-100">
+                  <td className="py-1 pr-4 font-medium">{team}</td>
+                  <td className={`py-1 pr-4 font-medium ${q?.cls ?? 'text-slate-400'}`}>
+                    {info.mape !== null ? `${info.mape.toFixed(1)}%` : '—'}
+                  </td>
+                  <td className={`py-1 ${q?.cls ?? 'text-slate-400'}`}>{q?.label ?? '—'}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {flatRows.length > 0 && (
         <table className="w-full text-left text-xs text-slate-700">
           <thead>
             <tr className="text-slate-500">
+              <th className="pb-1 pr-4 font-medium">Ekip</th>
               <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
               <th className="pb-1 pr-4 font-medium">MAPE</th>
-              <th className="pb-1 pr-4 font-medium">Yorum</th>
               <th className="pb-1 font-medium">Gün sayısı</th>
             </tr>
           </thead>
           <tbody>
-            {types.map(([tt, info]) => {
+            {flatRows.map(({ team, tt, info }) => {
               const q = info.mape !== null ? mapeQuality(info.mape) : null
               return (
-                <tr key={tt} className="border-t border-blue-100">
+                <tr key={`${team}::${tt}`} className="border-t border-blue-100">
+                  <td className="py-1 pr-4 text-slate-500">{team}</td>
                   <td className="py-1 pr-4">{tt}</td>
                   <td className={`py-1 pr-4 font-medium ${q?.cls ?? 'text-slate-400'}`}>
                     {info.mape !== null ? `${info.mape.toFixed(1)}%` : '—'}
-                  </td>
-                  <td className={`py-1 pr-4 ${q?.cls ?? 'text-slate-400'}`}>
-                    {q?.label ?? '—'}
                   </td>
                   <td className="py-1 text-slate-500">{info.rows.length}</td>
                 </tr>
@@ -102,11 +130,11 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
         </table>
       )}
 
-      {types.map(([tt, info]) =>
+      {flatRows.map(({ team, tt, info }) =>
         info.rows.length > 0 ? (
-          <details key={tt} className="mt-3">
+          <details key={`${team}::${tt}`} className="mt-3">
             <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
-              {tt} — gün bazlı gerçekleşen vs tahmin
+              {team} / {tt} — gün bazlı gerçekleşen vs tahmin
             </summary>
             <div className="mt-2 max-h-48 overflow-y-auto rounded border border-slate-200">
               <table className="w-full text-left text-xs">
@@ -168,22 +196,23 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
           </div>
 
           {(() => {
-            const typesWithModelMapes = Object.entries(result.by_type).filter(
-              ([, info]) => info.model_mapes && Object.keys(info.model_mapes).length > 1,
+            const rowsWithModelMapes = flatRows.filter(
+              ({ info }) => info.model_mapes && Object.keys(info.model_mapes).length > 1,
             )
-            if (typesWithModelMapes.length === 0) return null
+            if (rowsWithModelMapes.length === 0) return null
             const modelNames = Object.keys(result.model_overall_mapes).sort(
               (a, b) => (result.model_overall_mapes![a] ?? 999) - (result.model_overall_mapes![b] ?? 999),
             )
             return (
               <details className="mt-3">
                 <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">
-                  İşlem tipi bazında model karşılaştırması
+                  Ekip / işlem tipi bazında model karşılaştırması
                 </summary>
                 <div className="mt-2 overflow-x-auto rounded border border-slate-200">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50">
                       <tr className="text-slate-500">
+                        <th className="px-3 py-1.5 font-medium">Ekip</th>
                         <th className="px-3 py-1.5 font-medium">İşlem Tipi</th>
                         {modelNames.map((m) => (
                           <th key={m} className="px-3 py-1.5 font-medium">
@@ -193,8 +222,9 @@ function HoldoutPanel({ result }: { result: HoldoutResult }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {typesWithModelMapes.map(([tt, info]) => (
-                        <tr key={tt} className="border-t border-slate-100 text-slate-700">
+                      {rowsWithModelMapes.map(({ team, tt, info }) => (
+                        <tr key={`${team}::${tt}`} className="border-t border-slate-100 text-slate-700">
+                          <td className="px-3 py-1.5 text-slate-500">{team}</td>
                           <td className="px-3 py-1.5">{tt}</td>
                           {modelNames.map((m) => {
                             const v = info.model_mapes?.[m] ?? null
@@ -269,26 +299,30 @@ export default function TrainingProgress({ status }: { status: RetrainStatus | n
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
           <div className="mb-2 text-sm font-medium text-emerald-700">Eğitim tamamlandı</div>
           {summaries.length > 0 && (
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead>
-                <tr className="text-slate-500">
-                  <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
-                  <th className="pb-1 pr-4 font-medium">Frekans</th>
-                  <th className="pb-1 pr-4 font-medium">Seçilen Algoritma</th>
-                  <th className="pb-1 font-medium">CV RMSE</th>
-                </tr>
-              </thead>
-              <tbody>
-                {summaries.map((s, i) => (
-                  <tr key={i} className="border-t border-emerald-100">
-                    <td className="py-1 pr-4">{s.type}</td>
-                    <td className="py-1 pr-4">{s.freq === 'daily' ? 'Günlük' : 'Saatlik'}</td>
-                    <td className="py-1 pr-4 font-medium text-amber-600">{s.model}</td>
-                    <td className="py-1">{s.cv_rmse?.toFixed(2)}</td>
+            <div className="max-h-64 overflow-y-auto">
+              <table className="w-full text-left text-xs text-slate-700">
+                <thead className="sticky top-0 bg-emerald-50">
+                  <tr className="text-slate-500">
+                    <th className="pb-1 pr-4 font-medium">Ekip</th>
+                    <th className="pb-1 pr-4 font-medium">İşlem Tipi</th>
+                    <th className="pb-1 pr-4 font-medium">Frekans</th>
+                    <th className="pb-1 pr-4 font-medium">Seçilen Algoritma</th>
+                    <th className="pb-1 font-medium">CV RMSE</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {summaries.map((s, i) => (
+                    <tr key={i} className="border-t border-emerald-100">
+                      <td className="py-1 pr-4 text-slate-500">{s.team}</td>
+                      <td className="py-1 pr-4">{s.type}</td>
+                      <td className="py-1 pr-4">{s.freq === 'daily' ? 'Günlük' : 'Saatlik'}</td>
+                      <td className="py-1 pr-4 font-medium text-amber-600">{s.model}</td>
+                      <td className="py-1">{s.cv_rmse?.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {status.holdout_result && <HoldoutPanel result={status.holdout_result} />}

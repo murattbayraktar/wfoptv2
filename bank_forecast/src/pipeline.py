@@ -1,6 +1,13 @@
-"""Ana orkestratör: train | forecast | evaluate akışlarını yönetir."""
+"""Ana orkestratör: train | forecast | evaluate akışlarını yönetir.
+
+Ekip (team) boyutu eklendiğinde model registry `models/saved/model_registry_<metric_type>.json`
+olarak metrik başına ayrılır ve içeriği `models[team][transaction_type][freq]` şeklinde
+nested bir sözlüktür (eskiden `f"{type}_{freq}"` düz string anahtardı — ekip/tip adları
+boşluk içerebildiğinden ve artık 3 boyut olduğundan string ayrıştırma kırılgan hale gelirdi).
+"""
 import json
 import os
+import re
 import shutil
 import tempfile
 import concurrent.futures
@@ -22,7 +29,20 @@ from src.reporting.html_reporter import generate_training_report, generate_forec
 
 console = Console()
 
-REGISTRY_FILE = "models/saved/model_registry.json"
+REGISTRY_DIR = "models/saved"
+
+# Geriye dönük referans için (CLI script varsayılanları) — artık tek bir registry
+# yerine metrik başına registry kullanılıyor, bkz. `registry_filename`.
+REGISTRY_FILE = os.path.join(REGISTRY_DIR, "model_registry_talimat.json")
+
+
+def registry_filename(metric_type: str, registry_dir: str = REGISTRY_DIR) -> str:
+    return os.path.join(registry_dir, f"model_registry_{metric_type}.json")
+
+
+def _safe_key(value: str) -> str:
+    """Dosya adı olarak kullanılabilecek şekilde ekip/tip adını temizler."""
+    return re.sub(r"[\\/]+", "-", value).strip()
 
 
 def load_config(config_path: str = "config/settings.yaml") -> dict:
@@ -38,9 +58,20 @@ def _save_registry(registry: dict, path: str) -> None:
         json.dump(registry, f, ensure_ascii=False, indent=2, default=str)
 
 
-def _load_registry(path: str = REGISTRY_FILE) -> dict:
+def _load_registry(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _flatten_registry_models(models: dict) -> dict:
+    """`models[team][type][freq] = entry` -> `{"team / type (freq)": entry}` —
+    yalnızca `html_reporter.generate_training_report`'ın beklediği düz yapı için."""
+    flat: dict = {}
+    for team, by_type in models.items():
+        for tt, by_freq in by_type.items():
+            for f_freq, entry in by_freq.items():
+                flat[f"{team} / {tt} ({f_freq})"] = entry
+    return flat
 
 
 def _history_lookup(hist_subset: "pd.DataFrame | None", freq: str):
@@ -169,20 +200,30 @@ def _recursive_predict(
 def _train_unit(args: tuple) -> dict:
     """ProcessPoolExecutor worker — modül seviyesinde tanımlı (pickle uyumlu).
 
-    Her (transaction_type, freq) birimi için: feature engineering, model seçimi,
+    Her (ekip, işlem_tipi, freq) birimi için: feature engineering, model seçimi,
     final fit ve kaydetme işlemlerini bağımsız bir process'te yürütür.
     progress_callback ana thread'e geri dönüş sonucuyla iletilir.
     """
-    (transaction_type, freq, agg_pkl_path, features_cfg, models_cfg,
+    (team, transaction_type, freq, agg_pkl_path, features_cfg, models_cfg,
      candidate_models, multi_save, cv_folds, metric, min_days, output_dir, report_flag) = args
 
-    key = f"{transaction_type}_{freq}"
+    # Birim başına zaten ayrı bir process ayrılmış durumda (bkz. ProcessPoolExecutor
+    # çağrısı); modellerin kendi içindeki n_jobs=-1 paralelliği bununla çakışıp tüm
+    # çekirdekleri N kat aşırı abone ederek (oversubscription) eğitimi durmuş gibi
+    # yavaşlatıyordu. Process-içi paralelliği kapatıp tüm çekirdekleri unit-düzeyindeki
+    # paralellikte kullanıyoruz.
+    models_cfg = {**models_cfg, "n_jobs": 1}
+
+    label = f"{team} / {transaction_type}"
+    flat_key = f"{_safe_key(team)}__{_safe_key(transaction_type)}__{freq}"
     try:
         import joblib as _joblib
         import traceback as _tb
 
         agg_df = pd.read_pickle(agg_pkl_path)
-        subset = agg_df[agg_df["transaction_type"] == transaction_type].copy()
+        subset = agg_df[
+            (agg_df["team"] == team) & (agg_df["transaction_type"] == transaction_type)
+        ].copy()
 
         feat_df, feat_cols, encoder = build_features(
             subset, freq=freq, target_col="count",
@@ -196,7 +237,7 @@ def _train_unit(args: tuple) -> dict:
 
         selector = ModelSelector()
         sel_result = selector.select_best(
-            transaction_type=transaction_type,
+            transaction_type=label,
             freq=freq,
             X_train=X_tr,
             y_train=y_tr,
@@ -209,14 +250,14 @@ def _train_unit(args: tuple) -> dict:
         )
 
         os.makedirs(output_dir, exist_ok=True)
-        encoder_path = os.path.join(output_dir, f"{key}_encoder.pkl")
+        encoder_path = os.path.join(output_dir, f"{flat_key}_encoder.pkl")
         best_name = sel_result["best_model"]
-        best_model_path = os.path.join(output_dir, f"{key}_best.pkl")
+        best_model_path = os.path.join(output_dir, f"{flat_key}_best.pkl")
         available_models: dict = {}
 
         if multi_save:
             trained = selector.train_selected(
-                transaction_type, freq, X, y, candidate_models, models_cfg,
+                label, freq, X, y, candidate_models, models_cfg,
                 search_artifacts=sel_result.get("_search_artifacts", {}),
             )
             # best_name eğitilememiş olabilir — önce diğerlerini kaydet,
@@ -225,7 +266,7 @@ def _train_unit(args: tuple) -> dict:
                 trained, key=lambda n: sel_result["all_scores"].get(n, float("inf"))
             )
             for name, model in trained.items():
-                m_path = best_model_path if name == effective_best else os.path.join(output_dir, f"{key}_{name}.pkl")
+                m_path = best_model_path if name == effective_best else os.path.join(output_dir, f"{flat_key}_{name}.pkl")
                 model.save(m_path)
                 available_models[name] = {
                     "model_path": m_path,
@@ -237,7 +278,7 @@ def _train_unit(args: tuple) -> dict:
             final_model = trained[best_name]
             model_path = best_model_path
         else:
-            final_model = selector.train_best(sel_result, transaction_type, freq, X, y, models_cfg)
+            final_model = selector.train_best(sel_result, label, freq, X, y, models_cfg)
             model_path = best_model_path
             final_model.save(model_path)
             available_models[best_name] = {
@@ -253,11 +294,11 @@ def _train_unit(args: tuple) -> dict:
         _joblib.dump(encoder, encoder_path)
 
         if not fi_df.empty and report_flag:
-            fi_path = f"outputs/plots/fi_{key}.html"
-            plot_feature_importance(fi_df, f"Feature Önemi: {key}", fi_path)
+            fi_path = f"outputs/plots/fi_{flat_key}.html"
+            plot_feature_importance(fi_df, f"Feature Önemi: {label} ({freq})", fi_path)
 
         return {
-            "key": key,
+            "team": team,
             "transaction_type": transaction_type,
             "freq": freq,
             "success": True,
@@ -278,7 +319,7 @@ def _train_unit(args: tuple) -> dict:
     except Exception as e:
         import traceback as _tb
         return {
-            "key": key,
+            "team": team,
             "transaction_type": transaction_type,
             "freq": freq,
             "success": False,
@@ -290,11 +331,12 @@ def _train_unit(args: tuple) -> dict:
 def train_pipeline(
     input_path: str,
     freq: str = "daily",
+    teams: list[str] = None,
     types: list[str] = None,
     models: list[str] = None,
     cv_folds: int = 5,
     metric: str = "rmse",
-    output_dir: str = "models/saved",
+    output_dir: str = None,
     report: bool = True,
     config_path: str = "config/settings.yaml",
     progress_callback=None,
@@ -308,18 +350,21 @@ def train_pipeline(
     working_hours = tuple(data_cfg.get("working_hours", [7, 18]))
 
     console.print("[bold green]Veri yükleniyor...[/bold green]")
-    df = load_transactions(input_path)
+    df, metric_type = load_transactions(input_path)
     val_report = validate(df, min_days)
     print_validation_report(val_report)
 
     if val_report["errors"]:
         raise ValueError("Veri doğrulama hatası: " + "; ".join(val_report["errors"]))
 
+    available_teams = val_report["teams"]
     available_types = val_report["transaction_types"]
-    if types:
-        types = [t for t in types if t in available_types]
-    else:
-        types = available_types
+    teams = [t for t in teams if t in available_teams] if teams else available_teams
+    types = [t for t in types if t in available_types] if types else available_types
+
+    if output_dir is None:
+        output_dir = os.path.join(REGISTRY_DIR, metric_type)
+    registry_path = registry_filename(metric_type)
 
     if models and models != ["auto"]:
         candidate_models = models
@@ -351,12 +396,15 @@ def train_pipeline(
         df = df[df["date"] < holdout_start].copy()
 
     registry = {
+        "metric_type": metric_type,
         "trained_at": datetime.now().isoformat(),
         "data_range": {
             "start": str(df["date"].min().date()),
             "end": str(df["date"].max().date()),
         },
         "holdout_period": holdout_period,
+        "teams": teams,
+        "transaction_types": types,
         "models": {},
     }
 
@@ -365,28 +413,25 @@ def train_pipeline(
             "kind": "data_ready",
             "row_count": int(len(df)),
             "transaction_types": available_types,
+            "teams": available_teams,
             "data_range": registry["data_range"],
         })
-        total_units = len(types) * len(freqs)
-        progress_callback({
-            "kind": "plan",
-            "total_units": total_units,
-            "types": types,
-            "freqs": freqs,
-        })
 
-    all_scores_for_plot = {}
+    all_scores_for_plot: dict = {}
 
-    # Aggregation, transaction_type'tan bağımsızdır (tüm tipler için tek seferde
-    # hesaplanıp sonradan filtrelenir — bkz. aggregator.py). Tip-döngüsü içinde
-    # tekrar tekrar çağırmak yerine her frekans için bir kez hesaplayıp önbelleğe al.
+    # Aggregation, ekip/işlem_tipi'nden bağımsızdır (tüm ekip/tip kombinasyonları
+    # için tek seferde hesaplanıp sonradan filtrelenir — bkz. aggregator.py).
+    # Birim döngüsü içinde tekrar tekrar çağırmak yerine her frekans için bir kez
+    # hesaplayıp önbelleğe al.
     agg_cache: dict[str, pd.DataFrame] = {}
     for f in freqs:
         agg_cache[f] = aggregate_daily(df) if f == "daily" else aggregate_hourly(df, working_hours=working_hours)
 
-    # Her (transaction_type, freq) birimini ProcessPoolExecutor ile paralel eğit.
-    # Aggregation DataFrame'leri geçici pickle dosyaları üzerinden aktarılır —
-    # spawn context'te her worker'a ayrı ayrı serialize etmek yerine disk üzerinden okuma.
+    # Yalnızca gerçekte gözlemlenmiş (team, transaction_type) çiftleri için birim
+    # oluştur — her ekip her işlem tipini yapmaz, var olmayan kombinasyonları
+    # eğitmeye çalışmak zaman kaybı ve muhtemelen hata olurdu.
+    existing_pairs = set(zip(df["team"], df["transaction_type"]))
+
     tmp_dir = tempfile.mkdtemp()
     try:
         agg_pkl_paths: dict[str, str] = {}
@@ -396,59 +441,73 @@ def train_pipeline(
             agg_pkl_paths[f] = pkl_path
 
         unit_args = [
-            (tt, f, agg_pkl_paths[f], features_cfg, models_cfg,
+            (team, tt, f, agg_pkl_paths[f], features_cfg, models_cfg,
              candidate_models, multi_save, cv_folds, metric, min_days, output_dir, report)
-            for tt in types for f in freqs
+            for team in teams for tt in types for f in freqs
+            if (team, tt) in existing_pairs
         ]
         total_units = len(unit_args)
 
+        if progress_callback:
+            progress_callback({
+                "kind": "plan",
+                "total_units": total_units,
+                "teams": teams,
+                "types": types,
+                "freqs": freqs,
+            })
+
         os.makedirs(output_dir, exist_ok=True)
         mp_ctx = multiprocessing.get_context("spawn")
-        max_workers = min(total_units, os.cpu_count() or 1)
+        max_workers = min(total_units, os.cpu_count() or 1) if total_units else 1
 
         unit_index = 0
         with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers, mp_context=mp_ctx) as pool:
             future_map = {}
             for args in unit_args:
-                tt, f_freq = args[0], args[1]
+                team, tt, f_freq = args[0], args[1], args[2]
                 unit_index += 1
                 console.print(f"\n[bold]{'─'*50}[/bold]")
-                console.print(f"[bold yellow]Kuyruğa alındı: {tt}_{f_freq}[/bold yellow]")
+                console.print(f"[bold yellow]Kuyruğa alındı: {team} / {tt} / {f_freq}[/bold yellow]")
                 if progress_callback:
                     progress_callback({
                         "kind": "unit_start",
+                        "team": team,
                         "type": tt,
                         "freq": f_freq,
                         "index": unit_index,
                         "total": total_units,
                     })
-                future_map[pool.submit(_train_unit, args)] = (tt, f_freq)
+                future_map[pool.submit(_train_unit, args)] = (team, tt, f_freq)
 
             for future in concurrent.futures.as_completed(future_map):
                 res = future.result()
-                key = res["key"]
+                team = res["team"]
                 tt = res["transaction_type"]
                 f_freq = res["freq"]
+                label = f"{team} / {tt} ({f_freq})"
 
                 if res["success"]:
-                    registry["models"][key] = res["registry_entry"]
-                    all_scores_for_plot[key] = res["all_scores"]
-                    console.print(f"[green]Tamamlandı: {key} — model: {res['registry_entry']['best_model']}[/green]")
+                    registry["models"].setdefault(team, {}).setdefault(tt, {})[f_freq] = res["registry_entry"]
+                    all_scores_for_plot[label] = res["all_scores"]
+                    console.print(f"[green]Tamamlandı: {label} — model: {res['registry_entry']['best_model']}[/green]")
                     if progress_callback:
-                        re = res["registry_entry"]
+                        re_ = res["registry_entry"]
                         progress_callback({
                             "kind": "unit_done",
+                            "team": team,
                             "type": tt,
                             "freq": f_freq,
-                            "model": re["best_model"],
-                            "cv_rmse": re["cv_rmse"],
-                            "feature_importance_top5": re["feature_importance_top5"],
+                            "model": re_["best_model"],
+                            "cv_rmse": re_["cv_rmse"],
+                            "feature_importance_top5": re_["feature_importance_top5"],
                         })
                 else:
-                    console.print(f"[red]Hata ({key}): {res['error']}[/red]")
+                    console.print(f"[red]Hata ({label}): {res['error']}[/red]")
                     if progress_callback:
                         progress_callback({
                             "kind": "unit_failed",
+                            "team": team,
                             "type": tt,
                             "freq": f_freq,
                             "error": res["error"],
@@ -456,7 +515,6 @@ def train_pipeline(
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    registry_path = os.path.join(output_dir, "model_registry.json")
     _save_registry(registry, registry_path)
     console.print(f"\n[green]Registry kaydedildi: {registry_path}[/green]")
     if progress_callback:
@@ -466,17 +524,18 @@ def train_pipeline(
         try:
             plot_paths = {}
             if all_scores_for_plot:
-                # her işlem tipi için aynı modelleri karşılaştır
-                by_type_scores = {}
-                for key, scores in all_scores_for_plot.items():
-                    tt = "_".join(key.split("_")[:-1])
-                    by_type_scores.setdefault(tt, {}).update(scores)
-                mc_path = "outputs/plots/model_comparison.html"
-                plot_model_comparison(by_type_scores, metric, mc_path)
+                # her (ekip, işlem tipi) için aynı modelleri karşılaştır (freq'ten bağımsız)
+                by_label_scores: dict = {}
+                for label, scores in all_scores_for_plot.items():
+                    base_label = label.rsplit(" (", 1)[0]
+                    by_label_scores.setdefault(base_label, {}).update(scores)
+                mc_path = f"outputs/plots/model_comparison_{metric_type}.html"
+                plot_model_comparison(by_label_scores, metric, mc_path)
                 plot_paths["Model Karşılaştırması"] = mc_path
 
-            report_path = "outputs/reports/training_report.html"
-            generate_training_report(registry, report_path, plot_paths)
+            report_path = f"outputs/reports/training_report_{metric_type}.html"
+            flat_view = {**registry, "models": _flatten_registry_models(registry["models"])}
+            generate_training_report(flat_view, report_path, plot_paths)
             console.print(f"[green]Eğitim raporu: {report_path}[/green]")
         except Exception as e:
             console.print(f"[yellow]Rapor oluşturulamadı: {e}[/yellow]")
@@ -487,12 +546,14 @@ def train_pipeline(
 def forecast_pipeline(
     start: str,
     end: str,
+    metric_type: str,
+    teams: list[str] = None,
     types: list[str] = None,
     freq: str = "daily",
     output_dir: str = "outputs/forecasts",
     fmt: list[str] = None,
     plot: bool = True,
-    registry_path: str = REGISTRY_FILE,
+    registry_path: str = None,
     config_path: str = "config/settings.yaml",
     historical_data: dict | None = None,
     models: list[str] | None = None,
@@ -506,11 +567,10 @@ def forecast_pipeline(
     `models`: None ise registry'deki `best_model` kullanılır (mevcut davranış).
     Bir veya daha fazla model adı verilirse, kayıtlı (`available_models`) olanlar
     için ayrı ayrı tahmin üretilir. Birden fazla model çalışırsa karşılaştırma
-    için `by_type[type]["models"]` alanı doldurulur — bkz. modül başı yorum.
+    için `by_team[team][type]["models"]` alanı doldurulur — bkz. modül başı yorum.
     """
     cfg = load_config(config_path)
     features_cfg = cfg.get("features", {})
-    forecast_cfg = cfg.get("forecast", {})
     working_hours = tuple(cfg.get("data", {}).get("working_hours", [7, 18]))
     hours = list(range(working_hours[0], working_hours[1] + 1))
     historical_data = historical_data or {}
@@ -518,26 +578,23 @@ def forecast_pipeline(
     if fmt is None:
         fmt = ["csv", "json", "html"]
 
+    if registry_path is None:
+        registry_path = registry_filename(metric_type)
     registry = _load_registry(registry_path)
-    base_dir = os.path.dirname(registry_path)
 
     start_dt = pd.Timestamp(start)
     end_dt = pd.Timestamp(end)
-    date_range = pd.date_range(start_dt, end_dt, freq="D")
 
-    if not types:
-        # Registry'deki tüm tipleri çıkar
-        all_keys = list(registry["models"].keys())
-        types = list({
-            "_".join(k.split("_")[:-1]) for k in all_keys
-        })
+    if not teams:
+        teams = list(registry["models"].keys())
 
     freqs = ["daily", "hourly"] if freq == "both" else [freq]
 
     result = {
         "generated_at": datetime.now().isoformat(),
         "forecast_range": {"start": start, "end": end},
-        "by_type": {},
+        "metric_type": metric_type,
+        "by_team": {},
     }
 
     import joblib
@@ -545,14 +602,12 @@ def forecast_pipeline(
     from src.features.seasonal_features import add_daily_fourier, add_hourly_fourier
     from src.models.base_model import BaseForecaster
 
-    def _run_single_model_forecast(model_name: str, model_entry: dict, transaction_type: str, f: str):
-        """Tek bir kayıtlı model ile bu (tip, frekans) için tahmin üretir.
+    def _run_single_model_forecast(model_name: str, model_entry: dict, team: str, transaction_type: str, f: str):
+        """Tek bir kayıtlı model ile bu (ekip, tip, frekans) için tahmin üretir.
 
-        Döner: (piece, forecast_df). `piece`, result["by_type"][type] altına
+        Döner: (piece, forecast_df). `piece`, result["by_team"][team][type] altına
         yazılacak {"model_used", "daily"} veya {"model_used", "hourly"} parçasıdır;
         `forecast_df` ise CSV/plot çıktıları için kullanılan ham tablodur.
-        Mantık, tek-model dönemindeki akışla birebir aynıdır — yalnızca model
-        bilgisi parametre olarak alınır.
         """
         model: BaseForecaster = BaseForecaster.load(model_entry["model_path"])
         encoder = joblib.load(model_entry["encoder_path"])
@@ -560,11 +615,13 @@ def forecast_pipeline(
 
         lag_cols = [c for c in feat_cols if c.startswith("lag_") or c.startswith("rolling_")]
 
-        # Yüklenen verinin agregasyonundan bu (tip, frekans) için geçmiş seri
+        # Yüklenen verinin agregasyonundan bu (ekip, tip, frekans) için geçmiş seri
         hist_agg = historical_data.get(f)
         hist_subset = None
         if hist_agg is not None and not hist_agg.empty:
-            candidate = hist_agg[hist_agg["transaction_type"] == transaction_type]
+            candidate = hist_agg[
+                (hist_agg["team"] == team) & (hist_agg["transaction_type"] == transaction_type)
+            ]
             if not candidate.empty:
                 hist_subset = candidate
         hist_keys, hist_count_map, fallback = _history_lookup(hist_subset, f)
@@ -583,13 +640,14 @@ def forecast_pipeline(
         if f == "daily":
             grid_df = pd.DataFrame({
                 "date": grid_dates,
+                "team": team,
                 "transaction_type": transaction_type,
                 "count": 0,
                 "amount": 0,
             })
         else:
-            rows = [(d, h, transaction_type) for d in grid_dates for h in hours]
-            grid_df = pd.DataFrame(rows, columns=["date", "hour", "transaction_type"])
+            rows = [(d, h, team, transaction_type) for d in grid_dates for h in hours]
+            grid_df = pd.DataFrame(rows, columns=["date", "hour", "team", "transaction_type"])
             grid_df["count"] = 0
             grid_df["amount"] = 0
 
@@ -684,82 +742,94 @@ def forecast_pipeline(
 
         return piece, forecast_df
 
-    for transaction_type in types:
-        result["by_type"][transaction_type] = {}
-        for f in freqs:
-            key = f"{transaction_type}_{f}"
-            if key not in registry["models"]:
-                console.print(f"[yellow]Model bulunamadı: {key}, atlanıyor.[/yellow]")
-                continue
+    for team in teams:
+        team_registry = registry["models"].get(team)
+        if not team_registry:
+            continue
 
-            reg_entry = registry["models"][key]
-            best_name = reg_entry["best_model"]
-            # Eski formatlı kayıtlarda available_models yok — best_model'den sentezle
-            avail = reg_entry.get("available_models") or {best_name: {
-                "model_path": reg_entry["model_path"],
-                "encoder_path": reg_entry["encoder_path"],
-                "cv_rmse": reg_entry.get("cv_rmse"),
-                "feature_names": reg_entry["feature_names"],
-            }}
+        result["by_team"][team] = {}
+        team_types = [t for t in types if t in team_registry] if types else list(team_registry.keys())
 
-            if not models:
-                run_models = [best_name]
-            else:
-                run_models = [m for m in models if m in avail]
-                if not run_models:
-                    run_models = [best_name]
-
-            primary_name = best_name if best_name in run_models else run_models[0]
-
-            pieces: dict[str, dict] = {}
-            primary_forecast_df = None
-            for model_name in run_models:
-                try:
-                    piece, f_df = _run_single_model_forecast(model_name, avail[model_name], transaction_type, f)
-                except Exception as e:
-                    console.print(f"[red]Tahmin üretilemedi ({key} / {model_name}): {e}[/red]")
+        for transaction_type in team_types:
+            result["by_team"][team][transaction_type] = {}
+            for f in freqs:
+                type_registry = team_registry.get(transaction_type, {})
+                reg_entry = type_registry.get(f)
+                if reg_entry is None:
+                    console.print(f"[yellow]Model bulunamadı: {team}/{transaction_type}/{f}, atlanıyor.[/yellow]")
                     continue
-                pieces[model_name] = piece
-                if model_name == primary_name:
-                    primary_forecast_df = f_df
 
-            if not pieces:
-                continue
+                best_name = reg_entry["best_model"]
+                # Eski formatlı kayıtlarda available_models yok — best_model'den sentezle
+                avail = reg_entry.get("available_models") or {best_name: {
+                    "model_path": reg_entry["model_path"],
+                    "encoder_path": reg_entry["encoder_path"],
+                    "cv_rmse": reg_entry.get("cv_rmse"),
+                    "feature_names": reg_entry["feature_names"],
+                }}
 
-            primary_piece = pieces.get(primary_name) or next(iter(pieces.values()))
-            # Geriye dönük uyum: birincil modelin sonucu doğrudan üst seviyeye yazılır
-            # (mevcut tüketiciler — comparison.py, frontend — bunu okumaya devam eder).
-            result["by_type"][transaction_type].update(primary_piece)
+                if not models:
+                    run_models = [best_name]
+                else:
+                    run_models = [m for m in models if m in avail]
+                    if not run_models:
+                        run_models = [best_name]
 
-            if len(pieces) > 1:
-                # Karşılaştırma verisi: her model için ayrı sonuç (overlay için).
-                # daily/hourly geçişleri arasında birikimli olarak birleştirilir.
-                models_field = result["by_type"][transaction_type].setdefault("models", {})
-                for name, piece in pieces.items():
-                    entry = models_field.setdefault(name, {"model_used": name})
-                    entry.update(piece)
+                primary_name = best_name if best_name in run_models else run_models[0]
 
-            forecast_df = primary_forecast_df
+                pieces: dict[str, dict] = {}
+                primary_forecast_df = None
+                for model_name in run_models:
+                    try:
+                        piece, f_df = _run_single_model_forecast(
+                            model_name, avail[model_name], team, transaction_type, f
+                        )
+                    except Exception as e:
+                        console.print(f"[red]Tahmin üretilemedi ({team}/{transaction_type}/{f} / {model_name}): {e}[/red]")
+                        continue
+                    pieces[model_name] = piece
+                    if model_name == primary_name:
+                        primary_forecast_df = f_df
 
-            # CSV çıktı (birincil model için — mevcut davranışla aynı dosya adı)
-            if "csv" in fmt and forecast_df is not None:
-                os.makedirs(output_dir, exist_ok=True)
-                csv_path = os.path.join(output_dir, f"forecast_{start}_{transaction_type}_{f}.csv")
-                out_cols = ["date", "transaction_type", "predicted_count", "lower_80", "upper_80",
-                            "confidence", "model_used", "calendar_flags"]
-                if f == "hourly":
-                    out_cols.insert(1, "hour")
-                forecast_df[out_cols].to_csv(csv_path, index=False)
+                if not pieces:
+                    continue
 
-            # Grafik (birincil model için)
-            if plot and f == "daily" and forecast_df is not None:
-                plot_path = f"outputs/plots/forecast_{transaction_type}_{f}_{start}.html"
-                plot_forecast(forecast_df, transaction_type, plot_path)
+                primary_piece = pieces.get(primary_name) or next(iter(pieces.values()))
+                # Geriye dönük uyum: birincil modelin sonucu doğrudan üst seviyeye yazılır
+                # (mevcut tüketiciler — comparison.py, frontend — bunu okumaya devam eder).
+                result["by_team"][team][transaction_type].update(primary_piece)
+
+                if len(pieces) > 1:
+                    # Karşılaştırma verisi: her model için ayrı sonuç (overlay için).
+                    # daily/hourly geçişleri arasında birikimli olarak birleştirilir.
+                    models_field = result["by_team"][team][transaction_type].setdefault("models", {})
+                    for name, piece in pieces.items():
+                        entry = models_field.setdefault(name, {"model_used": name})
+                        entry.update(piece)
+
+                forecast_df = primary_forecast_df
+
+                # CSV çıktı (birincil model için — mevcut davranışla aynı dosya adı)
+                if "csv" in fmt and forecast_df is not None:
+                    os.makedirs(output_dir, exist_ok=True)
+                    csv_key = f"{_safe_key(team)}_{_safe_key(transaction_type)}"
+                    csv_path = os.path.join(output_dir, f"forecast_{metric_type}_{start}_{csv_key}_{f}.csv")
+                    out_cols = ["date", "team", "transaction_type", "predicted_count", "lower_80", "upper_80",
+                                "confidence", "model_used", "calendar_flags"]
+                    if f == "hourly":
+                        out_cols.insert(1, "hour")
+                    forecast_df[out_cols].to_csv(csv_path, index=False)
+
+                # Grafik (birincil model için)
+                if plot and f == "daily" and forecast_df is not None:
+                    plot_key = f"{_safe_key(team)}_{_safe_key(transaction_type)}"
+                    plot_path = f"outputs/plots/forecast_{metric_type}_{plot_key}_{f}_{start}.html"
+                    plot_forecast(forecast_df, f"{team} / {transaction_type}", plot_path)
 
     # JSON çıktı
     if "json" in fmt:
         os.makedirs(output_dir, exist_ok=True)
-        json_path = os.path.join(output_dir, f"forecast_{start}.json")
+        json_path = os.path.join(output_dir, f"forecast_{metric_type}_{start}.json")
         with open(json_path, "w", encoding="utf-8") as jf:
             json.dump(result, jf, ensure_ascii=False, indent=2, default=str)
         console.print(f"[green]JSON: {json_path}[/green]")
@@ -767,13 +837,17 @@ def forecast_pipeline(
     # HTML rapor
     if "html" in fmt:
         plot_paths = {}
-        if plot:
-            for transaction_type in types:
-                pp = f"outputs/plots/forecast_{transaction_type}_daily_{start}.html"
-                if os.path.exists(pp):
-                    plot_paths[f"{transaction_type} Günlük Tahmin"] = pp
-        report_path = f"outputs/reports/forecast_report_{start}.html"
-        generate_forecast_report(result, report_path, plot_paths)
+        flat_by_type: dict = {}
+        for team, by_type in result["by_team"].items():
+            for tt, info in by_type.items():
+                flat_by_type[f"{team} / {tt}"] = info
+                if plot:
+                    plot_key = f"{_safe_key(team)}_{_safe_key(tt)}"
+                    pp = f"outputs/plots/forecast_{metric_type}_{plot_key}_daily_{start}.html"
+                    if os.path.exists(pp):
+                        plot_paths[f"{team} / {tt} Günlük Tahmin"] = pp
+        report_path = f"outputs/reports/forecast_report_{metric_type}_{start}.html"
+        generate_forecast_report({**result, "by_type": flat_by_type}, report_path, plot_paths)
         console.print(f"[green]HTML Rapor: {report_path}[/green]")
 
     return result

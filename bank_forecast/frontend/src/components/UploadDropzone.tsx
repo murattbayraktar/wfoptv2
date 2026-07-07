@@ -1,9 +1,13 @@
 import { useRef, useState, type DragEvent } from 'react'
 import { useData } from '../context/DataContext'
 import { MODEL_LABELS, MODEL_OPTIONS } from '../constants'
+import type { MetricType } from '../types'
+import { METRIC_LABELS } from '../types'
 
-export default function UploadDropzone() {
-  const { upload, loadDemo, loadingDataset, datasetError, trainModels, toggleTrainModel } = useData()
+export default function UploadDropzone({ metricType }: { metricType: MetricType }) {
+  const data = useData()
+  const { upload, loadDemo, loadingDataset, datasetError } = data
+  const { trainModels, toggleTrainModel } = data[metricType]
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -18,8 +22,13 @@ export default function UploadDropzone() {
     handleFiles(e.dataTransfer.files)
   }
 
+  const metricCol = metricType === 'talimat' ? 'talimat_adet' : 'islem_adet'
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 text-sm font-semibold text-slate-900">
+        {METRIC_LABELS[metricType]} Verisi
+      </div>
       <div className="mb-6">
         <label className="mb-2 block text-xs font-medium text-slate-500">
           Eğitim için algoritma seçimi
@@ -43,12 +52,6 @@ export default function UploadDropzone() {
             )
           })}
         </div>
-        <p className="mt-1.5 text-xs text-slate-400">
-          "Tümü" seçilirse her aday algoritma denenip en iyisi otomatik seçilir (daha uzun sürer).
-          Tek bir spesifik algoritma seçilirse eğitim yalnızca onunla yapılır (daha hızlıdır).
-          Birden fazla spesifik algoritma seçerseniz HEPSİ tam veri ile eğitilip kaydedilir —
-          tahmin ekranında aralarında karşılaştırma yapabilirsiniz (daha uzun sürer ve daha fazla disk alanı kullanır).
-        </p>
       </div>
       <div
         onDragOver={(e) => {
@@ -57,7 +60,7 @@ export default function UploadDropzone() {
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
-        className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-8 py-12 text-center transition-colors ${
+        className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-10 text-center transition-colors ${
           dragOver ? 'border-blue-400 bg-blue-50' : 'border-slate-300 hover:border-slate-400'
         }`}
       >
@@ -67,7 +70,7 @@ export default function UploadDropzone() {
           </svg>
         </div>
         <div className="mb-1 font-medium text-slate-900">CSV dosyasını sürükleyin veya seçin</div>
-        <div className="mb-4 text-xs text-slate-400">tarih, saat, işlem tipi, adet, tutar</div>
+        <div className="mb-4 text-xs text-slate-400">tarih, saat, işlem tipi, ekip_adi, {metricCol}</div>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -85,7 +88,7 @@ export default function UploadDropzone() {
         />
       </div>
 
-      <div className="my-6 flex items-center gap-4 text-xs text-slate-400">
+      <div className="my-5 flex items-center gap-4 text-xs text-slate-400">
         <div className="h-px flex-1 bg-slate-200" />
         veya
         <div className="h-px flex-1 bg-slate-200" />
@@ -94,11 +97,11 @@ export default function UploadDropzone() {
       <div className="flex justify-center">
         <button
           type="button"
-          onClick={() => void loadDemo()}
+          onClick={() => void loadDemo(metricType)}
           disabled={loadingDataset}
-          className="rounded-md border border-blue-300 bg-blue-50 px-5 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-50"
+          className="rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-50"
         >
-          ✦ Demo Data Yükle (2024 – 12 aylık sentetik)
+          ✦ {METRIC_LABELS[metricType]} Demo Veri Yükle
         </button>
       </div>
 

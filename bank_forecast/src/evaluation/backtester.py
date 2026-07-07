@@ -16,11 +16,13 @@ class WalkForwardBacktester:
         self,
         transaction_type: str,
         freq: str,
+        team: str = None,
         cv_folds: int = 5,
         min_train_days: int = 90,
         cfg: dict = None,
     ):
         self.transaction_type = transaction_type
+        self.team = team
         self.freq = freq
         self.cv_folds = cv_folds
         self.min_train_days = min_train_days
@@ -35,7 +37,10 @@ class WalkForwardBacktester:
         if models_cfg is None:
             models_cfg = {}
 
-        subset = df[df["transaction_type"] == self.transaction_type].copy()
+        mask = df["transaction_type"] == self.transaction_type
+        if self.team is not None:
+            mask &= df["team"] == self.team
+        subset = df[mask].copy()
         subset = subset.sort_values("date").reset_index(drop=True)
 
         if len(subset) < self.min_train_days * 2:
@@ -72,7 +77,8 @@ class WalkForwardBacktester:
 
             # Model yükle ve eğit
             from src.models.model_selector import _make_model
-            m = _make_model(model_name, self.transaction_type, self.freq, models_cfg)
+            label = f"{self.team} / {self.transaction_type}" if self.team else self.transaction_type
+            m = _make_model(model_name, label, self.freq, models_cfg)
             m.fit(X_tr, y_tr)
             preds = m.predict(X_val)
 
@@ -114,6 +120,7 @@ class WalkForwardBacktester:
 
         summary = {
             "transaction_type": self.transaction_type,
+            "team": self.team,
             "freq": self.freq,
             "model": model_name,
             "folds": fold_results,
@@ -134,7 +141,8 @@ class WalkForwardBacktester:
             console.print(f"[red]Backtest hatası: {summary['error']}[/red]")
             return
 
-        table = Table(title=f"Backtest: {summary['transaction_type']} / {summary['freq']}")
+        label = f"{summary['team']} / {summary['transaction_type']}" if summary.get("team") else summary["transaction_type"]
+        table = Table(title=f"Backtest: {label} / {summary['freq']}")
         table.add_column("Fold", style="dim")
         table.add_column("Train n")
         table.add_column("Val n")
