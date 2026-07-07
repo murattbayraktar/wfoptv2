@@ -56,10 +56,10 @@ start_services() {
         return
     fi
 
-    ( cd "$API_DIR" && exec "$UVICORN" api.main:app --reload --port 8000 ) > "$API_LOG" 2>&1 &
+    ( cd "$API_DIR" && exec "$UVICORN" api.main:app --reload --reload-dir api --reload-dir src --reload-dir config --port 8000 ) > "$API_LOG" 2>&1 &
     local api_pid=$!
 
-    ( cd "$FRONT_DIR" && exec npm run dev ) > "$FRONT_LOG" 2>&1 &
+    ( cd "$FRONT_DIR" && exec npm run dev </dev/null ) > "$FRONT_LOG" 2>&1 &
     local front_pid=$!
 
     echo "${api_pid},${front_pid}" > "$PID_FILE"

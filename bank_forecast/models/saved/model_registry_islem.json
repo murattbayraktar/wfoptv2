@@ -1,6 +1,6 @@
 {
   "metric_type": "islem",
-  "trained_at": "2026-07-04T10:06:47.380310",
+  "trained_at": "2026-07-07T11:15:08.981559",
   "data_range": {
     "start": "2025-06-02",
     "end": "2025-12-12"
@@ -25,8 +25,8 @@
           "cv_rmse": 459.9217,
           "cv_mae": 459.9217,
           "all_scores": {
-            "lightgbm": 491.308,
-            "xgboost": 459.9217
+            "xgboost": 459.9217,
+            "lightgbm": 491.308
           },
           "selection_reason": "xgboost en düşük CV RMSE'yi verdi (459.9217). İkinci sıra: lightgbm (491.3080).",
           "feature_importance_top5": [
@@ -95,10 +95,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/MHS__EFT__daily_lightgbm.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/MHS__EFT__daily_best.pkl",
               "encoder_path": "models/saved/islem/MHS__EFT__daily_encoder.pkl",
-              "cv_rmse": 491.308,
+              "cv_rmse": 459.9217,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -156,10 +156,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/MHS__EFT__daily_best.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/MHS__EFT__daily_lightgbm.pkl",
               "encoder_path": "models/saved/islem/MHS__EFT__daily_encoder.pkl",
-              "cv_rmse": 459.9217,
+              "cv_rmse": 491.308,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -224,8 +224,8 @@
           "cv_rmse": 78.4999,
           "cv_mae": 78.4999,
           "all_scores": {
-            "lightgbm": 79.5635,
-            "xgboost": 78.4999
+            "xgboost": 78.4999,
+            "lightgbm": 79.5635
           },
           "selection_reason": "xgboost en düşük CV RMSE'yi verdi (78.4999). İkinci sıra: lightgbm (79.5635).",
           "feature_importance_top5": [
@@ -290,10 +290,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/MHS__EFT__hourly_lightgbm.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/MHS__EFT__hourly_best.pkl",
               "encoder_path": "models/saved/islem/MHS__EFT__hourly_encoder.pkl",
-              "cv_rmse": 79.5635,
+              "cv_rmse": 78.4999,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -347,10 +347,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/MHS__EFT__hourly_best.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/MHS__EFT__hourly_lightgbm.pkl",
               "encoder_path": "models/saved/islem/MHS__EFT__hourly_encoder.pkl",
-              "cv_rmse": 78.4999,
+              "cv_rmse": 79.5635,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -415,8 +415,8 @@
           "cv_rmse": 380.6661,
           "cv_mae": 380.6661,
           "all_scores": {
-            "lightgbm": 418.7067,
-            "xgboost": 380.6661
+            "xgboost": 380.6661,
+            "lightgbm": 418.7067
           },
           "selection_reason": "xgboost en düşük CV RMSE'yi verdi (380.6661). İkinci sıra: lightgbm (418.7067).",
           "feature_importance_top5": [
@@ -485,10 +485,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/PSO__EFT__daily_lightgbm.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/PSO__EFT__daily_best.pkl",
               "encoder_path": "models/saved/islem/PSO__EFT__daily_encoder.pkl",
-              "cv_rmse": 418.7067,
+              "cv_rmse": 380.6661,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -546,10 +546,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/PSO__EFT__daily_best.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/PSO__EFT__daily_lightgbm.pkl",
               "encoder_path": "models/saved/islem/PSO__EFT__daily_encoder.pkl",
-              "cv_rmse": 380.6661,
+              "cv_rmse": 418.7067,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -614,8 +614,8 @@
           "cv_rmse": 74.5059,
           "cv_mae": 74.5059,
           "all_scores": {
-            "lightgbm": 74.5059,
-            "xgboost": 75.4639
+            "xgboost": 75.4639,
+            "lightgbm": 74.5059
           },
           "selection_reason": "lightgbm en düşük CV RMSE'yi verdi (74.5059). İkinci sıra: xgboost (75.4639).",
           "feature_importance_top5": [
@@ -680,10 +680,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/PSO__EFT__hourly_best.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/PSO__EFT__hourly_xgboost.pkl",
               "encoder_path": "models/saved/islem/PSO__EFT__hourly_encoder.pkl",
-              "cv_rmse": 74.5059,
+              "cv_rmse": 75.4639,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -737,10 +737,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/PSO__EFT__hourly_xgboost.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/PSO__EFT__hourly_best.pkl",
               "encoder_path": "models/saved/islem/PSO__EFT__hourly_encoder.pkl",
-              "cv_rmse": 75.4639,
+              "cv_rmse": 74.5059,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -805,8 +805,8 @@
           "cv_rmse": 303.058,
           "cv_mae": 303.058,
           "all_scores": {
-            "lightgbm": 339.2349,
-            "xgboost": 303.058
+            "xgboost": 303.058,
+            "lightgbm": 339.2349
           },
           "selection_reason": "xgboost en düşük CV RMSE'yi verdi (303.0580). İkinci sıra: lightgbm (339.2349).",
           "feature_importance_top5": [
@@ -875,10 +875,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/TLO__EFT__daily_lightgbm.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/TLO__EFT__daily_best.pkl",
               "encoder_path": "models/saved/islem/TLO__EFT__daily_encoder.pkl",
-              "cv_rmse": 339.2349,
+              "cv_rmse": 303.058,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -936,10 +936,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/TLO__EFT__daily_best.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/TLO__EFT__daily_lightgbm.pkl",
               "encoder_path": "models/saved/islem/TLO__EFT__daily_encoder.pkl",
-              "cv_rmse": 303.058,
+              "cv_rmse": 339.2349,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -1004,8 +1004,8 @@
           "cv_rmse": 60.3915,
           "cv_mae": 60.3915,
           "all_scores": {
-            "lightgbm": 60.3915,
-            "xgboost": 60.3956
+            "xgboost": 60.3956,
+            "lightgbm": 60.3915
           },
           "selection_reason": "lightgbm en düşük CV RMSE'yi verdi (60.3915). İkinci sıra: xgboost (60.3956).",
           "feature_importance_top5": [
@@ -1070,10 +1070,10 @@
             "transaction_type_enc"
           ],
           "available_models": {
-            "lightgbm": {
-              "model_path": "models/saved/islem/TLO__EFT__hourly_best.pkl",
+            "xgboost": {
+              "model_path": "models/saved/islem/TLO__EFT__hourly_xgboost.pkl",
               "encoder_path": "models/saved/islem/TLO__EFT__hourly_encoder.pkl",
-              "cv_rmse": 60.3915,
+              "cv_rmse": 60.3956,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",
@@ -1127,10 +1127,10 @@
                 "transaction_type_enc"
               ]
             },
-            "xgboost": {
-              "model_path": "models/saved/islem/TLO__EFT__hourly_xgboost.pkl",
+            "lightgbm": {
+              "model_path": "models/saved/islem/TLO__EFT__hourly_best.pkl",
               "encoder_path": "models/saved/islem/TLO__EFT__hourly_encoder.pkl",
-              "cv_rmse": 60.3956,
+              "cv_rmse": 60.3915,
               "feature_names": [
                 "is_public_holiday",
                 "is_religious_holiday",

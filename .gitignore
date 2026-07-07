@@ -16,7 +16,7 @@ env/
 .env
 
 # Trained model files (büyük binary dosyalar — gerekirse Git LFS kullanın)
-bank_forecast/models/saved/*.pkl
+bank_forecast/models/saved/**/*.pkl
 bank_forecast/models/saved/model_registry.json
 
 # Geçici upload dosyaları
