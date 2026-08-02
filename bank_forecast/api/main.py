@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from . import routes_data, routes_forecast, routes_train
+from . import routes_calibration, routes_data, routes_forecast, routes_train
 
 # Windows konsolunun varsayılan kodlaması (cp1252/"charmap"), pipeline'ın bastığı
 # özel karakterleri (→, ✓ vb.) UnicodeEncodeError ile patlatır — arka plan eğitim
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(routes_data.router)
 app.include_router(routes_forecast.router)
 app.include_router(routes_train.router)
+app.include_router(routes_calibration.router)
 
 
 @app.get("/api/health")

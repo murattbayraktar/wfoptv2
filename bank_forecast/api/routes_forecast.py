@@ -44,7 +44,7 @@ async def available_models(metric_type: str = "talimat"):
     return {"available": out}
 
 
-def _run_forecast_for_metric(metric_type: str, req: ForecastRequest) -> dict | None:
+def _run_forecast_for_metric(metric_type: str, req: ForecastRequest, calibration_override: dict | None = None) -> dict | None:
     registry_path = registry_filename(metric_type)
     ds = STATE.get(metric_type)
     if not ds.is_loaded() or not os.path.exists(registry_path):
@@ -63,6 +63,7 @@ def _run_forecast_for_metric(metric_type: str, req: ForecastRequest) -> dict | N
             registry_path=registry_path,
             historical_data={"daily": ds.daily_agg, "hourly": ds.hourly_agg},
             models=req.models,
+            calibration_override=calibration_override,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Tahmin üretilemedi ({metric_type}): {e}")

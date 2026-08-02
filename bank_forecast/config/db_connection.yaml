@@ -1,0 +1,8 @@
+host: "localhost"
+port: 1521
+service_name: "ORCLPDB1"
+user: "wfopt_user"
+password: "changeme"
+# Doluysa host/port/service_name yerine doğrudan bu DSN/Easy-Connect string kullanılır
+# örn: "host:1521/service_name" veya tam bir TNS connect descriptor
+dsn: null

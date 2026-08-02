@@ -24,3 +24,22 @@ class RetrainRequest(BaseModel):
     types: list[str] | None = None
     models: list[str] | None = None  # None/["auto"] = tüm adaylar denenir; tek model verilirse yalnızca o eğitilir
     holdout_days: int = 0  # 0 = devre dışı; >0 = son N günü eğitime dahil etme (doğrulama seti)
+
+
+class CalibrationAnalyzeRequest(BaseModel):
+    metric_type: str  # "talimat" | "islem"
+    start: str
+    end: str
+    teams: list[str] | None = None
+    types: list[str] | None = None
+    min_samples: int = 4
+    error_threshold_pct: float = 15.0
+
+
+class CalibrationConfigBody(BaseModel):
+    multipliers: dict[str, dict[str, float]] = {}
+    half_days: list[str] = []
+
+
+class CalibrationPreviewRequest(CalibrationAnalyzeRequest):
+    proposed: CalibrationConfigBody

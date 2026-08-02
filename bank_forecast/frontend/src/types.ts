@@ -188,3 +188,74 @@ export interface RetrainStatus {
   holdout_days?: number
   holdout_result?: HoldoutResult | null
 }
+
+/** Kalibrasyon desenleri — sırasıyla en yüksekten en düşük önceliğe (bkz. backend `PATTERN_PRECEDENCE`) */
+export const CALIBRATION_PATTERNS = ['half_day', 'first_monday_of_month', 'friday'] as const
+export type CalibrationPattern = (typeof CALIBRATION_PATTERNS)[number]
+
+export const CALIBRATION_PATTERN_LABELS: Record<CalibrationPattern, string> = {
+  half_day: 'Yarım Gün',
+  first_monday_of_month: 'Ayın İlk Pazartesi',
+  friday: 'Cuma',
+}
+
+export interface CalibrationHotspot {
+  team: string
+  transaction_type: string
+  granularity: 'daily' | 'hourly'
+  weekday: number
+  hour: number | null
+  pattern: CalibrationPattern | null
+  n: number
+  mean_actual: number
+  mean_predicted: number
+  pct_error: number
+  direction: 'under_forecast' | 'over_forecast'
+  impact_score: number
+  recommendation: string
+}
+
+export interface CalibrationReport {
+  generated_at: string
+  params: { min_samples: number; error_threshold_pct: number }
+  hotspots: CalibrationHotspot[]
+  summary: { groups_checked: number; hotspot_count: number }
+}
+
+export interface SuggestedMultiplier {
+  multiplier: number
+  n_pattern: number
+  n_baseline: number
+  confidence: 'ok' | 'low_sample'
+}
+
+export interface SuggestedMultipliersResponse {
+  generated_at: string
+  by_type: Record<string, Record<string, SuggestedMultiplier>>
+}
+
+export interface CalibrationConfig {
+  multipliers: Record<string, Record<string, number>>
+  half_days: string[]
+  updated_at: string | null
+}
+
+export interface CalibrationPreviewMetric {
+  overall_mape: number | null
+  by_team: Record<string, MapeByTeam>
+}
+
+export interface CalibrationPreviewResponse {
+  current: CalibrationPreviewMetric
+  proposed: CalibrationPreviewMetric
+  delta: CalibrationPreviewMetric
+}
+
+/** Tahmin ekranından Kalibrasyon ekranına geçerken taşınan bağlam (bkz. `ResultsPanel.tsx`) */
+export interface CalibrationScope {
+  metricType: MetricType
+  team: string
+  type: string
+  start: string
+  end: string
+}
