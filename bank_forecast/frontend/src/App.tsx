@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { DataProvider, useData } from './context/DataContext'
-import type { DatasetSummaryMap } from './types'
+import type { CalibrationScope, DatasetSummaryMap } from './types'
 import { METRIC_LABELS, METRIC_TYPES } from './types'
 import TopBar from './components/TopBar'
 import Sidebar from './components/Sidebar'
 import ProgressStepper from './components/ProgressStepper'
 import ResultsPanel from './components/ResultsPanel'
 import TrainingScreen from './components/TrainingScreen'
+import CalibrationScreen from './components/CalibrationScreen'
 
-export type Screen = 'forecast' | 'training'
+export type Screen = 'forecast' | 'training' | 'calibration'
 
 function NoDataCard({ onGoToTraining }: { onGoToTraining: () => void }) {
   return (
@@ -63,11 +64,17 @@ function ReadyToForecastCard({ datasetMap }: { datasetMap: DatasetSummaryMap }) 
   )
 }
 
-function MainContent({ onGoToTraining }: { onGoToTraining: () => void }) {
+function MainContent({
+  onGoToTraining,
+  onGoToCalibration,
+}: {
+  onGoToTraining: () => void
+  onGoToCalibration: (scope: CalibrationScope) => void
+}) {
   const { datasetMap, anyLoaded, uiStep, forecastResult } = useData()
 
   if (uiStep === 'progress') return <ProgressStepper />
-  if (uiStep === 'results' && forecastResult) return <ResultsPanel />
+  if (uiStep === 'results' && forecastResult) return <ResultsPanel onGoToCalibration={onGoToCalibration} />
 
   return (
     <div className="space-y-6">
@@ -78,8 +85,14 @@ function MainContent({ onGoToTraining }: { onGoToTraining: () => void }) {
 
 function Layout() {
   const [screen, setScreen] = useState<Screen>('forecast')
+  const [calibrationScope, setCalibrationScope] = useState<CalibrationScope | null>(null)
   const { uiStep, forecastResult } = useData()
   const showingResults = screen === 'forecast' && uiStep === 'results' && !!forecastResult
+
+  const goToCalibration = (scope: CalibrationScope) => {
+    setCalibrationScope(scope)
+    setScreen('calibration')
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -87,12 +100,12 @@ function Layout() {
       <div className="flex flex-1">
         {screen === 'forecast' && <Sidebar />}
         <main className="flex-1 overflow-y-auto p-6">
-          <div className={showingResults ? 'mx-auto max-w-7xl' : 'mx-auto max-w-4xl'}>
-            {screen === 'forecast' ? (
-              <MainContent onGoToTraining={() => setScreen('training')} />
-            ) : (
-              <TrainingScreen />
+          <div className={showingResults || screen === 'calibration' ? 'mx-auto max-w-7xl' : 'mx-auto max-w-4xl'}>
+            {screen === 'forecast' && (
+              <MainContent onGoToTraining={() => setScreen('training')} onGoToCalibration={goToCalibration} />
             )}
+            {screen === 'training' && <TrainingScreen />}
+            {screen === 'calibration' && <CalibrationScreen initialScope={calibrationScope} />}
           </div>
         </main>
       </div>

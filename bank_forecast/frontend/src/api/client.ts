@@ -1,9 +1,13 @@
 import type {
   AvailableModelsResponse,
+  CalibrationConfig,
+  CalibrationPreviewResponse,
+  CalibrationReport,
   DatasetSummaryMap,
   ForecastResponse,
   MetricType,
   RetrainStatus,
+  SuggestedMultipliersResponse,
 } from '../types'
 
 async function handleJson<T>(res: Response): Promise<T> {
@@ -100,4 +104,60 @@ export async function startRetrain(params: {
 export async function getRetrainStatus(metricType: MetricType): Promise<RetrainStatus> {
   const res = await fetch(`/api/retrain/status?metric_type=${metricType}`)
   return handleJson<RetrainStatus>(res)
+}
+
+export interface CalibrationAnalyzeParams {
+  metric_type: MetricType
+  start: string
+  end: string
+  teams?: string[]
+  types?: string[]
+  min_samples?: number
+  error_threshold_pct?: number
+}
+
+export async function analyzeCalibration(params: CalibrationAnalyzeParams): Promise<CalibrationReport> {
+  const res = await fetch('/api/calibration/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  })
+  return handleJson<CalibrationReport>(res)
+}
+
+export async function suggestMultipliers(params: CalibrationAnalyzeParams): Promise<SuggestedMultipliersResponse> {
+  const res = await fetch('/api/calibration/multipliers/suggest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  })
+  return handleJson<SuggestedMultipliersResponse>(res)
+}
+
+export async function getCalibrationConfig(): Promise<CalibrationConfig> {
+  const res = await fetch('/api/calibration/config')
+  return handleJson<CalibrationConfig>(res)
+}
+
+export async function saveCalibrationConfig(body: {
+  multipliers: CalibrationConfig['multipliers']
+  half_days: string[]
+}): Promise<CalibrationConfig> {
+  const res = await fetch('/api/calibration/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  return handleJson<CalibrationConfig>(res)
+}
+
+export async function previewCalibrationConfig(
+  params: CalibrationAnalyzeParams & { proposed: { multipliers: CalibrationConfig['multipliers']; half_days: string[] } },
+): Promise<CalibrationPreviewResponse> {
+  const res = await fetch('/api/calibration/preview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  })
+  return handleJson<CalibrationPreviewResponse>(res)
 }

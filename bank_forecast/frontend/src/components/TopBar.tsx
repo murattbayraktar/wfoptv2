@@ -36,6 +36,7 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
             [
               { id: 'forecast' as const, label: 'Tahmin' },
               { id: 'training' as const, label: 'Veri & Model Eğitimi' },
+              { id: 'calibration' as const, label: 'Kalibrasyon' },
             ]
           ).map((tab) => (
             <button

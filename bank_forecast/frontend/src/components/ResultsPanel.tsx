@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useData } from '../context/DataContext'
-import type { MetricForecastResult, MetricType } from '../types'
+import type { CalibrationScope, MetricForecastResult, MetricType } from '../types'
 import { METRIC_LABELS, METRIC_TYPES } from '../types'
 import ModelSummaryCard from './ModelSummaryCard'
 import TotalCountCard from './TotalCountCard'
@@ -10,7 +10,15 @@ import HourlyBreakdownChart from './HourlyBreakdownChart'
 import ActualVsPredictedChart from './ActualVsPredictedChart'
 import ExportToExcelButton from './ExportToExcelButton'
 
-function MetricSection({ metricType, result }: { metricType: MetricType; result: MetricForecastResult }) {
+function MetricSection({
+  metricType,
+  result,
+  onGoToCalibration,
+}: {
+  metricType: MetricType
+  result: MetricForecastResult
+  onGoToCalibration: (scope: CalibrationScope) => void
+}) {
   const [showHourly, setShowHourly] = useState(false)
 
   const combos = useMemo(() => {
@@ -68,28 +76,45 @@ function MetricSection({ metricType, result }: { metricType: MetricType; result:
                     <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
                       Grafik görünümü — {active.team} / {active.type}
                     </span>
-                    {hasHourly && (
-                      <div className="flex gap-2 text-xs">
-                        <button
-                          type="button"
-                          onClick={() => setShowHourly(false)}
-                          className={`rounded-full px-3 py-1 transition-colors ${
-                            !showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
-                          }`}
-                        >
-                          Günlük
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowHourly(true)}
-                          className={`rounded-full px-3 py-1 transition-colors ${
-                            showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
-                          }`}
-                        >
-                          Saatlik Kırılım
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {hasHourly && (
+                        <div className="flex gap-2 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setShowHourly(false)}
+                            className={`rounded-full px-3 py-1 transition-colors ${
+                              !showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
+                            }`}
+                          >
+                            Günlük
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowHourly(true)}
+                            className={`rounded-full px-3 py-1 transition-colors ${
+                              showHourly ? 'bg-blue-600 text-white shadow-sm' : 'border border-slate-200 text-slate-600 hover:border-slate-300'
+                            }`}
+                          >
+                            Saatlik Kırılım
+                          </button>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onGoToCalibration({
+                            metricType,
+                            team: active.team,
+                            type: active.type,
+                            start: result.forecast.forecast_range.start,
+                            end: result.forecast.forecast_range.end,
+                          })
+                        }
+                        className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                      >
+                        Kalibrasyon Analizi Çalıştır
+                      </button>
+                    </div>
                   </div>
 
                   {showHourly && hasHourly ? (
@@ -121,7 +146,7 @@ function MetricSection({ metricType, result }: { metricType: MetricType; result:
   )
 }
 
-export default function ResultsPanel() {
+export default function ResultsPanel({ onGoToCalibration }: { onGoToCalibration: (scope: CalibrationScope) => void }) {
   const { forecastResult, resetResults } = useData()
 
   const loadedMetrics = useMemo(
@@ -189,7 +214,12 @@ export default function ResultsPanel() {
       )}
 
       {active && forecastResult[active] && (
-        <MetricSection key={active} metricType={active} result={forecastResult[active]!} />
+        <MetricSection
+          key={active}
+          metricType={active}
+          result={forecastResult[active]!}
+          onGoToCalibration={onGoToCalibration}
+        />
       )}
     </div>
   )

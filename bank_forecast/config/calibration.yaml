@@ -1,0 +1,10 @@
+# Kalibrasyon çarpanları — İŞLEM TİPİ bazında (ekip bazında DEĞİL).
+# 1.0 = düzeltme yok. Kalibrasyon ekranı > "Önerilen değerleri doldur" ile
+# doldurulabilir ya da elle girilebilir. Eksik işlem tipi/desen anahtarı
+# çarpanı 1.0 (etkisiz) kabul edilir.
+multipliers: {}
+
+# Bankaca ilan edilen, elle bakımı yapılan yarım gün tarihleri (YYYY-MM-DD).
+half_days: []
+
+updated_at: null

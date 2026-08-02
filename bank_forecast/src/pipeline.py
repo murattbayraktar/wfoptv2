@@ -557,6 +557,7 @@ def forecast_pipeline(
     config_path: str = "config/settings.yaml",
     historical_data: dict | None = None,
     models: list[str] | None = None,
+    calibration_override: dict | None = None,
 ) -> dict:
     """
     `historical_data`: {"daily": daily_agg_df, "hourly": hourly_agg_df} biçiminde,
@@ -568,12 +569,21 @@ def forecast_pipeline(
     Bir veya daha fazla model adı verilirse, kayıtlı (`available_models`) olanlar
     için ayrı ayrı tahmin üretilir. Birden fazla model çalışırsa karşılaştırma
     için `by_team[team][type]["models"]` alanı doldurulur — bkz. modül başı yorum.
+
+    `calibration_override`: `None` ise diskteki kayıtlı `config/calibration.yaml`
+    okunur (varsayılan davranış — kaydedilen çarpanlar otomatik uygulanır). Boş
+    `{}` verilirse (ör. önizleme endpoint'inin "kalibrasyonsuz" tarafı için) hiç
+    çarpan uygulanmaz. Bkz. `src/analysis/calibration_multipliers.py`.
     """
     cfg = load_config(config_path)
     features_cfg = cfg.get("features", {})
     working_hours = tuple(cfg.get("data", {}).get("working_hours", [7, 18]))
     hours = list(range(working_hours[0], working_hours[1] + 1))
     historical_data = historical_data or {}
+
+    from src.calibration_config import load_calibration
+    calibration_cfg = load_calibration() if calibration_override is None else calibration_override
+    half_days = set(calibration_cfg.get("half_days", []))
 
     if fmt is None:
         fmt = ["csv", "json", "html"]
@@ -599,6 +609,7 @@ def forecast_pipeline(
 
     import joblib
     from src.features.calendar_features import add_calendar_features
+    from src.features.calibration_patterns import PATTERN_PRECEDENCE, add_pattern_flags
     from src.features.seasonal_features import add_daily_fourier, add_hourly_fourier
     from src.models.base_model import BaseForecaster
 
@@ -704,11 +715,30 @@ def forecast_pipeline(
             lower = forecast_df["predicted_count_raw"].values * 0.8
             upper = forecast_df["predicted_count_raw"].values * 1.2
 
-        forecast_df["predicted_count"] = np.round(forecast_df["predicted_count_raw"].values, 1)
-        forecast_df["lower_80"] = np.round(np.maximum(lower, 0), 1)
-        forecast_df["upper_80"] = np.round(np.maximum(upper, 0), 1)
+        # Kalibrasyon çarpanları (Cuma / ayın ilk pazartesi / yarım gün, işlem tipi
+        # bazında) — `grid_df` zaten `add_calendar_features` görmüş olduğundan
+        # `forecast_df` (onun bir alt kümesi) `day_of_week`/`week_of_month` içerir,
+        # `add_pattern_flags` bunları yeniden kullanır. Saatlik ızgarada aynı günün
+        # tüm saatleri aynı `date` değerini paylaştığından çarpan gün içinde
+        # otomatik olarak tutarlıdır — ayrı bir işlem gerekmez.
+        forecast_df = add_pattern_flags(forecast_df, half_days)
+        type_multipliers = calibration_cfg.get("multipliers", {}).get(transaction_type, {})
+        row_multiplier = np.ones(len(forecast_df))
+        applied_pattern = np.full(len(forecast_df), None, dtype=object)
+        # PATTERN_PRECEDENCE ters sırada uygulanır ki en yüksek öncelikli (listede
+        # ilk) desen en son yazılıp kazansın (bkz. calibration_patterns.py).
+        for pattern in reversed(PATTERN_PRECEDENCE):
+            mask = forecast_df[f"is_{pattern}"].values == 1
+            row_multiplier[mask] = type_multipliers.get(pattern, 1.0)
+            applied_pattern[mask] = pattern
+
+        forecast_df["predicted_count"] = np.round(forecast_df["predicted_count_raw"].values * row_multiplier, 1)
+        forecast_df["lower_80"] = np.round(np.maximum(lower, 0) * row_multiplier, 1)
+        forecast_df["upper_80"] = np.round(np.maximum(upper, 0) * row_multiplier, 1)
         forecast_df["confidence"] = "high"
         forecast_df["model_used"] = model_name
+        forecast_df["calibration_multiplier"] = row_multiplier
+        forecast_df["calibration_pattern"] = applied_pattern
 
         calendar_cols = ["is_public_holiday", "is_religious_holiday", "is_month_start",
                          "is_month_end", "is_eve_of_holiday"]
@@ -728,6 +758,8 @@ def forecast_pipeline(
                     "upper_80": float(row["upper_80"]),
                     "confidence": row["confidence"],
                     "calendar_flags": row["calendar_flags"].split(",") if row["calendar_flags"] else [],
+                    "calibration_multiplier": float(row["calibration_multiplier"]),
+                    "calibration_pattern": row["calibration_pattern"] if pd.notna(row["calibration_pattern"]) else None,
                 })
             piece = {"model_used": model_name, "daily": daily_list}
         else:
@@ -737,6 +769,8 @@ def forecast_pipeline(
                 hourly_by_date.setdefault(d, []).append({
                     "hour": int(row["hour"]),
                     "count": float(row["predicted_count"]),
+                    "calibration_multiplier": float(row["calibration_multiplier"]),
+                    "calibration_pattern": row["calibration_pattern"] if pd.notna(row["calibration_pattern"]) else None,
                 })
             piece = {"model_used": model_name, "hourly": hourly_by_date}
 
