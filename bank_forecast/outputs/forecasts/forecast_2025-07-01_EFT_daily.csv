@@ -1,8 +1,0 @@
-date,transaction_type,predicted_count,lower_80,upper_80,confidence,model_used,calendar_flags
-2025-07-01,EFT,250.8,180.9,323.8,high,ridge,is_month_start
-2025-07-02,EFT,229.3,159.4,302.3,high,ridge,
-2025-07-03,EFT,214.7,144.8,287.7,high,ridge,
-2025-07-04,EFT,200.1,130.2,273.1,high,ridge,
-2025-07-05,EFT,0.0,0.0,73.0,high,ridge,
-2025-07-06,EFT,14.1,0.0,87.1,high,ridge,
-2025-07-07,EFT,295.4,225.5,368.4,high,ridge,

@@ -81,12 +81,12 @@ Sadece **kayıtlı / öğrenilmiş** modellerle (`models/saved/model_registry.js
 
 CSV yükleme + arka planda model eğitimi burada toplanmış (`TrainingScreen.tsx`):
 
-- `UploadDropzone`: CSV sürükle-bırak / dosya seç ya da "Demo Data Yükle"; ayrıca eğitimde hangi
-  algoritmanın kullanılacağını seçen bir açılır liste içerir ("Tümü (otomatik en iyi seçim)" ya da
-  belirli bir algoritma — `xgboost`, `lightgbm`, `random_forest`, `holt_winters`, `ridge`)
-- Gerçek bir CSV yüklendikten sonra (`source_kind === 'upload'`) `DatasetSummaryCard` üzerinde
-  beliren **"Eğitimi Başlat"** butonuna basılınca `DataContext.startTraining()` seçilen algoritmayla
-  `POST /api/retrain {freq: 'both', models}` tetikler — demo veri ile eğitim **yapılmaz** (uyarı notu gösterilir)
+- `UploadDropzone`: CSV sürükle-bırak / dosya seç; ayrıca eğitimde hangi algoritmanın kullanılacağını
+  seçen bir açılır liste içerir ("Tümü (otomatik en iyi seçim)" ya da belirli bir algoritma —
+  `xgboost`, `lightgbm`, `random_forest`, `holt_winters`, `ridge`)
+- CSV yüklendikten sonra `DatasetSummaryCard` üzerinde beliren **"Eğitimi Başlat"** butonuna
+  basılınca `DataContext.startTraining()` seçilen algoritmayla `POST /api/retrain {freq: 'both', models}`
+  tetikler
 - `TrainingProgress.tsx`: `GET /api/retrain/status`'u ~1.2 sn'de bir poll'layıp **adım adım ilerlemeyi** canlı gösterir — ilerleme çubuğu (`progress`, `completed_units/total_units`), Türkçe adım günlüğü (`steps[]`: `data_ready → plan → unit_start → selection_start → model_evaluated × N → model_selected → unit_done → ... → completed`), tamamlanınca seçilen algoritma + CV RMSE özet tablosu, hata durumunda banner
 
 Backend tarafında bu adım akışı `progress_callback` enjeksiyonuyla sağlanıyor — `train_pipeline` ([pipeline.py](src/pipeline.py)) ve `ModelSelector.select_best` ([model_selector.py](src/models/model_selector.py)) opsiyonel `progress_callback=None` parametresi alır (CLI davranışını etkilemez), event'ler `routes_train.py`'de Türkçe mesajlara çevrilip `RETRAIN_STATUS`'a (`steps`, `progress`, `total_units`, `completed_units`) yazılır.

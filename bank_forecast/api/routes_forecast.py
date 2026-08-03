@@ -107,7 +107,7 @@ async def create_forecast(req: ForecastRequest):
             raise HTTPException(status_code=400, detail=f"Geçersiz metric_type: {mt}")
 
     if not any(STATE.get(mt).is_loaded() for mt in metric_types):
-        raise HTTPException(status_code=400, detail="Önce bir CSV veya demo veri yükleyin.")
+        raise HTTPException(status_code=400, detail="Önce bir CSV yükleyin.")
 
     results = {mt: _run_forecast_for_metric(mt, req) for mt in metric_types}
 

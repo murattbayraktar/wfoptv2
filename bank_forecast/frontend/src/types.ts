@@ -22,7 +22,6 @@ export interface DatasetSummary {
   loaded: boolean
   metric_type?: MetricType
   filename?: string
-  source_kind?: 'upload' | 'demo'
   row_count?: number
   date_range?: DateRange
   teams?: string[]

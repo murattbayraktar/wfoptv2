@@ -292,7 +292,7 @@ async def start_retrain(req: RetrainRequest):
     if not ds.is_loaded() or not ds.uploaded_path:
         raise HTTPException(
             status_code=400,
-            detail="Yeniden eğitim için yüklenmiş bir CSV gerekir (demo veri ile yeniden eğitim desteklenmez).",
+            detail="Yeniden eğitim için yüklenmiş bir CSV gerekir.",
         )
     if RETRAIN_STATUS[req.metric_type].status == "running":
         raise HTTPException(status_code=409, detail="Bu metrik için zaten devam eden bir eğitim var.")

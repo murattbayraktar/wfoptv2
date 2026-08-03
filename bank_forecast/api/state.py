@@ -20,7 +20,6 @@ class DatasetState:
         self.daily_agg: pd.DataFrame | None = None
         self.hourly_agg: pd.DataFrame | None = None
         self.source_filename: str | None = None
-        self.source_kind: str | None = None  # "upload" | "demo"
         self.uploaded_path: str | None = None
         self.loaded_at: datetime | None = None
 

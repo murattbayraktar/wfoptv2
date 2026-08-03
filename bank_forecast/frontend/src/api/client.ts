@@ -29,11 +29,6 @@ export async function getDatasetSummary(): Promise<DatasetSummaryMap> {
   return handleJson<DatasetSummaryMap>(res)
 }
 
-export async function loadDemoData(metricType: MetricType): Promise<DatasetSummaryMap> {
-  const res = await fetch(`/api/demo-data?metric_type=${metricType}`, { method: 'POST' })
-  return handleJson<DatasetSummaryMap>(res)
-}
-
 /** CSV içeriğine göre metrik tipi (talimat/işlem) otomatik algılanır — çağıran taraf belirtmez. */
 export async function uploadCsv(file: File): Promise<DatasetSummaryMap> {
   const form = new FormData()

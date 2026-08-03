@@ -11,7 +11,7 @@ const STEPS = [
 const STEP_INTERVAL_MS = 500
 
 export default function ProgressStepper() {
-  const { uiStep, forecastResult } = useData()
+  const { uiStep } = useData()
   const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function ProgressStepper() {
     return () => clearInterval(timer)
   }, [uiStep])
 
-  const done = uiStep === 'results' || forecastResult !== null
+  const done = uiStep === 'results'
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">

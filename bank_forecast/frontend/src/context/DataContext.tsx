@@ -33,7 +33,6 @@ interface DataContextValue {
   anyLoaded: boolean
   datasetError: string | null
   loadingDataset: boolean
-  loadDemo: (metricType: MetricType) => Promise<void>
   upload: (file: File) => Promise<void>
 
   talimat: MetricUiState
@@ -67,32 +66,11 @@ const DataContext = createContext<DataContextValue | null>(null)
 const EMPTY_DATASET_MAP: DatasetSummaryMap = { talimat: null, islem: null }
 
 function defaultRange(): { start: string; end: string } {
-  const today = new Date()
-  const start = new Date(today)
-  const end = new Date(today)
-  end.setDate(end.getDate() + 30)
-  const fmt = (d: Date) => d.toISOString().slice(0, 10)
-  return { start: fmt(start), end: fmt(end) }
-}
-
-/**
- * Yüklenen veri kümesinin son 30 günü — veriyle örtüşen bir aralık önerir, böylece
- * "Tahmin Oluştur" ilk denemede hem anlamlı bir sonuç hem de gerçekleşen-vs-tahmin
- * karşılaştırmasını gösterir. Veri kümesi 30 günden kısaysa baştan başlatılır.
- */
-function rangeFromDataset(dateRange?: { start: string; end: string }): { start: string; end: string } | null {
-  if (!dateRange) return null
-  const fmt = (d: Date) => d.toISOString().slice(0, 10)
-  const dataStart = new Date(dateRange.start)
-  const dataEnd = new Date(dateRange.end)
-  const start = new Date(dataEnd)
-  start.setUTCDate(start.getUTCDate() - 29)
-  if (start < dataStart) start.setTime(dataStart.getTime())
-  return { start: fmt(start), end: fmt(dataEnd) }
+  return { start: '2026-11-24', end: '2026-11-28' }
 }
 
 function useMetricState(metricType: MetricType, dataset: DatasetSummary | null) {
-  const [trainModels, setTrainModels] = useState<string[]>(['auto'])
+  const [trainModels, setTrainModels] = useState<string[]>(['xgboost', 'lightgbm'])
   const [holdoutDays, setHoldoutDays] = useState<number>(0)
   const [startingTraining, setStartingTraining] = useState(false)
   const [trainingStartError, setTrainingStartError] = useState<string | null>(null)
@@ -120,7 +98,7 @@ function useMetricState(metricType: MetricType, dataset: DatasetSummary | null) 
     prevStatusRef.current = current
   }, [retrainStatus?.status, refreshAvailableModels])
 
-  const trackingRetrain = dataset?.loaded && dataset.source_kind === 'upload'
+  const trackingRetrain = dataset?.loaded
 
   useEffect(() => {
     if (!trackingRetrain) {
@@ -220,12 +198,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
       .getDatasetSummary()
       .then((summaryMap) => {
         setDatasetMap(summaryMap)
-        const anyDataset = summaryMap.talimat ?? summaryMap.islem
-        const suggested = rangeFromDataset(anyDataset?.date_range)
-        if (suggested) {
-          setRangeStart(suggested.start)
-          setRangeEnd(suggested.end)
-        }
       })
       .catch(() => {
         // sayfa açılışında özet alınamazsa sessizce "veri yok" durumunda kalınır
@@ -236,26 +208,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setDatasetMap(summaryMap)
     setForecastResult(null)
     setUiStep('idle')
-    const anyDataset = summaryMap.talimat ?? summaryMap.islem
-    const suggested = rangeFromDataset(anyDataset?.date_range)
-    if (suggested) {
-      setRangeStart(suggested.start)
-      setRangeEnd(suggested.end)
-    }
   }, [])
-
-  const loadDemo = useCallback(async (metricType: MetricType) => {
-    setLoadingDataset(true)
-    setDatasetError(null)
-    try {
-      const summaryMap = await api.loadDemoData(metricType)
-      applySummary(summaryMap)
-    } catch (e) {
-      setDatasetError(e instanceof Error ? e.message : 'Demo veri yüklenemedi.')
-    } finally {
-      setLoadingDataset(false)
-    }
-  }, [applySummary])
 
   const upload = useCallback(async (file: File) => {
     setLoadingDataset(true)
@@ -343,7 +296,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     anyLoaded: !!(datasetMap.talimat?.loaded || datasetMap.islem?.loaded),
     datasetError,
     loadingDataset,
-    loadDemo,
     upload,
     talimat,
     islem,
