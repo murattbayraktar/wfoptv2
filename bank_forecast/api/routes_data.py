@@ -1,4 +1,4 @@
-"""Veri yükleme uçları: CSV yükleme, demo data, mevcut veri özeti.
+"""Veri yükleme uçları: CSV yükleme, mevcut veri özeti.
 
 Bir CSV yüklendiğinde `load_transactions` içeriğe bakarak metrik tipini
 (talimat_adet | islem_adet sütunundan) otomatik belirler — kullanıcı hangi
@@ -18,10 +18,6 @@ from .state import STATE, METRIC_TYPES
 
 router = APIRouter(prefix="/api", tags=["data"])
 
-DEMO_CSV_PATHS = {
-    "talimat": os.path.join("data", "raw", "demo_talimat.csv"),
-    "islem": os.path.join("data", "raw", "demo_islem.csv"),
-}
 WORKING_HOURS = (7, 18)
 
 
@@ -43,7 +39,6 @@ def _build_dataset_summary(metric_type: str) -> dict | None:
         "loaded": True,
         "metric_type": metric_type,
         "filename": ds.source_filename,
-        "source_kind": ds.source_kind,
         "row_count": int(len(df)),
         "date_range": {
             "start": str(df["date"].min().date()),
@@ -66,7 +61,7 @@ def _build_summary() -> dict:
     return {m: _build_dataset_summary(m) for m in METRIC_TYPES}
 
 
-def _load_into_state(csv_path: str, filename: str, source_kind: str, uploaded_path: str | None) -> str:
+def _load_into_state(csv_path: str, filename: str, uploaded_path: str) -> str:
     """CSV'yi yükler, metrik tipini tespit eder ve ilgili STATE slotuna yazar.
 
     Döner: tespit edilen `metric_type`.
@@ -84,7 +79,6 @@ def _load_into_state(csv_path: str, filename: str, source_kind: str, uploaded_pa
     ds.daily_agg = daily_agg
     ds.hourly_agg = hourly_agg
     ds.source_filename = filename
-    ds.source_kind = source_kind
     ds.uploaded_path = uploaded_path
     ds.loaded_at = datetime.now()
 
@@ -102,36 +96,13 @@ async def upload_csv(file: UploadFile):
         with os.fdopen(fd, "wb") as f:
             f.write(await file.read())
 
-        _load_into_state(tmp_path, file.filename, "upload", tmp_path)
+        _load_into_state(tmp_path, file.filename, tmp_path)
     except ValueError as e:
         os.remove(tmp_path)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         os.remove(tmp_path)
         raise HTTPException(status_code=500, detail=f"Dosya işlenemedi: {e}")
-
-    return _build_summary()
-
-
-@router.post("/demo-data")
-async def load_demo_data(metric_type: str = "talimat"):
-    if metric_type not in METRIC_TYPES:
-        raise HTTPException(status_code=400, detail=f"Geçersiz metric_type: {metric_type}")
-
-    demo_path = DEMO_CSV_PATHS[metric_type]
-    if not os.path.exists(demo_path):
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                f"Demo veri bulunamadı ({demo_path}). "
-                "`python scripts/generate_demo_data.py` ile üretebilirsiniz."
-            ),
-        )
-
-    try:
-        _load_into_state(demo_path, os.path.basename(demo_path), "demo", None)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Demo veri yüklenemedi: {e}")
 
     return _build_summary()
 

@@ -1,22 +1,7 @@
 import type { MapeSummary } from '../types'
+import { MapeBadge } from './MapeBadge'
 
-function mapeQuality(mape: number): { label: string; cls: string } {
-  if (mape < 10) return { label: 'İyi', cls: 'text-emerald-600' }
-  if (mape < 20) return { label: 'Kabul', cls: 'text-amber-600' }
-  return { label: 'Zayıf', cls: 'text-red-500' }
-}
-
-function MapeBadge({ mape }: { mape: number | null }) {
-  if (mape === null) return <span className="text-xs text-slate-400">—</span>
-  const q = mapeQuality(mape)
-  return (
-    <span className={`text-xs font-semibold ${q.cls}`}>
-      {mape.toFixed(1)}% <span className="font-normal opacity-75">({q.label})</span>
-    </span>
-  )
-}
-
-export default function MapeSummaryCard({ mapeSummary, label }: { mapeSummary: MapeSummary; label: string }) {
+export default function MapeOverviewCard({ label, mapeSummary }: { label: string; mapeSummary: MapeSummary }) {
   const teams = Object.entries(mapeSummary.by_team)
   if (teams.length === 0) return null
 
@@ -58,7 +43,8 @@ export default function MapeSummaryCard({ mapeSummary, label }: { mapeSummary: M
         </tbody>
       </table>
       <p className="mt-3 text-xs text-slate-400">
-        MAPE = Ortalama Mutlak Yüzde Hata (seçilen aralığın geçmiş veriyle örtüşen kısmı üzerinden). &lt;10%: iyi, 10–20%: kabul edilebilir, &gt;20%: zayıf.
+        MAPE = Ortalama Mutlak Yüzde Hata (seçilen aralığın geçmiş veriyle örtüşen kısmı üzerinden). &lt;10%: iyi,
+        10–20%: kabul edilebilir, &gt;20%: zayıf.
       </p>
     </div>
   )

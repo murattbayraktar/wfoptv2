@@ -33,10 +33,10 @@ export default function Sidebar() {
     <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-5">
       <DateRangePicker />
       <TeamPicker />
+      <ForecastModelPicker />
       <div className="mt-5">
         <CreateForecastButton />
       </div>
-      <ForecastModelPicker />
     </aside>
   )
 }

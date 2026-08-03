@@ -6,7 +6,7 @@ import { METRIC_LABELS } from '../types'
 
 export default function UploadDropzone({ metricType }: { metricType: MetricType }) {
   const data = useData()
-  const { upload, loadDemo, loadingDataset, datasetError } = data
+  const { upload, loadingDataset, datasetError } = data
   const { trainModels, toggleTrainModel } = data[metricType]
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
@@ -86,23 +86,6 @@ export default function UploadDropzone({ metricType }: { metricType: MetricType 
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-      </div>
-
-      <div className="my-5 flex items-center gap-4 text-xs text-slate-400">
-        <div className="h-px flex-1 bg-slate-200" />
-        veya
-        <div className="h-px flex-1 bg-slate-200" />
-      </div>
-
-      <div className="flex justify-center">
-        <button
-          type="button"
-          onClick={() => void loadDemo(metricType)}
-          disabled={loadingDataset}
-          className="rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 disabled:opacity-50"
-        >
-          ✦ {METRIC_LABELS[metricType]} Demo Veri Yükle
-        </button>
       </div>
 
       {loadingDataset && (

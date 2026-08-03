@@ -18,14 +18,14 @@ function NoDataCard({ onGoToTraining }: { onGoToTraining: () => void }) {
       <h1 className="mb-2 text-lg font-semibold text-slate-900">İşlem Hacmi Tahmin Sistemine Hoş Geldiniz</h1>
       <p className="mx-auto mb-5 max-w-md text-sm text-slate-500">
         Tahmin oluşturabilmek için önce bir veri kümesi yüklemeniz gerekir. CSV yükleme ve model
-        eğitimi artık <span className="font-medium text-slate-700">Veri & Model Eğitimi</span> sekmesinde.
+        eğitimi artık <span className="font-medium text-slate-700">Veri & Eğitim</span> sekmesinde.
       </p>
       <button
         type="button"
         onClick={onGoToTraining}
         className="rounded-md border border-blue-300 bg-blue-50 px-5 py-2.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
       >
-        Veri & Model Eğitimi sekmesine git →
+        Veri & Eğitim sekmesine git →
       </button>
     </div>
   )

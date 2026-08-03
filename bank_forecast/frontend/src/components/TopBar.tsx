@@ -14,10 +14,11 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
     .filter((d) => d?.loaded)
     .map((d) => `${d!.filename} (${d!.row_count?.toLocaleString('tr-TR')} kayıt)`)
 
-  const status = anyLoaded ? loadedLabels.join(' · ') : 'Veri yüklenmedi'
+  const status = anyLoaded ? `${loadedLabels.length} veri yüklü` : 'Veri yüklenmedi'
+  const statusTitle = anyLoaded ? loadedLabels.join(' · ') : undefined
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
+    <header className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-6 py-3">
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-600 text-white">
@@ -26,16 +27,16 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
             </svg>
           </div>
           <div>
-            <div className="text-sm font-semibold tracking-wide text-slate-900">WFOpt</div>
-            <div className="text-xs text-slate-500">İşlem Hacmi Tahmin Sistemi</div>
+            <div className="text-sm font-semibold tracking-wide text-slate-100">WFOpt</div>
+            <div className="text-xs text-slate-400">İşlem Hacmi Tahmin Sistemi</div>
           </div>
         </div>
 
-        <nav className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 text-xs">
+        <nav className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800/60 p-1 text-xs">
           {(
             [
               { id: 'forecast' as const, label: 'Tahmin' },
-              { id: 'training' as const, label: 'Veri & Model Eğitimi' },
+              { id: 'training' as const, label: 'Veri & Eğitim' },
               { id: 'calibration' as const, label: 'Kalibrasyon' },
             ]
           ).map((tab) => (
@@ -43,10 +44,10 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
               key={tab.id}
               type="button"
               onClick={() => onScreenChange(tab.id)}
-              className={`rounded-md px-3 py-1.5 font-medium transition-colors ${
+              className={`whitespace-nowrap rounded-md px-3 py-1.5 font-medium transition-colors ${
                 screen === tab.id
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {tab.label}
@@ -56,11 +57,14 @@ export default function TopBar({ screen, onScreenChange }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3 text-xs">
-        <span className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
-          <span className={`h-2 w-2 rounded-full ${anyLoaded ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+        <span
+          title={statusTitle}
+          className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-slate-300"
+        >
+          <span className={`h-2 w-2 rounded-full ${anyLoaded ? 'bg-emerald-500' : 'bg-slate-500'}`} />
           {status}
         </span>
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-400">
+        <span className="rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-slate-500">
           In-Memory · Sayfa yenilenince sıfırlanır
         </span>
       </div>
