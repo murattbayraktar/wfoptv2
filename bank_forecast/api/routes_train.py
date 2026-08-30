@@ -36,9 +36,12 @@ def _event_message(event: dict) -> str:
             f"Model bu tarihler hariç eğitilecek."
         )
     if kind == "plan":
+        worker_txt = ""
+        if event.get("max_workers"):
+            worker_txt = f" ({event['max_workers']} paralel işçi ile, kaynak: {event.get('worker_source', 'auto')})"
         return (
             f"{len(event.get('teams', []))} ekip × {len(event['types'])} işlem tipi × "
-            f"{len(event['freqs'])} frekans = {event['total_units']} model eğitilecek."
+            f"{len(event['freqs'])} frekans = {event['total_units']} model eğitilecek{worker_txt}."
         )
     if kind == "unit_start":
         return f"[{event['index']}/{event['total']}] {event['team']} / {event['type']} / {event['freq']} için eğitim başlıyor..."

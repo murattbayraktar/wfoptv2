@@ -18,6 +18,13 @@ models:
   xgboost_n_iter: 30
   lightgbm_n_iter: 30
   rf_n_iter: 20
+  # Eğitim işçi havuzu (ProcessPoolExecutor) için elle üst sınır — null bırakılırsa
+  # cgroup CPU kotası ve bellek limitine göre otomatik hesaplanır.
+  # Ortam değişkeni MAX_TRAIN_WORKERS bu değerin önüne geçer.
+  max_workers: null
+  # Süreç başına tahmini bellek kullanımı (MB) — pandas/numpy/xgboost/lightgbm import
+  # baseline'ı temkinli üst sınır alınarak belirlendi (bellek bazlı işçi sınırı buna göre hesaplanır).
+  est_worker_memory_mb: 400
   # Saatlik veri günlüğe göre ~10x daha fazla satır içerir (her model.fit() orantısız
   # pahalıdır). Bu blok yalnızca freq == "hourly" olduğunda yukarıdaki değerlerin
   # üzerine uygulanır — kaldırılırsa/boş bırakılırsa davranış değişmez.

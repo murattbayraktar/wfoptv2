@@ -11,6 +11,7 @@ import os
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from starlette.concurrency import run_in_threadpool
 
 from src.pipeline import forecast_pipeline, registry_filename, _load_registry
 
@@ -44,14 +45,18 @@ async def available_models(metric_type: str = "talimat"):
     return {"available": out}
 
 
-def _run_forecast_for_metric(metric_type: str, req: ForecastRequest, calibration_override: dict | None = None) -> dict | None:
+async def _run_forecast_for_metric(metric_type: str, req: ForecastRequest, calibration_override: dict | None = None) -> dict | None:
     registry_path = registry_filename(metric_type)
     ds = STATE.get(metric_type)
     if not ds.is_loaded() or not os.path.exists(registry_path):
         return None
 
     try:
-        forecast_result = forecast_pipeline(
+        # CPU-yoğun (satır satır recursive tahmin) senkron çağrı — event loop'u
+        # bloklamaması için ayrı bir thread'de çalıştırılıyor (bkz. plan: forecast
+        # sırasında /api/health'in de yanıt verebilmesi gerekiyor).
+        forecast_result = await run_in_threadpool(
+            forecast_pipeline,
             start=req.start,
             end=req.end,
             metric_type=metric_type,
@@ -109,7 +114,9 @@ async def create_forecast(req: ForecastRequest):
     if not any(STATE.get(mt).is_loaded() for mt in metric_types):
         raise HTTPException(status_code=400, detail="Önce bir CSV yükleyin.")
 
-    results = {mt: _run_forecast_for_metric(mt, req) for mt in metric_types}
+    results = {}
+    for mt in metric_types:
+        results[mt] = await _run_forecast_for_metric(mt, req)
 
     if not any(results.values()):
         raise HTTPException(
@@ -172,7 +179,9 @@ async def export_forecast(req: ForecastRequest):
         if mt not in METRIC_TYPES:
             raise HTTPException(status_code=400, detail=f"Geçersiz metric_type: {mt}")
 
-    results = {mt: _run_forecast_for_metric(mt, req) for mt in metric_types}
+    results = {}
+    for mt in metric_types:
+        results[mt] = await _run_forecast_for_metric(mt, req)
     if not any(results.values()):
         raise HTTPException(status_code=404, detail="Aktarılacak tahmin sonucu bulunamadı.")
 
