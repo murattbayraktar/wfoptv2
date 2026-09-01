@@ -1,9 +1,10 @@
 """Veri yükleme uçları: CSV yükleme, mevcut veri özeti.
 
-Bir CSV yüklendiğinde `load_transactions` içeriğe bakarak metrik tipini
-(talimat_adet | islem_adet sütunundan) otomatik belirler — kullanıcı hangi
-metriği yüklediğini ayrıca seçmek zorunda kalmaz, veri kendiliğinden doğru
-`STATE` slotuna (`talimat` | `islem`) yazılır.
+Bir CSV yüklendiğinde `load_transactions` satır-bazlı ham talimat verisinden
+'talimat' (referans sayısı) ve, EntryProcessCount kolonu mevcutsa, 'islem'
+(işlem adedi) metriklerini birlikte üretir — kullanıcı hangi metriği
+yüklediğini ayrıca seçmek zorunda kalmaz, veri kendiliğinden ilgili
+`STATE` slotlarına (`talimat` ve varsa `islem`) yazılır.
 """
 import os
 import tempfile
@@ -61,28 +62,33 @@ def _build_summary() -> dict:
     return {m: _build_dataset_summary(m) for m in METRIC_TYPES}
 
 
-def _load_into_state(csv_path: str, filename: str, uploaded_path: str) -> str:
-    """CSV'yi yükler, metrik tipini tespit eder ve ilgili STATE slotuna yazar.
+def _load_into_state(csv_path: str, filename: str, uploaded_path: str) -> list[str]:
+    """CSV'yi yükler ve içeriğinden üretilen HER metric_type'ı ilgili STATE
+    slotuna yazar (bkz. `load_transactions` — tek CSV'den 'talimat' ve,
+    EntryProcessCount kolonu varsa, 'islem' birlikte üretilir).
 
-    Döner: tespit edilen `metric_type`.
+    Döner: doldurulan metric_type listesi.
     """
-    df, metric_type = load_transactions(csv_path)
+    results = load_transactions(csv_path)
 
-    daily_agg = aggregate_daily(df)
-    try:
-        hourly_agg = aggregate_hourly(df, working_hours=WORKING_HOURS)
-    except ValueError:
-        hourly_agg = None
+    filled = []
+    for metric_type, df in results.items():
+        daily_agg = aggregate_daily(df)
+        try:
+            hourly_agg = aggregate_hourly(df, working_hours=WORKING_HOURS)
+        except ValueError:
+            hourly_agg = None
 
-    ds = STATE.get(metric_type)
-    ds.raw_df = df
-    ds.daily_agg = daily_agg
-    ds.hourly_agg = hourly_agg
-    ds.source_filename = filename
-    ds.uploaded_path = uploaded_path
-    ds.loaded_at = datetime.now()
+        ds = STATE.get(metric_type)
+        ds.raw_df = df
+        ds.daily_agg = daily_agg
+        ds.hourly_agg = hourly_agg
+        ds.source_filename = filename
+        ds.uploaded_path = uploaded_path
+        ds.loaded_at = datetime.now()
+        filled.append(metric_type)
 
-    return metric_type
+    return filled
 
 
 @router.post("/upload")

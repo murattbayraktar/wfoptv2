@@ -267,7 +267,8 @@ def _run_training(
     status.finished_at = None
     try:
         train_pipeline(
-            input_path=input_path, freq=freq, teams=teams, types=types, models=models or ["auto"],
+            input_path=input_path, metric_type=metric_type, freq=freq, teams=teams, types=types,
+            models=models or ["auto"],
             report=False, progress_callback=lambda e: _on_event(status, e), holdout_days=holdout_days,
         )
         if holdout_days > 0:

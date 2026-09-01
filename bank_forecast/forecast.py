@@ -51,7 +51,12 @@ def main():
     if args.input:
         cfg = load_config(args.config)
         working_hours = tuple(cfg.get("data", {}).get("working_hours", [7, 18]))
-        df, _detected_metric = load_transactions(args.input)
+        results = load_transactions(args.input)
+        df = results.get(args.metric_type)
+        if df is None:
+            console.print(f"[red]CSV'de '{args.metric_type}' metriği için veri yok "
+                           "(islem için EntryProcessCount kolonu gerekli).[/red]")
+            sys.exit(1)
         historical_data = {"daily": aggregate_daily(df)}
         try:
             historical_data["hourly"] = aggregate_hourly(df, working_hours=working_hours)

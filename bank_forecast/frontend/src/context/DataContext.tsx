@@ -66,7 +66,7 @@ const DataContext = createContext<DataContextValue | null>(null)
 const EMPTY_DATASET_MAP: DatasetSummaryMap = { talimat: null, islem: null }
 
 function defaultRange(): { start: string; end: string } {
-  return { start: '2026-11-24', end: '2026-11-28' }
+  return { start: '2026-02-02', end: '2026-02-06' }
 }
 
 function useMetricState(metricType: MetricType, dataset: DatasetSummary | null) {

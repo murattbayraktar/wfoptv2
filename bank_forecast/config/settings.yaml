@@ -1,7 +1,9 @@
 data:
   date_formats: ["%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%Y%m%d"]
   working_hours: [7, 18]
-  min_training_days: 60
+  # Bu eşiğin altındaki eğitim verisiyle (auto modda) yalnızca holt_winters/ridge
+  # denenir; XGBoost/LightGBM gibi modeller es geçilir (bkz. ModelSelector.select_best).
+  min_training_days: 14
 
 features:
   lag_days_daily: [1, 2, 3, 5, 7, 14, 21, 28]
