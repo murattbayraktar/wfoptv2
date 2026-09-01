@@ -14,44 +14,56 @@ venv\Scripts\activate      # Windows
 # 2. Bağımlılıkları yükle
 pip install -r requirements.txt
 
-# 3. Demo veri üret (data/raw/demo_talimat.csv ve data/raw/demo_islem.csv üretir)
-python scripts/generate_demo_data.py --output-dir data/raw
+# 3. Demo veri üret
+# NOT: scripts/generate_demo_data.py şu an repoda mevcut değil (eski format için
+# yazılmıştı, kaldırıldı). Yeni format için elle hazırlanmış bir test CSV'si kullanın
+# (bkz. "CSV Giriş Formatı" altındaki örnek).
 
-# 4. Modeli eğit (her metrik ayrı registry'e yazılır — model_registry_talimat.json / _islem.json)
-python train.py --input data/raw/demo_talimat.csv --freq both --models auto --report
-python train.py --input data/raw/demo_islem.csv --freq both --models auto --report
+# 4. Modeli eğit (metrik --metric-type ile seçilir, aynı CSV'den 'talimat' ve
+# EntryProcessCount kolonu varsa 'islem' ayrı ayrı eğitilebilir)
+python train.py --input data/raw/talimatlar.csv --metric-type talimat --freq both --models auto --report
+python train.py --input data/raw/talimatlar.csv --metric-type islem --freq both --models auto --report
 
 # 5. Tahmin yap
 python forecast.py --metric-type talimat --start 2025-07-01 --end 2025-07-31 --freq daily --plot
 
 # 6. Değerlendir
-python evaluate.py --input data/raw/demo_talimat.csv --backtest-days 60 --plot
+python evaluate.py --input data/raw/talimatlar.csv --metric-type talimat --backtest-days 60 --plot
 ```
 
 ## CSV Giriş Formatı
 
-İki format desteklenir — bir CSV yalnızca ikisinden birine ait olabilir, hangisi
-olduğu `talimat_adet`/`islem_adet` sütunundan otomatik tespit edilir:
+Her satır bir talimatı (referansı) temsil eder — önceden agregatlanmış sayım
+DEĞİLDİR. Sistem, satırları hem karşılayıcı (dispatcher) hem işlemci (operator)
+ekibin kendi zaman diliminden görecek şekilde otomatik dönüştürür:
 
 ```
-ekip_adi,islem_tipi,tarih,saat,talimat_adet
-Merkez Ekip,EFT,2025-06-02,8,71
-Merkez Ekip,EFT,2025-06-02,9,180
-İstanbul Ekip,EFT,2025-06-02,9,42
+Reference,TaskType,SubTaskType,OrderDate,DispatcherMainPortfolio,FirstForwardOmDate,OperatorMainPortfolio,EntryProcessCount
+100234,SOG,EFT,2025-06-02 11:00,MHS,2025-06-02 12:05,TLO,1
+100235,SOG,EFT,2025-06-02 09:15,PSO,2025-06-02 09:20,PSO,1
+100236,VIR,HVL,2025-06-02 14:40,MHS,,TLO,2
 ```
 
-```
-ekip_adi,islem_tipi,tarih,saat,islem_adet
-Merkez Ekip,EFT,2025-06-02,8,65
-Merkez Ekip,EFT,2025-06-02,9,171
-```
+- `Reference`: talimatın tekil numarası.
+- `TaskType` + `SubTaskType`: birleştirilip model kırılımı için `transaction_type`
+  olarak kullanılır (örn. `"SOG-EFT"`).
+- `OrderDate`: talimatın bankaya geliş zamanı — **karşılayıcı** (`DispatcherMainPortfolio`)
+  ekibin göreceği zaman.
+- `FirstForwardOmDate`: işlemci ekibe ilk yönlendirme zamanı (boş bırakılabilir —
+  henüz yönlendirilmemişse) — **işlemci** (`OperatorMainPortfolio`) ekibin göreceği zaman.
+- `DispatcherMainPortfolio` == `OperatorMainPortfolio` ise (aynı ekip karşılayıp
+  kendi işliyor), talimat yalnızca `OrderDate` ile tek kez sayılır. Farklıysa ve
+  `FirstForwardOmDate` doluysa, talimat **iki ekibin de** iş yükünde (kendi zaman
+  damgasıyla) ayrı ayrı sayılır — bu kasıtlıdır.
+- `EntryProcessCount` **opsiyoneldir**: mevcutsa aynı CSV'den `islem` metriği de
+  (talimat başına işlem adedi toplamı) üretilir; yoksa yalnızca `talimat` metriği
+  (referans/satır sayısı) üretilir.
 
-`ekip_adi` (takım) ve `islem_tipi` zorunludur; `tutar` (amount) sütunu opsiyoneldir —
-yoksa model yalnızca adet (`count`) üzerinde eğitilir. Sütun adı varyantları otomatik
-tanınır: `tarih`→`date`, `saat`→`hour`, `islem_tipi`→`transaction_type`, `ekip_adi`→`team`.
+Modeller **ekip × (TaskType-SubTaskType) × frekans** tam kırılımında eğitilir (her
+kombinasyon için ayrı model) — bu yüzden ekip/tip sayısı arttıkça eğitim süresi de artar.
 
-Modeller **ekip × işlem tipi × frekans** tam kırılımında eğitilir (her kombinasyon için
-ayrı model) — bu yüzden ekip/tip sayısı arttıkça eğitim süresi de artar.
+> Format değişikliği nedeniyle `models/saved/` altındaki önceden eğitilmiş modeller
+> yeni `transaction_type` değerleriyle uyumsuzdur — geçiş sonrası yeniden eğitim gerekir.
 
 ## Web Arayüzü (FastAPI + React)
 

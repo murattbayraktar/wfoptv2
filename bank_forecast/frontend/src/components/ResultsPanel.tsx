@@ -146,6 +146,7 @@ function MetricSection({
             byType={byType}
             rangeStart={result.forecast.forecast_range.start}
             rangeEnd={result.forecast.forecast_range.end}
+            comparison={result.comparison.daily}
             onGoToCalibration={onGoToCalibration}
           />
         </>

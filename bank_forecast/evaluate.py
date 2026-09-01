@@ -23,7 +23,9 @@ console = Console()
 
 def parse_args():
     p = argparse.ArgumentParser(description="Model değerlendirme ve backtest")
-    p.add_argument("--input", required=True, help="CSV giriş dosyası")
+    p.add_argument("--input", required=True, help="CSV giriş dosyası (ham talimat/referans formatında)")
+    p.add_argument("--metric-type", default="talimat", choices=["talimat", "islem"],
+                   help="Hangi metrik değerlendirilecek ('islem' için CSV'de EntryProcessCount kolonu gerekir)")
     p.add_argument("--backtest-days", type=int, default=60,
                    help="Son N günü test seti olarak ayır")
     p.add_argument("--teams", default="", help="Virgülle ayrılmış ekip adları")
@@ -49,7 +51,13 @@ def main():
     models_cfg = cfg.get("models", {})
     working_hours = tuple(data_cfg.get("working_hours", [7, 18]))
 
-    df, metric_type = load_transactions(args.input)
+    results = load_transactions(args.input)
+    df = results.get(args.metric_type)
+    if df is None:
+        console.print(f"[red]CSV'de '{args.metric_type}' metriği için veri yok "
+                       "(islem için EntryProcessCount kolonu gerekli).[/red]")
+        sys.exit(1)
+    metric_type = args.metric_type
 
     if not teams:
         teams = sorted(df["team"].unique().tolist())

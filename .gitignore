@@ -22,6 +22,9 @@ bank_forecast/models/saved/model_registry.json
 # Geçici upload dosyaları
 bank_forecast/data/raw/_uploads/
 
+# Sentetik eğitim CSV'leri (generate-training-csv skill çıktısı)
+bank_forecast/data/synthetic/
+
 # Frontend build & cache
 bank_forecast/frontend/node_modules/
 bank_forecast/frontend/dist/

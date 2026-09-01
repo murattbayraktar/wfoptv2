@@ -16,7 +16,9 @@ console = Console()
 
 def parse_args():
     p = argparse.ArgumentParser(description="Banka işlem tahmin modeli eğitimi")
-    p.add_argument("--input", required=True, help="CSV giriş dosyası (talimat_adet ya da islem_adet formatında)")
+    p.add_argument("--input", required=True, help="CSV giriş dosyası (ham talimat/referans formatında)")
+    p.add_argument("--metric-type", default="talimat", choices=["talimat", "islem"],
+                   help="Hangi metrik eğitilecek ('islem' için CSV'de EntryProcessCount kolonu gerekir)")
     p.add_argument("--freq", default="daily", choices=["daily", "hourly", "both"],
                    help="Tahmin frekansı")
     p.add_argument("--teams", default="", help="Virgülle ayrılmış ekip adları (boş = hepsi)")
@@ -51,6 +53,7 @@ def main():
 
     registry = train_pipeline(
         input_path=args.input,
+        metric_type=args.metric_type,
         freq=args.freq,
         teams=teams,
         types=types,

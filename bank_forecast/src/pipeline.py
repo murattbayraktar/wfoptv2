@@ -330,6 +330,7 @@ def _train_unit(args: tuple) -> dict:
 
 def train_pipeline(
     input_path: str,
+    metric_type: str,
     freq: str = "daily",
     teams: list[str] = None,
     types: list[str] = None,
@@ -350,7 +351,13 @@ def train_pipeline(
     working_hours = tuple(data_cfg.get("working_hours", [7, 18]))
 
     console.print("[bold green]Veri yükleniyor...[/bold green]")
-    df, metric_type = load_transactions(input_path)
+    results = load_transactions(input_path)
+    df = results.get(metric_type)
+    if df is None:
+        raise ValueError(
+            f"CSV'de '{metric_type}' metriği için veri yok "
+            "(islem için EntryProcessCount kolonu gerekli)."
+        )
     val_report = validate(df, min_days)
     print_validation_report(val_report)
 

@@ -4,24 +4,36 @@ import yaml
 import os
 from pathlib import Path
 
+from src.data.reference_transform import build_dispatcher_operator_views
+
 
 COLUMN_ALIASES = {
-    "date": ["tarih", "DATE", "TARIH", "dt"],
-    "hour": ["saat", "SAAT", "HOUR", "hr"],
-    "transaction_type": ["islem_tipi", "TIP", "type", "TYPE"],
-    "team": ["ekip_adi", "EKIP_ADI", "ekip", "team"],
-    "amount": ["tutar", "TUTAR", "AMOUNT"],
+    "reference": ["Reference", "REFERENCE", "reference_no"],
+    "task_type": ["TaskType", "TASK_TYPE", "task_type"],
+    "sub_task_type": ["SubTaskType", "SUB_TASK_TYPE", "sub_task_type"],
+    "order_date": ["OrderDate", "ORDER_DATE", "order_date"],
+    "dispatcher_team": ["DispatcherMainPortfolio", "DISPATCHER_MAIN_PORTFOLIO"],
+    "first_forward_date": ["FirstForwardOmDate", "FIRST_FORWARD_OM_DATE"],
+    "operator_team": ["OperatorMainPortfolio", "OPERATOR_MAIN_PORTFOLIO"],
 }
 
-# Metrik sütunları birer eş anlamlı değil — hangisi CSV'de mevcutsa satırın
-# `metric_type`'ını belirler (bkz. `load_transactions`). Bu yüzden diğer
-# `COLUMN_ALIASES` girdileri gibi tek bir kanonik ada collapse edilmezler.
-METRIC_COLUMN_ALIASES = {
-    "talimat": ["talimat_adet", "TALIMAT_ADET"],
-    "islem": ["islem_adet", "ISLEM_ADET"],
-}
+# EntryProcessCount opsiyoneldir — mevcutsa 'islem' metriği de bu CSV'den
+# üretilir (bkz. `load_transactions`); mevcut değilse yalnızca 'talimat'
+# metriği (referans/satır sayısı) üretilir.
+ENTRY_PROCESS_COUNT_ALIASES = ["EntryProcessCount", "ENTRY_PROCESS_COUNT", "entry_process_count"]
 
-DATE_FORMATS = ["%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%Y%m%d"]
+DATE_FORMATS = [
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d %H:%M",
+    "%d.%m.%Y %H:%M:%S",
+    "%d.%m.%Y %H:%M",
+    "%d/%m/%Y %H:%M:%S",
+    "%d/%m/%Y %H:%M",
+    "%Y-%m-%d",
+    "%d.%m.%Y",
+    "%d/%m/%Y",
+    "%Y%m%d",
+]
 
 
 def detect_encoding(filepath: str) -> str:
@@ -41,55 +53,40 @@ def standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
             if alias.lower() in lower_cols:
                 rename_map[lower_cols[alias.lower()]] = standard
                 break
+
+    for alias in ["entry_process_count"] + ENTRY_PROCESS_COUNT_ALIASES:
+        if alias.lower() in lower_cols and "entry_process_count" not in df.columns:
+            rename_map[lower_cols[alias.lower()]] = "entry_process_count"
+            break
+
     return df.rename(columns=rename_map)
-
-
-def detect_metric_column(df: pd.DataFrame) -> tuple[str, str]:
-    """CSV'de hangi metrik sütununun (talimat_adet | islem_adet) mevcut olduğunu bulur.
-
-    Döner: (metric_type, matched_column_name). İkisi birden ya da hiçbiri
-    yoksa `ValueError` fırlatır — iki format birbirini dışlar (bkz. planv1.txt).
-    """
-    lower_cols = {c.lower(): c for c in df.columns}
-    found: list[tuple[str, str]] = []
-    for metric_type, aliases in METRIC_COLUMN_ALIASES.items():
-        for alias in aliases:
-            if alias.lower() in lower_cols:
-                found.append((metric_type, lower_cols[alias.lower()]))
-                break
-
-    if not found:
-        raise ValueError(
-            "Metrik sütunu bulunamadı: 'talimat_adet' veya 'islem_adet' sütunlarından "
-            "biri zorunlu. Mevcut sütunlar: " + str(list(df.columns))
-        )
-    if len(found) > 1:
-        cols = ", ".join(c for _, c in found)
-        raise ValueError(
-            f"Birden fazla metrik sütunu bulundu ({cols}) — bir CSV yalnızca "
-            "'talimat_adet' ya da 'islem_adet' içerebilir, ikisini birden değil."
-        )
-    return found[0]
 
 
 def parse_date_column(series: pd.Series) -> pd.Series:
     for fmt in DATE_FORMATS:
         try:
             parsed = pd.to_datetime(series, format=fmt)
-            if parsed.notna().sum() > len(series) * 0.9:
+            non_null = series.notna().sum()
+            if non_null == 0 or parsed.notna().sum() > non_null * 0.9:
                 return parsed
         except Exception:
             pass
     return pd.to_datetime(series, infer_datetime_format=True)
 
 
-def load_transactions(filepath: str) -> tuple[pd.DataFrame, str]:
+def load_transactions(filepath: str) -> dict[str, pd.DataFrame]:
     """CSV'yi okur ve standart şemaya dönüştürür.
 
-    Döner: (df, metric_type). `metric_type` ("talimat" | "islem"), CSV'de hangi
-    metrik sütununun bulunduğuna göre belirlenir (bkz. `detect_metric_column`);
-    değeri `df["count"]` sütununa normalize edilir, böylece aggregator/pipeline
-    katmanları metrik tipinden bağımsız çalışmaya devam eder.
+    Girdi: her satırı bir talimatı (referansı) temsil eden ham veri
+    (Reference, TaskType, SubTaskType, OrderDate, DispatcherMainPortfolio,
+    FirstForwardOmDate, OperatorMainPortfolio, [EntryProcessCount]).
+
+    Döner: `{"talimat": df}` ya da (CSV'de `EntryProcessCount` kolonu varsa)
+    `{"talimat": df, "islem": df}`. Her df, aggregator'ın beklediği
+    `date, hour, team, transaction_type, count, amount` şemasındadır.
+
+    Karşılayıcı (dispatcher) ve işlemci (operator) ekip görünümleri ayrımı
+    için bkz. `src.data.reference_transform.build_dispatcher_operator_views`.
     """
     df = None
     for enc in ["utf-8", detect_encoding(filepath), "latin-1"]:
@@ -102,32 +99,55 @@ def load_transactions(filepath: str) -> tuple[pd.DataFrame, str]:
         raise ValueError("Dosya okunamadı: desteklenen bir karakter kodlaması bulunamadı.")
 
     df = standardize_columns(df)
-    metric_type, metric_col = detect_metric_column(df)
-    df = df.rename(columns={metric_col: "count"})
 
-    required = ["date", "team", "transaction_type", "count"]
+    required = [
+        "reference",
+        "task_type",
+        "sub_task_type",
+        "order_date",
+        "dispatcher_team",
+        "first_forward_date",
+        "operator_team",
+    ]
     missing = [c for c in required if c not in df.columns]
     if missing:
         raise ValueError(f"Zorunlu sütunlar eksik: {missing}. Mevcut sütunlar: {list(df.columns)}")
 
-    df["date"] = parse_date_column(df["date"])
+    df["order_date"] = parse_date_column(df["order_date"])
+    df["first_forward_date"] = parse_date_column(df["first_forward_date"])
 
-    if "hour" not in df.columns:
-        df["hour"] = None
-    else:
-        df["hour"] = pd.to_numeric(df["hour"], errors="coerce")
+    df["task_type"] = df["task_type"].astype(str).str.strip()
+    df["sub_task_type"] = df["sub_task_type"].astype(str).str.strip()
+    df["transaction_type"] = df["task_type"] + "-" + df["sub_task_type"]
 
-    df["count"] = pd.to_numeric(df["count"], errors="coerce").fillna(0).astype(int)
+    df["dispatcher_team"] = df["dispatcher_team"].astype(str).str.strip()
+    df["operator_team"] = df["operator_team"].astype(str).str.strip()
 
-    if "amount" not in df.columns:
-        df["amount"] = 0.0
-    else:
-        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0)
+    has_entry_process_count = "entry_process_count" in df.columns
+    if has_entry_process_count:
+        df["entry_process_count"] = pd.to_numeric(df["entry_process_count"], errors="coerce")
 
-    df["transaction_type"] = df["transaction_type"].astype(str).str.strip()
-    df["team"] = df["team"].astype(str).str.strip()
+    df = df.dropna(subset=["order_date", "transaction_type", "dispatcher_team"])
 
-    df = df.dropna(subset=["date", "transaction_type", "team"])
-    df = df.sort_values("date").reset_index(drop=True)
+    combined = build_dispatcher_operator_views(df)
+    combined["date"] = combined["event_time"].dt.normalize()
+    combined["hour"] = combined["event_time"].dt.hour
 
-    return df, metric_type
+    results: dict[str, pd.DataFrame] = {}
+
+    talimat_df = combined.copy()
+    talimat_df["count"] = 1
+    talimat_df["amount"] = 0.0
+    talimat_df = talimat_df[["date", "hour", "team", "transaction_type", "count", "amount"]]
+    talimat_df = talimat_df.sort_values("date").reset_index(drop=True)
+    results["talimat"] = talimat_df
+
+    if has_entry_process_count:
+        islem_df = combined.dropna(subset=["entry_process_count"]).copy()
+        islem_df["count"] = islem_df["entry_process_count"].astype(int)
+        islem_df["amount"] = 0.0
+        islem_df = islem_df[["date", "hour", "team", "transaction_type", "count", "amount"]]
+        islem_df = islem_df.sort_values("date").reset_index(drop=True)
+        results["islem"] = islem_df
+
+    return results

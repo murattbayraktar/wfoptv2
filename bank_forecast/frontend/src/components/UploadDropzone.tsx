@@ -22,8 +22,6 @@ export default function UploadDropzone({ metricType }: { metricType: MetricType 
     handleFiles(e.dataTransfer.files)
   }
 
-  const metricCol = metricType === 'talimat' ? 'talimat_adet' : 'islem_adet'
-
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-4 text-sm font-semibold text-slate-900">
@@ -70,7 +68,12 @@ export default function UploadDropzone({ metricType }: { metricType: MetricType 
           </svg>
         </div>
         <div className="mb-1 font-medium text-slate-900">CSV dosyasını sürükleyin veya seçin</div>
-        <div className="mb-4 text-xs text-slate-400">tarih, saat, işlem tipi, ekip_adi, {metricCol}</div>
+        <div className="mb-1 text-xs text-slate-400">
+          Reference, TaskType, SubTaskType, OrderDate, DispatcherMainPortfolio, FirstForwardOmDate, OperatorMainPortfolio
+        </div>
+        <div className="mb-4 text-xs text-slate-400">
+          Bu CSV hem Talimat hem İşlem verisini otomatik dolduracaktır (İşlem için EntryProcessCount kolonu gereklidir).
+        </div>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
