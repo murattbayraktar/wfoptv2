@@ -60,7 +60,7 @@ async def analyze(req: CalibrationAnalyzeRequest):
     if req.metric_type not in METRIC_TYPES:
         raise HTTPException(status_code=400, detail=f"Geçersiz metric_type: {req.metric_type}")
 
-    result = _run_forecast_for_metric(req.metric_type, _to_forecast_request(req, freq="both"))
+    result = await _run_forecast_for_metric(req.metric_type, _to_forecast_request(req, freq="both"))
     if result is None:
         raise HTTPException(status_code=404, detail="Analiz için yüklü veri veya kayıtlı model bulunamadı.")
 
@@ -76,7 +76,7 @@ async def suggest_multipliers(req: CalibrationAnalyzeRequest):
     if req.metric_type not in METRIC_TYPES:
         raise HTTPException(status_code=400, detail=f"Geçersiz metric_type: {req.metric_type}")
 
-    result = _run_forecast_for_metric(req.metric_type, _to_forecast_request(req, freq="daily"))
+    result = await _run_forecast_for_metric(req.metric_type, _to_forecast_request(req, freq="daily"))
     if result is None:
         raise HTTPException(status_code=404, detail="Öneri için yüklü veri veya kayıtlı model bulunamadı.")
 
@@ -112,8 +112,8 @@ async def preview(req: CalibrationPreviewRequest):
     _validate_config_body(req.proposed)
     forecast_req = _to_forecast_request(req, freq="daily")
 
-    current_result = _run_forecast_for_metric(req.metric_type, forecast_req, calibration_override=None)
-    proposed_result = _run_forecast_for_metric(
+    current_result = await _run_forecast_for_metric(req.metric_type, forecast_req, calibration_override=None)
+    proposed_result = await _run_forecast_for_metric(
         req.metric_type, forecast_req,
         calibration_override={"multipliers": req.proposed.multipliers, "half_days": req.proposed.half_days},
     )

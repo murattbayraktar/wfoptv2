@@ -52,6 +52,145 @@ def load_config(config_path: str = "config/settings.yaml") -> dict:
     return {}
 
 
+ENV_MAX_TRAIN_WORKERS = "MAX_TRAIN_WORKERS"
+
+
+def _detect_available_cpus() -> int:
+    """`os.sched_getaffinity` varsa (Linux) izin verilen çekirdek sayısını döner;
+    yoksa (macOS/Windows'ta bu fonksiyon `os` modülünde hiç tanımlı değildir)
+    `os.cpu_count()`'a düşer."""
+    try:
+        return len(os.sched_getaffinity(0))
+    except AttributeError:
+        return os.cpu_count() or 1
+
+
+def _detect_cgroup_cpu_quota() -> float | None:
+    """Container'a tanınan kesirli CPU kotasını (ör. 2.0) döner; sınır yoksa veya
+    cgroup dosyaları okunamıyorsa (macOS, düz Docker) `None`."""
+    try:
+        v2_path = "/sys/fs/cgroup/cpu.max"
+        if os.path.exists(v2_path):
+            with open(v2_path, "r", encoding="utf-8") as f:
+                quota_str, period_str = f.read().split()
+            if quota_str == "max":
+                return None
+            return int(quota_str) / int(period_str)
+
+        v1_quota_path = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+        v1_period_path = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+        if os.path.exists(v1_quota_path) and os.path.exists(v1_period_path):
+            with open(v1_quota_path, "r", encoding="utf-8") as f:
+                quota = int(f.read().strip())
+            if quota <= 0:
+                return None
+            with open(v1_period_path, "r", encoding="utf-8") as f:
+                period = int(f.read().strip())
+            return quota / period
+    except Exception:
+        return None
+    return None
+
+
+def _detect_cgroup_memory_limit_bytes() -> int | None:
+    """Container'a tanınan bellek limitini (byte) döner; sınır yoksa veya cgroup
+    dosyaları okunamıyorsa `None`."""
+    try:
+        v2_path = "/sys/fs/cgroup/memory.max"
+        if os.path.exists(v2_path):
+            with open(v2_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            if content == "max":
+                return None
+            return int(content)
+
+        v1_path = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+        if os.path.exists(v1_path):
+            with open(v1_path, "r", encoding="utf-8") as f:
+                value = int(f.read().strip())
+            # cgroup v1'in "sınırsız" sentinel değeri (platforma göre değişebilir,
+            # ~2^62 civarı çok büyük bir sayıdır) — gerçek bir limit değil.
+            if value >= (1 << 62):
+                return None
+            return value
+    except Exception:
+        return None
+    return None
+
+
+def resolve_max_workers(total_units: int, models_cfg: dict) -> dict:
+    """Eğitim `ProcessPoolExecutor` havuzunun boyutunu belirler.
+
+    Öncelik: `MAX_TRAIN_WORKERS` ortam değişkeni > `config/settings.yaml`'daki
+    `models.max_workers` > otomatik tespit (cgroup CPU kotası ve bellek limitinin
+    ikisi de dikkate alınır, en kısıtlayıcısı kazanır) > tekil fallback (1).
+    Otomatik tespit host'un değil **container'ın** gördüğü limitleri okumaya
+    çalışır (`os.cpu_count()` bunu yapmaz — cgroup kotasını değil host'un toplam
+    çekirdek sayısını döner); cgroup dosyaları yoksa (ör. macOS geliştirme
+    ortamı) sessizce `os.cpu_count()`'a düşülür, hata fırlatılmaz.
+
+    Döner: `{"workers": int, "source": str, "detail": dict}` — `source`, hangi
+    kademenin kullanıldığını taşır (log/UI'da görünür kılmak için).
+    """
+    if total_units <= 0:
+        return {"workers": 1, "source": "fallback:no_units", "detail": {}}
+
+    env_val = os.getenv(ENV_MAX_TRAIN_WORKERS)
+    if env_val:
+        try:
+            n = int(env_val)
+            if n > 0:
+                workers = max(1, min(total_units, n))
+                return {
+                    "workers": workers,
+                    "source": f"env:{ENV_MAX_TRAIN_WORKERS}={n}",
+                    "detail": {},
+                }
+        except ValueError:
+            console.print(
+                f"[yellow]{ENV_MAX_TRAIN_WORKERS}='{env_val}' geçersiz — yok sayılıp bir sonraki kademeye geçiliyor.[/yellow]"
+            )
+
+    cfg_val = models_cfg.get("max_workers")
+    if cfg_val:
+        try:
+            n = int(cfg_val)
+            if n > 0:
+                workers = max(1, min(total_units, n))
+                return {
+                    "workers": workers,
+                    "source": f"config:models.max_workers={n}",
+                    "detail": {},
+                }
+        except (TypeError, ValueError):
+            pass
+
+    est_mb = int(models_cfg.get("est_worker_memory_mb") or 400)
+    available_cpus = _detect_available_cpus()
+    cgroup_cpu = _detect_cgroup_cpu_quota()
+    cpu_cap = available_cpus if cgroup_cpu is None else max(1, min(available_cpus, int(cgroup_cpu)))
+
+    mem_limit = _detect_cgroup_memory_limit_bytes()
+    mem_cap = None if mem_limit is None else max(1, mem_limit // (est_mb * 1024 * 1024))
+
+    auto_workers = cpu_cap if mem_cap is None else min(cpu_cap, mem_cap)
+    workers = max(1, min(total_units, auto_workers))
+    source = "auto:cgroup" if (cgroup_cpu is not None or mem_limit is not None) else "auto:cpu_count"
+
+    return {
+        "workers": workers,
+        "source": source,
+        "detail": {
+            "available_cpus": available_cpus,
+            "cgroup_cpu_quota": cgroup_cpu,
+            "cgroup_memory_limit_mb": None if mem_limit is None else round(mem_limit / (1024 * 1024)),
+            "est_worker_memory_mb": est_mb,
+            "cpu_cap": cpu_cap,
+            "mem_cap": mem_cap,
+        },
+    }
+
+
 def _save_registry(registry: dict, path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -455,6 +594,12 @@ def train_pipeline(
         ]
         total_units = len(unit_args)
 
+        worker_info = resolve_max_workers(total_units, models_cfg)
+        max_workers = worker_info["workers"]
+        console.print(
+            f"[cyan]Eğitim havuzu: {max_workers} paralel işçi (kaynak: {worker_info['source']})[/cyan]"
+        )
+
         if progress_callback:
             progress_callback({
                 "kind": "plan",
@@ -462,11 +607,12 @@ def train_pipeline(
                 "teams": teams,
                 "types": types,
                 "freqs": freqs,
+                "max_workers": max_workers,
+                "worker_source": worker_info["source"],
             })
 
         os.makedirs(output_dir, exist_ok=True)
         mp_ctx = multiprocessing.get_context("spawn")
-        max_workers = min(total_units, os.cpu_count() or 1) if total_units else 1
 
         unit_index = 0
         with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers, mp_context=mp_ctx) as pool:
