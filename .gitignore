@@ -16,6 +16,8 @@ env/
 .env
 
 # Trained model files (büyük binary dosyalar — gerekirse Git LFS kullanın)
+# Not: model_registry_islem.json / model_registry_talimat.json ignore EDİLMEZ,
+# forecast.py ve evaluate.py bunları varsayılan olarak okur.
 bank_forecast/models/saved/**/*.pkl
 bank_forecast/models/saved/model_registry.json
 
